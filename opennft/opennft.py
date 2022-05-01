@@ -41,6 +41,7 @@ import re
 import fnmatch
 import threading
 import multiprocessing
+import os
 
 from pathlib import Path
 from loguru import logger
@@ -229,6 +230,10 @@ class OpenNFT(QWidget):
         self.mainLoopData = {}
         self.shamData = None
         self.rtQA_matlab = {}
+
+        # double blind dir initialization
+        self.doubleBlindDir = None
+
         self.reultFromHelper = None
 
         self.imageViewMode = ImageViewMode.mosaic
@@ -970,6 +975,10 @@ class OpenNFT(QWidget):
             if config.USE_SHAM:
                 self.displayData['dispValue'] = self.shamData[self.iteration - self.P['nrSkipVol'] - 1]
 
+            # if we are in double blind mode and the sham data are available (Yok subj)
+            if config.USE_BBLIND and self.shamData:
+                self.displayData['dispValue'] = self.shamData[self.iteration - self.P['nrSkipVol'] - 1]
+
             if config.USE_UDP_FEEDBACK:
                 logger.info('Sending by UDP - dispValue = {}', self.displayData['dispValue'])
                 self.udpSender.send_data(self.displayData['dispValue'])
@@ -1425,22 +1434,66 @@ class OpenNFT(QWidget):
                     path = Path(self.P['nfbDataFolder'])
                     eventRecordsPath = path / ('TimeVectors_display_' + str(self.P['NFRunNr']).zfill(2) + '.txt')
 
-                    ptbP = {}
-                    ptbP['eventRecordsPath'] = str(eventRecordsPath)
-                    ptbP['TargDIAM'] = self.P['TargDIAM']
-                    ptbP['TargRAD'] = self.P['TargRAD']
-                    ptbP['TargANG'] = self.P['TargANG']
-                    ptbP['NFRunNr'] = self.P['NFRunNr']
-                    ptbP['Type'] = self.P['Type']
-                    ptbP['WorkFolder'] = self.P['WorkFolder']
-                    ptbP['DisplayFeedbackFullscreen'] = self.P['DisplayFeedbackFullscreen']
-                    ptbP['Prot'] = self.P['Prot']
-                    ptbP['FeedbackValDec'] = self.P['FeedbackValDec']
-                    if self.P['Prot'] == 'ContTask':
-                        ptbP['TaskFolder'] = self.P['TaskFolder']
+                    # ptbP = {}
+                    # ptbP['eventRecordsPath'] = str(eventRecordsPath)
+                    # ptbP['TargDIAM'] = self.P['TargDIAM']
+                    # ptbP['TargRAD'] = self.P['TargRAD']
+                    # ptbP['TargANG'] = self.P['TargANG']
+                    # ptbP['NFRunNr'] = self.P['NFRunNr']
+                    # ptbP['Type'] = self.P['Type']
+                    # ptbP['WorkFolder'] = self.P['WorkFolder']
+                    # ptbP['DisplayFeedbackFullscreen'] = self.P['DisplayFeedbackFullscreen']
+                    # ptbP['Prot'] = self.P['Prot']
+                    # ptbP['FeedbackValDec'] = self.P['FeedbackValDec']
+                    # if self.P['Prot'] == 'ContTask':
+                    #     ptbP['TaskFolder'] = self.P['TaskFolder']
 
                     self.ptbScreen.initialize(
-                        sid, self.P['WorkFolder'], self.P['Prot'], ptbP)
+                        sid, self.P['WorkFolder'], self.P['Prot'], self.P)
+
+                    # return updated params to the GUI, this is necessary when in double blind routine (implemented in the ptb engine)
+                    self.P = self.ptbScreen.return_params()
+
+                    # get the V1 right/left condition after double blind routine and give it to the main engine (which will use it in nfbcalc)
+                    self.eng.assignin('base', 'P', self.ptbScreen.eng.evalin('base', 'P'), nargout=0)
+
+                    # inform the experimenter about the V1 chosen from the double blind routine
+                    logger.info('V1 Right: {}, V1 Left: {}'.format(bool(self.P['V1_right']), bool(self.P['V1_left'])))
+
+
+            if config.USE_BBLIND and self.P['yokID'] != 'Null':
+                logger.info('Sham subject taken') # for debug purposes
+
+
+                sessNr = self.P['SessionNr']
+                runNr = self.P['NFRunNr']
+                shamSub = self.P['yokID']
+
+                # for debug purposes
+                sessNr = '01'
+                runNr = '1'
+                shamSub = '01'
+
+                pathRoot = self.P['ProjectFolder'] + os.path.sep
+                pathMainLoop =  str(shamSub) + os.path.sep + 'Session_' + str(sessNr) + os.path.sep + 'NF_DATA_' + str(runNr) + os.path.sep + str(shamSub) + '_' + str(runNr) + '_mainLoopData.mat'
+
+                NFBdata = loadmat(os.path.join(pathRoot,pathMainLoop))['dispValues']
+                NFBdataRaw = loadmat(os.path.join(pathRoot, pathMainLoop))['rawDispValues']
+                dispValues = list(NFBdata.flatten())
+                rawDispValues = list(NFBdataRaw.flatten())
+
+
+                self.shamData = [float(v) for v in dispValues]
+                self.shamDataRaw = [float(v) for v in rawDispValues]
+
+                # loading the sham data
+                self.P['shamData'] = self.shamData
+                self.P['shamDataRaw'] = self.shamDataRaw
+                logger.info("Sham data has been loaded") # for debugging purposes only
+
+                # give back sham data params to PTBscreen (is this necessary?)
+                self.ptbScreen.insert_params(self.P)
+
 
             if config.USE_MRPULSE:
                 (self.pulseProc, self.mrPulses) = mrpulse.start(self.P['NrOfVolumes'], self.displayEvent)
@@ -2226,6 +2279,7 @@ class OpenNFT(QWidget):
             # --- top ---
             self.leProtocolFile.setText(self.settings.value('StimulationProtocol', ''))
             self.leWorkFolder.setText(self.settings.value('WorkFolder', ''))
+            self.leProjectFolder.setText(self.settings.value('ProjectFolder',''))
             self.leWatchFolder.setText(self.settings.value('WatchFolder', ''))
             if (self.settings.value('Type', '')) == 'DCM':
                 self.leRoiAnatFolder.setText(self.settings.value('RoiAnatFolder', ''))
@@ -2237,6 +2291,7 @@ class OpenNFT(QWidget):
             self.leMCTempl.setText(self.settings.value('MCTempl', ''))
             if (self.settings.value('Prot', '')) == 'ContTask':
                 self.leTaskFolder.setText(self.settings.value('TaskFolder', ''))
+                self.leStimFolder.setText(self.settings.value('StimFolder', ''))
 
             # --- middle ---
             self.leProjName.setText(self.settings.value('ProjectName', ''))
@@ -2269,7 +2324,8 @@ class OpenNFT(QWidget):
             self.cbFeedbackPlot.setChecked(str(self.settings.value('PlotFeedback', 'true')).lower() == 'true')
 
             self.leShamFile.setText(self.settings.value('ShamFile', ''))
-
+            self.leDoubleBlindDir.setText(self.settings.values('DoubleBlindDir',''))
+            
             self.cbUsePTB.setChecked(str(self.settings.value('UsePTB', 'false')).lower() == 'true')
             if not config.USE_PTB_HELPER:
                 self.cbUsePTB.setChecked(False)
@@ -2444,6 +2500,7 @@ class OpenNFT(QWidget):
         # --- top ---
         self.P['ProtocolFile'] = self.leProtocolFile.text()
         self.P['WorkFolder'] = self.leWorkFolder.text()
+        self.P['ProjectFolder'] = self.leProjectFolder.text()
         self.P['WatchFolder'] = self.leWatchFolder.text()
 
         self.P['Type'] = self.cbType.currentText()
@@ -2459,6 +2516,7 @@ class OpenNFT(QWidget):
         # --- middle ---
         self.P['ProjectName'] = self.leProjName.text()
         self.P['SubjectID'] = self.leSubjectID.text()
+        self.P['SessionNr'] = self.leSessionNr.text()
         self.P['FirstFileNameTxt'] = self.leFirstFile.text()
         self.P['ImgSerNr'] = self.sbImgSerNr.value()
         self.P['NFRunNr'] = self.sbNFRunNr.value()
@@ -2492,14 +2550,23 @@ class OpenNFT(QWidget):
 
         if self.P['Prot'] == 'ContTask':
             self.P['TaskFolder'] = self.leTaskFolder.text()
+            self.P['StimFolder'] = self.leStimFolder.text()
+            self.P['V1_right'] = self.cbRIGHT.isChecked()
+            self.P['V1_left'] = self.cbLEFT.isChecked()
+            self.P['TRANSF'] = self.cbTRANSF.isChecked()
+            self.P['leftRot'] = self.cbleftRot.isChecked()
+            self.P['rightRot'] = self.cbrightRot.isChecked()
 
         self.P['MaxFeedbackVal'] = float(self.leMaxFeedbackVal.text())
         self.P['MinFeedbackVal'] = float(self.leMinFeedbackVal.text())
         self.P['FeedbackValDec'] = self.sbFeedbackValDec.value()
         self.P['NegFeedback'] = self.cbNegFeedback.isChecked()
         self.P['PlotFeedback'] = self.cbFeedbackPlot.isChecked()
+        self.P['DoubleBlindCheck'] = self.cbDoubleBlind.isChecked()
 
         self.P['ShamFile'] = self.leShamFile.text()
+        self.P['DoubleBlindDir'] = self.leDoubleBlindDir.text()
+        self.P['SubGender'] = str(self.cbSubGender.currentText())
 
         # --- main viewer ---
         self.P['TargANG'] = self.sbTargANG.value()
@@ -2619,6 +2686,15 @@ class OpenNFT(QWidget):
             config.TCP_DATA_PORT = int(self.leTCPDataPort.text())
 
         config.USE_SHAM = bool(len(self.P['ShamFile']))
+
+        config.USE_SHAM = bool(len(self.P['ShamFile']))
+        config.USE_BBLIND = bool(len(self.P['DoubleBlindDir'])) and self.P['DoubleBlindCheck']
+        if bool(len(self.P['DoubleBlindDir'])) == 0:
+            logger.warning('Please specify a double blind directory to write in')
+        if config.USE_BBLIND:
+            logger.warning("Double Blind mode ON")
+
+
 
         config.USE_PTB = self.cbUsePTB.isChecked()
 
@@ -2745,14 +2821,23 @@ class OpenNFT(QWidget):
         dataRaw = np.array(self.outputSamples[key], ndmin=2)[self.selectedRoi, :]
         dataProc = np.array(self.outputSamples['kalmanProcTimeSeries'], ndmin=2)[self.selectedRoi, :]
         dataNorm = np.array(self.outputSamples['scalProcTimeSeries'], ndmin=2)[self.selectedRoi, :]
+        
         if self.P['PlotFeedback']:
             dataNorm = np.concatenate(
                 (dataNorm, np.array([self.displaySamples]) / self.P['MaxFeedbackVal'])
             )
 
-        self.drawGivenRoiPlot(init, self.rawRoiPlot, dataRaw)
-        self.drawGivenRoiPlot(init, self.procRoiPlot, dataProc)
-        self.drawGivenRoiPlot(init, self.normRoiPlot, dataNorm)
+        if config.USE_BBLIND: # get the black line data
+            dataBlackLine = np.array(np.zeros(self.iteration - self.P['nrSkipVol'] + 1), ndmin=2)
+
+        if not config.USE_BBLIND:
+            self.drawGivenRoiPlot(init, self.rawRoiPlot, dataRaw)
+            self.drawGivenRoiPlot(init, self.procRoiPlot, dataProc)
+            self.drawGivenRoiPlot(init, self.normRoiPlot, dataNorm)
+
+        else: # just draw the dataNorm plot with a line showing the volumes we are processing atm
+            self.drawGivenRoiPlot(init, self.normRoiPlot, dataBlackLine)
+            self.normRoiPlot.setYRange(-1, 1, padding=0.0)
 
     # --------------------------------------------------------------------------
     def drawGivenRoiPlot(self, init, plotwidget: pg.PlotWidget, data):
