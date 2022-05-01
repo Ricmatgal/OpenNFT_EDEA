@@ -101,3 +101,13 @@ class PtbScreen(object):
 
         self.endEvent.set()
         self.displayLock.release()
+
+    def return_params(self):
+        '''Added so that we can transmit the double blind parameters from the
+        PTB helper workspace to the NFB calculation'''
+        # return self.eng.workspace['V1_right'], self.eng.workspace['V1_left'], self.eng.workspace['yokID'],self.eng.workspace['P']
+        return self.eng.workspace['P']
+
+    def insert_params(self,P):
+        ''' Added so that I can give the display value from the yok subj to the P struct again and use it in displayFeedback.m'''
+        self.eng.workspace['P'] = P
