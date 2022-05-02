@@ -35,6 +35,8 @@ if ~P.isAutoRTQA
     end
 
     P.vectEncCond = ones(1,NrOfVolumes-nrSkipVol);
+    P.TaskFirstVol = zeros(1,NrOfVolumes+nrSkipVol);
+    P.TaskFirstVol(1,(prt.ConditionIndex{1}.OnOffsets(:,1)+double(P.nrSkipVol))')=1;
 
     % check if baseline field already exists in protocol
     % and protocol reading presets

@@ -518,4 +518,4 @@ if strcmp(protName, 'InterBlock')
 end
 
 assignin('base', 'P', P);
-assignin('base', 'Tex', Tex);
+%assignin('base', 'Tex', Tex);

@@ -15,7 +15,7 @@ function displayFeedback(displayData)
 tDispl = tic;
 
 P = evalin('base', 'P');
-Tex = evalin('base', 'Tex');
+%Tex = evalin('base', 'Tex');
 
 % Note, don't split cell structure in 2 lines with '...'.
 fieldNames = {'feedbackType', 'condition', 'dispValue', 'Reward', 'displayStage','displayBlankScreen', 'iteration'};

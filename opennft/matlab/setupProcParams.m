@@ -117,6 +117,8 @@ mainLoopData.posMin = [];
 mainLoopData.posMax = [];
 mainLoopData.mposMax = [];
 mainLoopData.mposMin = [];
+mainLoopData.rawDispValues = [];
+mainLoopData.currNFblock = [];
 
 mainLoopData.blockNF = 0;
 mainLoopData.firstNF = 0;
