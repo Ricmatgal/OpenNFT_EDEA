@@ -1218,6 +1218,33 @@
                   </property>
                  </spacer>
                 </item>
+                <item row="2" column="0">
+                    <widget class="QLabel" name="label">
+                         <property name="text">
+                              <string>Project Folder</string>
+                         </property>
+                    </widget>
+               </item>
+               <item row="2" column="2">
+                    <widget class="QLineEdit" name="leProjectFolder">
+                         <property name="readOnly">
+                              <bool>false</bool>
+                         </property>
+                    </widget>
+               </item>
+               <item row="2" column="3">
+                    <widget class="QPushButton" name="btnChooseProjectFolder">
+                         <property name="maximumSize">
+                              <size>
+                                   <width>32</width>
+                                   <height>16777215</height>
+                              </size>
+                         </property>
+                         <property name="text">
+                              <string>...</string>
+                         </property>
+                    </widget>
+               </item>
                 <item row="3" column="0">
                  <widget class="QLabel" name="label">
                   <property name="text">
@@ -1493,6 +1520,29 @@
                   </property>
                  </widget>
                 </item>
+                <item row="15" column="0">
+                    <widget class="QLabel" name="label_10">
+                         <property name="text">
+                         <string>Stim Folder</string>
+                         </property>
+                    </widget>
+               </item>
+               <item row="15" column="2">
+                    <widget class="QLineEdit" name="leStimFolder"/>
+               </item>
+               <item row="15" column="3">
+                    <widget class="QPushButton" name="btnChooseStimFolder">
+                         <property name="maximumSize">
+                         <size>
+                              <width>32</width>
+                              <height>16777215</height>
+                         </size>
+                         </property>
+                         <property name="text">
+                         <string>...</string>
+                         </property>
+                    </widget>
+               </item>
                </layout>
               </item>
               <item>
@@ -1638,6 +1688,16 @@
                   </property>
                  </widget>
                 </item>
+                <item row="1" column="3">
+                    <widget class="QLabel" name="label_13">
+                         <property name="text">
+                              <string>Session No</string>
+                         </property>
+                    </widget>
+               </item>
+               <item row="1" column="4">
+                    <widget class="QLineEdit" name="leSessionNr"/>
+               </item>
                 <item row="8" column="1">
                  <widget class="QSpinBox" name="sbTR">
                   <property name="maximum">
@@ -2097,6 +2157,76 @@
                     </property>
                    </widget>
                   </item>
+                <item>
+                    <widget class="QCheckBox" name="cbRIGHT">
+                    <property name="text">
+                         <string>Right&gt;Left</string>
+                    </property>
+                    <property name="checked">
+                         <bool>false</bool>
+                    </property>
+                    </widget>
+                </item>
+                <item>
+                    <widget class="QCheckBox" name="cbLEFT">
+                         <property name="text">
+                              <string>Left&gt;Right</string>
+                         </property>
+                         <property name="checked">
+                              <bool>false</bool>
+                         </property>
+                    </widget>
+                </item>
+                <item>
+                    <widget class="QCheckBox" name="cbTRANSF">
+                          <property name="text">
+                               <string>TRANSFER RUN</string>
+                          </property>
+                          <property name="checked">
+                               <bool>false</bool>
+                          </property>
+               </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_37_1">
+                     <property name="text">
+                          <string>Rotation:</string>
+                     </property>
+                     <property name="alignment">
+                          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     </property>
+                    </widget>
+                </item>
+                <item>
+                    <widget class="QCheckBox" name="cbleftRot">
+                          <property name="text">
+                               <string>&#10226;</string>
+                          </property>
+                          <property name="checked">
+                               <bool>false</bool>
+                          </property>
+                            <property name="font">
+                            <font>
+                            <pointsize>14</pointsize>
+                            </font>
+                            </property>
+                    </widget>
+                </item>
+                <item>
+                    <widget class="QCheckBox" name="cbrightRot">
+                          <property name="text">
+                               <string>&#10227;</string>
+                          </property>
+                          <property name="checked">
+                               <bool>false</bool>
+                          </property>   
+                            <property name="font">
+                            <font>
+                        <pointsize>14</pointsize>
+                        </font>
+                        </property>
+                        </widget>
+                </item>
                   <item>
                    <spacer name="horizontalSpacer">
                     <property name="orientation">
@@ -2204,7 +2334,94 @@
                   </item>
                  </layout>
                 </item>
-                <item row="2" column="0">
+            <!-- Riccardo implementation, double blind files directoy,
+            + Manual inputing gender + double blind check START -->
+            <item row="2" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_DoubleBlindDir">
+                            <property name="spacing">
+                                <number>6</number>
+                            </property>
+                            <property name="leftMargin">
+                                <number>0</number>
+                            </property>
+                            <item>
+                                <widget class="QLabel" name="label_DoubleBlindDir">
+                                    <property name="text">
+                                            <string>Double blind directory</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QLineEdit" name="leDoubleBlindDir">
+                            <property name="readOnly">
+                                <bool>false</bool>
+                            </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QPushButton" name="btnChooseDoubleBlindDir">
+                                    <property name="maximumSize">
+                                            <size>
+                                                <width>32</width>
+                                                <height>16777215</height>
+                                            </size>
+                                    </property>
+                                    <property name="text">
+                                            <string>...</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <spacer name="horizontalSpacer">
+                                    <property name="orientation">
+                                            <enum>Qt::Horizontal</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                            <size>
+                                                <width>40</width>
+                                                <height>20</height>
+                                            </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                        </layout>
+                </item>
+                <item row = "2" column = "1">
+                                <widget class="QCheckBox" name="cbBBLIND">
+                                    <property name="text">
+                                            <string>Double Blind</string>
+                                    </property>
+                                    <property name="checked">
+                                            <bool>false</bool>
+                                    </property>
+                                </widget>
+                            </item>
+                <item row="2" column="2">
+                        <widget class="QLabel" name="label_37_2">
+                            <property name="text">
+                                <string>Subject Gender</string>
+                            </property>
+                            <property name="alignment">
+                                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                            </property>
+                        </widget>
+                </item>
+                <item row="2" column="3">
+                <widget class="QComboBox" name="cbSubGender">
+                            <item>
+                                <property name="text">
+                                    <string>Male</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Female</string>
+                                </property>
+                            </item>
+                        </widget>
+                </item>
+                <!-- Riccardo implementation, double blind files directoy, END -->
+                <item row="3" column="0">
                  <layout class="QHBoxLayout" name="horizontalLayout_PTB">
                   <property name="spacing">
                    <number>6</number>
@@ -2315,7 +2532,7 @@
                   </item>
                  </layout>
                 </item>
-                <item row="3" column="0">
+                <item row="4" column="0">
                  <layout class="QHBoxLayout" name="horizontalLayout_UDP">
                   <property name="spacing">
                    <number>6</number>
