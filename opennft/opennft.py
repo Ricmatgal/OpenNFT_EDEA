@@ -2324,7 +2324,7 @@ class OpenNFT(QWidget):
             self.cbFeedbackPlot.setChecked(str(self.settings.value('PlotFeedback', 'true')).lower() == 'true')
 
             self.leShamFile.setText(self.settings.value('ShamFile', ''))
-            self.leDoubleBlindDir.setText(self.settings.values('DoubleBlindDir',''))
+            self.leDoubleBlindDir.setText(self.settings.value('DoubleBlindDir',''))
             
             self.cbUsePTB.setChecked(str(self.settings.value('UsePTB', 'false')).lower() == 'true')
             if not config.USE_PTB_HELPER:
