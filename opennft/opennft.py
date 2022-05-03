@@ -249,7 +249,7 @@ class OpenNFT(QWidget):
 
         self.initializeUi()
         self.readAppSettings()
-        self.initialize(start=False)
+        self.initialize(start=True)
 
         self.calc_rtqa = None
         self.windowRTQA = None
@@ -956,7 +956,7 @@ class OpenNFT(QWidget):
                             # will use the taskse flag to call the ptbTask function.
                             # cond = self.eng.evalin('base', 'mainLoopData.displayData.condition')
                             cond = self.displayData['condition']
-                            if cond == 3 and int(self.P['TaskFirstVol'][0][self.iteration - 1]) == 1:
+                            if cond == 1 and int(self.P['TaskFirstVol'][0][self.iteration - 1]) == 1:
                                 self.displayData['taskseq'] = 1
                                 self.displayScreen()
                                 QApplication.processEvents()
@@ -1640,6 +1640,7 @@ class OpenNFT(QWidget):
         x = self.P['MatrixSizeX']
         y = self.P['MatrixSizeY']
         z = self.P['NrOfSlices']
+        print(z)
         ROI_vols = np.zeros((nrROIs, x, y, z))
         ROI_mats = np.zeros((nrROIs, 4, 4))
         if self.P['Type'] == 'DCM':

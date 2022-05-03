@@ -17,7 +17,7 @@ import glob
 
 delete_files = True
 
-#mask = "001_000005_00O"
+#mask = "001_000005_000"
 #fns = list(range(1,211))
 #fns = list(range(1,93))
 fns = None
@@ -25,7 +25,7 @@ testCase = 'PSC'
 if testCase == 'PSC':
     #srcpath = 'F:/MRI_DATA/20201119.LUCACHU_S20_SESS1.99622'
     #dstpath = 'F:/rtTestFolder'
-    #srcpath = 'C:/Users/gallir/Documents/OPENNFT/ProjectCecilia/dummy_data/20201119.LUCACHU_S20_SESS1.99622'
+    #srcpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectCecilia/dummy_data/20201119.LUCACHU_S20_SESS1.99622'
     #srcpath = 'C:/Users/gallir/Documents/OPENNFT/ProjectCecilia/dummy_data/testpath'
     srcpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectCecilia/dummy_data/20220430.MRI_DEV_Test_NFB.110734'
     dstpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectCecilia/dummy_data/rtTestFolder'
