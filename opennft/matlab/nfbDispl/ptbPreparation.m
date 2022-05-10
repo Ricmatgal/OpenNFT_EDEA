@@ -171,12 +171,13 @@ if strcmp(protName, 'ContTask')
     
     %% Cecilia Task Parameters
     P.nrEq      = length(P.ProtCond{2})*2; % number of blocks which requires the equations to be generated for
+    P.nrDigits = 2 % how many digits per equation?
     % (all baseline blocks - 2 per baseline block)
     P.nrFigs    = 2; % number of textures on screen
     P.dim       = 100; % Texture dimensions
     P.yPos      = P.Screen.yCenter;
     P.xPos      = linspace(w * 0.15, w * 0.85, P.nrFigs);
-    P.strings_operation = repelem(ptbCreateOperations(P.nrEq),length(P.ProtCond{2}{1}));
+    P.strings_operation = repelem(ptbCreateOperations(P.nrEq, P.nrDigits),length(P.ProtCond{2}{1}));
     list_angles = 360/length(P.ProtCond{2}):360/length(P.ProtCond{2}):360;
     P.rotation_angle_BAS = repelem(list_angles(randperm(length(list_angles))),length(P.ProtCond{2}{1})*2);
     P.K_rot = 0;

@@ -1,21 +1,25 @@
 % Helper function for displayFeedback() to create mental operation for the baseline part of the NF run
 
-function [strings_operation] = ptbCreateOperations(neqs)
+function [strings_operation] = ptbCreateOperations(neqs,ndigits)
 
 a = 0; b = 10; % range from -100 to 100;
 
-% how many numbers per equation?
+% how many numbers per equation? create the numbers and concatenate in list
 
-n1 = randi([a,b],1,neqs);
-n2 = randi([a,b],1,neqs);
-n3 = randi([a,b],1,neqs);
-% n4 = randi([a,b],1,neqs);
+if ndigits == 2
+    n1 = randi([a,b],1,neqs);
+    n2 = randi([a,b],1,neqs);
+    numbs= [n1; n2];
 
-% concatenate the numbers
-numbs= [n1; n2; n3];
+elseif ndigits == 3
+    n1 = randi([a,b],1,neqs);
+    n2 = randi([a,b],1,neqs);
+    n3 = randi([a,b],1,neqs);
+    numbs= [n1; n2; n3];
+end
 
 % make indexes for numbers randomization
-idx_numbs= randi([1,neqs],3,neqs);
+idx_numbs= randi([1,neqs],ndigits,neqs);
 
 % how many possible different operators per equation?
 operators = ['-', '+'];
@@ -29,9 +33,17 @@ strings_operation = cell(0);
 % main routine
 
     for run = 1:neqs
+        
 
-        strings_operation{run} = [' ', num2str(numbs(1,idx_numbs(1,(run)))), ' ', operators(idx_oper(1,(run))), ...
-            ' ', num2str(numbs(2,idx_numbs(2,(run)))), ' ', operators(idx_oper(2,(run))), ...
-            ' ', num2str(numbs(3,idx_numbs(3,(run))))];
+        if ndigits == 2
+            strings_operation{run} = [' ', num2str(numbs(1,idx_numbs(1,(run)))), ' ', operators(idx_oper(1,(run))), ...
+            ' ', num2str(numbs(2,idx_numbs(2,(run))))];
+
+        elseif ndigits == 3
+            strings_operation{run} = [' ', num2str(numbs(1,idx_numbs(1,(run)))), ' ', operators(idx_oper(1,(run))), ...
+                ' ', num2str(numbs(2,idx_numbs(2,(run)))), ' ', operators(idx_oper(2,(run))), ...
+                ' ', num2str(numbs(3,idx_numbs(3,(run))))];
+        end
     end
+
 end
