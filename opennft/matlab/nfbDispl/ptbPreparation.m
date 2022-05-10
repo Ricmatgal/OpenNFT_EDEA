@@ -69,8 +69,12 @@ P.Screen.h = h;
 P.Screen.w = w;
 P.Screen.lw = 10;
 
-% font to use
+% Text presentation specs
 P.Font = 'Geneva';
+P.textSizeVAS = 30;
+P.textSizeBAS = 60;
+P.textSizeNF = 10; % width of the fixation cross while regulating
+P.textSizeSUM = 100;
 
 % Text "HELLO" - also to check that PTB-3 function 'DrawText' is working
 Screen('TextSize', P.Screen.wPtr , P.Screen.h/10);
@@ -170,16 +174,18 @@ if strcmp(protName, 'ContTask')
 
     
     %% Cecilia Task Parameters
-    P.nrEq      = length(P.ProtCond{2})*2; % number of blocks which requires the equations to be generated for
+    P.nrEqBlock = 3;
+    P.nrAnglesBlock = 2;
+    P.nrEq      = length(P.ProtCond{2})*P.nrEqBlock; % number of blocks which requires the equations to be generated for
     P.nrDigits = 2 % how many digits per equation?
     % (all baseline blocks - 2 per baseline block)
     P.nrFigs    = 2; % number of textures on screen
     P.dim       = 100; % Texture dimensions
     P.yPos      = P.Screen.yCenter;
     P.xPos      = linspace(w * 0.15, w * 0.85, P.nrFigs);
-    P.strings_operation = repelem(ptbCreateOperations(P.nrEq, P.nrDigits),length(P.ProtCond{2}{1}));
+    P.strings_operation = repelem(ptbCreateOperations(P.nrEq, P.nrDigits),length(P.ProtCond{2}{1})*2/P.nrEqBlock); % times 2 because function visited twice
     list_angles = 360/length(P.ProtCond{2}):360/length(P.ProtCond{2}):360;
-    P.rotation_angle_BAS = repelem(list_angles(randperm(length(list_angles))),length(P.ProtCond{2}{1})*2);
+    P.rotation_angle_BAS = repelem(list_angles(randperm(length(list_angles))),length(P.ProtCond{2}{1})*2/P.nrAnglesBlock); % times 2 because function visited twice
     P.K_rot = 0;
     P.k_eq = 0;
     P.rotAng = 0;

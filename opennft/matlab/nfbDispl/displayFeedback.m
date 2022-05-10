@@ -139,7 +139,7 @@ switch feedbackType
                 P.K_rot = P.K_rot + 1; % update the wheel orientation index
 
                 
-                Screen('TextSize',P.Screen.wPtr,80);
+                Screen('TextSize',P.Screen.wPtr,P.textSizeBAS);
 
                 Screen('DrawTextures', P.Screen.wPtr, P.wheelTex, [],...
                     P.dstRects(:, 1:2), P.rotation_angle_BAS(P.K_rot),[],[]); % need to adjust the rotation angle update
@@ -260,25 +260,29 @@ switch feedbackType
                         % the fixation cross color to white.
 
                         if P.TRANSF == 0
+                            
+                            % intialize the wheels according to the specific angle
                             fvol = cellfun(@(x) x(1) == (iteration-P.nrSkipVol), P.ProtCond{3});
                             if any(fvol)
                                 P.rotAng = P.rotation_angle_BAS(P.K_rot);
                                 P.rotSpe = 0;
                                 fixCol = [255, 255, 255];
                             end
+
                             Screen('DrawTextures', P.Screen.wPtr, P.wheelTex, [],...
                                 P.dstRects(:, 1:2), P.rotAng, [], []);
                             % fixation cross while regulation
-                            % Screen('DrawLines', P.Screen.wPtr, P.Screen.allCoords,...
-                            %     4, fixCol, [P.Screen.xCenter P.Screen.yCenter], 2);
-                            % cue while regulation
-                            Screen('TextSize',P.Screen.wPtr,120);
+                            Screen('DrawLines', P.Screen.wPtr, P.Screen.allCoords,...
+                            P.textSizeNF, fixCol, [P.Screen.xCenter P.Screen.yCenter], 2); % last arguments is the smoothing
 
-                            if P.V1_left == 1 % need to point to the right hemifield, therefore increasing left V1
-                                DrawFormattedText(P.Screen.wPtr,'> + >','center','center',fixCol);
-                            else % viceversa
-                                DrawFormattedText(P.Screen.wPtr,'< + <','center','center',fixCol);
-                            end
+                            % cue while regulation
+                            % Screen('TextSize',P.Screen.wPtr,120);
+                            % if P.V1_left == 1 % need to point to the right hemifield, therefore increasing left V1
+                            %     DrawFormattedText(P.Screen.wPtr,'> + >','center','center',fixCol);
+                            % else % viceversa
+                            %     DrawFormattedText(P.Screen.wPtr,'< + <','center','center',fixCol);
+                            % end
+
                         elseif P.TRANSF == 1
                             Screen('DrawTextures', P.Screen.wPtr, P.wheelTex, [],...
                                 P.dstRects(:, 1:2), 0, [], []);
@@ -330,7 +334,7 @@ switch feedbackType
                     % if regular run:
                     if P.TRANSF == 0
                         % feedback value
-                        Screen('TextSize',P.Screen.wPtr,100);
+                        Screen('TextSize',P.Screen.wPtr,P.textSizeSUM);
                         DrawFormattedText(P.Screen.wPtr, mat2str(dispValue), ...
                             'center',  P.Screen.h * 0.65, dispColor);
                         % if transfer run:

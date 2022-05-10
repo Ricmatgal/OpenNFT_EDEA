@@ -28,7 +28,7 @@ fprintf('\nTask Fix Onset!\n')
 WaitSecs(1)
 
 % re-adjust textsize for response options on screen
-Screen('TextSize',P.Screen.wPtr, 28);
+Screen('TextSize',P.Screen.wPtr, P.textSizeVAS);
 
 
 if P.END_run_msg == 0
@@ -76,7 +76,7 @@ if P.END_run_msg == 0
             Screen('FillRect', P.Screen.wPtr, P.VColor, P.VLine);
 
             % Text
-            DrawFormattedText(P.Screen.wPtr, 'How motivated are you?', 'center',P.Screen.h * 0.3, [255 255 255]);
+            DrawFormattedText(P.Screen.wPtr, 'HOW MOTIVATED ARE YOU?', 'center',P.Screen.h * 0.3, [255 255 255]);
 
             Screen('TextSize', P.Screen.wPtr, 40); %Screen('TextFont', P.Screen.wPtr, 'Courier New');
             DrawFormattedText(P.Screen.wPtr, '0', P.Screen.w * 0.15 , P.Screen.h * 0.61, [255 255 255]);
@@ -112,7 +112,7 @@ if P.END_run_msg == 0
 elseif P.END_run_msg == 1
 
     % Draw end run message to buffer
-    DrawFormattedText(P.Screen.wPtr, 'Thanks! End of the RUN', 'center','center', [255 255 255]);
+    DrawFormattedText(P.Screen.wPtr, strcat('THANKS! END OF THE RUN NUMBER: ',num2str(P.NFRunNr)), 'center','center', [255 255 255]);
 
     % Flip message to the screen
 %     P.Screen.vbl=Screen('Flip', P.Screen.wPtr);
