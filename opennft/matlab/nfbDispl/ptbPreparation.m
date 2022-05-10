@@ -205,6 +205,10 @@ if strcmp(protName, 'ContTask')
         P.TargetSide = 'left';
     end
 
+    % struct to iteratively save wheel angles during NFB
+    P.PtbCallIdx = 0;
+    P.WheelAnglesStruct.Iteration.PtbScreenCall = struct;
+
 
     %% Double blind parameters import
 

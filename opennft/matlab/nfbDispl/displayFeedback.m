@@ -242,6 +242,7 @@ switch feedbackType
                     fixCol = [255, 255, 255];
                 end
 
+                wheelAngles = [];
 
                 % Draw the wheels and rotate them
                 times2repeat = ceil(((double(P.TR)/1000)/2)/(P.Screen.numFrames*P.Screen.ifi));
@@ -301,6 +302,8 @@ switch feedbackType
                     elseif P.rightRot == 1
                         P.rotAng = P.rotAng + P.rotSpe;
                     end
+                    
+                    wheelAngles(end+1) = P.rotAng;
 
                 end
 
@@ -308,6 +311,14 @@ switch feedbackType
 
                 % Record the iteration
                 P.NFBC.it_curr(end+1)= iteration;
+
+
+                P.PtbCallIdx = P.PtbCallIdx + 1;
+                P.WheelAnglesStruct(iteration).Iteration(P.PtbCallIdx).PtbScreenCall = wheelAngles;
+
+                if P.PtbCallIdx == 2
+                    P.PtbCallIdx = 0;
+                end
 
 
             case 1
