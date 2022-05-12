@@ -1653,7 +1653,7 @@ class OpenNFT(QWidget):
         x = self.P['MatrixSizeX']
         y = self.P['MatrixSizeY']
         z = self.P['NrOfSlices']
-        print(z)
+        #print(z)
         ROI_vols = np.zeros((nrROIs, x, y, z))
         ROI_mats = np.zeros((nrROIs, 4, 4))
         if self.P['Type'] == 'DCM':

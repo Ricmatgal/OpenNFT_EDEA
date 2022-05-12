@@ -177,7 +177,7 @@ if strcmp(protName, 'ContTask')
     P.nrEqBlock = 3;
     P.nrAnglesBlock = 2;
     P.nrEq      = length(P.ProtCond{2})*P.nrEqBlock; % number of blocks which requires the equations to be generated for
-    P.nrDigits = 2 % how many digits per equation?
+    P.nrDigits = 2; % how many digits per equation?
     % (all baseline blocks - 2 per baseline block)
     P.nrFigs    = 2; % number of textures on screen
     P.dim       = 100; % Texture dimensions
