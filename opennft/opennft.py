@@ -700,7 +700,7 @@ class OpenNFT(QWidget):
             # display instruction prior to data acquisition for current iteration
             if self.P['Type'] in ['PSC', 'Corr']:
                 if config.USE_PTB:
-                    logger.info('instruction + {}', self.iteration)
+                    #logger.info('instruction + {}', self.iteration)
                     self.displayScreen()
 
                 if self.iteration > self.P['nrSkipVol'] and config.UDP_SEND_CONDITION:
@@ -973,12 +973,13 @@ class OpenNFT(QWidget):
                                 self.endDisplayEvent.clear()
                             else:
                                 self.displayData['taskseq'] = 0
-                                self.displayData['displayStage'] = 'feedback'
+                                # self.displayData['displayStage'] = 'feedback'
                                 self.displayScreen()
-                        else:
-                            self.displayData['taskseq'] = 0
-                            self.displayData['displayStage'] = 'feedback'
-                            self.displayScreen()
+                                QApplication.processEvents()
+                        # else:
+                        #     self.displayData['taskseq'] = 0
+                        #     self.displayData['displayStage'] = 'feedback'
+                        #     self.displayScreen()
 
         if self.displayData:
             if config.USE_SHAM:
