@@ -1,4 +1,4 @@
-function displayData = initDispalyData(indVol)
+function displayData = initDisplayData(indVol)
 % Function to initialize the PTB display data structure from main loop
 % data structure.
 %

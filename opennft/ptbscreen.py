@@ -11,6 +11,7 @@ Written by Evgeny Prilepin, Artem Nikonorov, Yury Koush
 
 """
 
+from turtle import end_fill
 from loguru import logger
 
 from opennft import eventrecorder as erd, mlproc
@@ -84,6 +85,13 @@ class PtbScreen(object):
             self.eng.ptbBlankScreen(nargout=0, background=True)
             displayData['displayBlankScreen'] = 0
         else:
+            
+            # if displayData['displayStage'] == 'Baseline' or displayData['displayStage'] == 'Modulation':
+            #             self.recorder.recordEvent(Times.t7, int(displayData['iteration']))
+            #             self.eng.displayFeedback(displayData, nargout=0, background=True)
+            # elif displayData['displayStage'] == 'VAS' or displayData['displayStage'] == 'Feedback':
+            #             self.eng.ptbTask(nargout=0, background=True)
+                
             if displayData['displayStage'] == 'instruction':
                 # t7
                 self.recorder.recordEvent(Times.t7, int(displayData['iteration']))

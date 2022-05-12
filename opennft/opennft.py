@@ -692,7 +692,7 @@ class OpenNFT(QWidget):
 
             self.eng.mainLoopEntry(self.iteration, nargout=0)
 
-            self.displayData = self.eng.initDispalyData(self.iteration)
+            self.displayData = self.eng.initDisplayData(self.iteration)
 
             # t6, display instruction prior to data acquisition for current iteration
             self.recorder.recordEvent(erd.Times.t6, self.iteration)
@@ -955,7 +955,16 @@ class OpenNFT(QWidget):
                             # taskseq is set to one. While set to 1, Display in ptbScreen.py
                             # will use the taskse flag to call the ptbTask function.
                             # cond = self.eng.evalin('base', 'mainLoopData.displayData.condition')
+                            
                             cond = self.displayData['condition']
+
+                            # self.displayScreen()
+                            # QApplication.processEvents()
+                            # self.endDisplayEvent.wait()
+                            # self.endDisplayEvent.clear()
+
+
+
                             if cond == 1 and int(self.P['TaskFirstVol'][0][self.iteration - 1]) == 1:
                                 self.displayData['taskseq'] = 1
                                 self.displayScreen()
