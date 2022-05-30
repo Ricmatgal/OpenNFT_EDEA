@@ -183,7 +183,11 @@ if strcmp(protName, 'ContTask')
     P.dim       = 100; % Texture dimensions
     P.yPos      = P.Screen.yCenter;
     P.xPos      = linspace(w * 0.15, w * 0.85, P.nrFigs);
+<<<<<<< HEAD
     P.strings_operation = repelem(ptbCreateOperations(P.nrEq, P.nrDigits),floor(length(P.ProtCond{2}{1})*2/P.nrEqBlock)); % times 2 because function visited twice
+=======
+    P.strings_operation = repelem(ptbCreateOperations(P.nrEq, P.nrDigits),ceil(length(P.ProtCond{2}{1})*2/P.nrEqBlock)); % times 2 because function visited twice
+>>>>>>> d13febc61f0eb67182332acadb6001f8ddf7a879
     list_angles = 360/length(P.ProtCond{2}):360/length(P.ProtCond{2}):360;
     P.rotation_angle_BAS = repelem(list_angles(randperm(length(list_angles))),floor(length(P.ProtCond{2}{1})*2/P.nrAnglesBlock)); % times 2 because function visited twice
     P.K_rot = 0;
@@ -287,7 +291,8 @@ if strcmp(protName, 'ContTask')
         %% Prepare PTB texture(s)
         P.stimFolderPath    = P.StimFolder;
 
-        wheelImage = 'wheel_illustrator_prf_2.png';
+        % wheelImage = 'wheel_illustrator_prf_2.png';
+        wheelImage = 'wheel_illustrator.png';
         P.imWheel           = imread([P.stimFolderPath, filesep, wheelImage]);
     
         P.wheelTex          = Screen('MakeTexture', P.Screen.wPtr, P.imWheel);
