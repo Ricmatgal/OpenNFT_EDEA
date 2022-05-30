@@ -179,7 +179,7 @@ switch feedbackType
                     % Adaptive Feedback display for differential PSC, scaled according to limits (limlow, limup) of brain activity and steps
                     % and using a logarithmic scale
 
-                    logTest = 1;
+                    logTest = 0;
 
                     if ~logTest
 

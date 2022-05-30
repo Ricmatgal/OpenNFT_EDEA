@@ -27,8 +27,8 @@ if testCase == 'PSC':
     #dstpath = 'F:/rtTestFolder'
     #srcpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectCecilia/dummy_data/20201119.LUCACHU_S20_SESS1.99622'
     #srcpath = 'C:/Users/gallir/Documents/OPENNFT/ProjectCecilia/dummy_data/testpath'
-    srcpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectCecilia/dummy_data/20220430.MRI_DEV_Test_NFB.110734'
-    dstpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectCecilia/dummy_data/rtTestFolder'
+    srcpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectBBL/dummy_data/20220524.EDEA_100.111112'
+    dstpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectBBL/dummy_data/watch_folder'
    # srcpath = 'E:/rtQA_testing/data/rtDCM/NFB_r2'
    # dstpath = 'E:/rtTestFolder'
     #pause_in_sec = 0.8

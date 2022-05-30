@@ -183,9 +183,9 @@ if strcmp(protName, 'ContTask')
     P.dim       = 100; % Texture dimensions
     P.yPos      = P.Screen.yCenter;
     P.xPos      = linspace(w * 0.15, w * 0.85, P.nrFigs);
-    P.strings_operation = repelem(ptbCreateOperations(P.nrEq, P.nrDigits),length(P.ProtCond{2}{1})*2/P.nrEqBlock); % times 2 because function visited twice
+    P.strings_operation = repelem(ptbCreateOperations(P.nrEq, P.nrDigits),floor(length(P.ProtCond{2}{1})*2/P.nrEqBlock)); % times 2 because function visited twice
     list_angles = 360/length(P.ProtCond{2}):360/length(P.ProtCond{2}):360;
-    P.rotation_angle_BAS = repelem(list_angles(randperm(length(list_angles))),length(P.ProtCond{2}{1})*2/P.nrAnglesBlock); % times 2 because function visited twice
+    P.rotation_angle_BAS = repelem(list_angles(randperm(length(list_angles))),floor(length(P.ProtCond{2}{1})*2/P.nrAnglesBlock)); % times 2 because function visited twice
     P.K_rot = 0;
     P.k_eq = 0;
     P.rotAng = 0;
