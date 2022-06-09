@@ -274,7 +274,7 @@ switch feedbackType
                                 P.dstRects(:, 1:2), P.rotAng, [], []);
                             % fixation cross while regulation
                             Screen('DrawLines', P.Screen.wPtr, P.Screen.allCoords,...
-                            P.textSizeNF, fixCol, [P.Screen.xCenter P.Screen.yCenter], 2); % last arguments is the smoothing
+                            P.Screen.lineWidthPix, fixCol, [P.Screen.xCenter P.Screen.yCenter], 2); % last arguments is the smoothing
 
                             % cue while regulation
                             % Screen('TextSize',P.Screen.wPtr,120);
@@ -288,7 +288,7 @@ switch feedbackType
                             Screen('DrawTextures', P.Screen.wPtr, P.wheelTex, [],...
                                 P.dstRects(:, 1:2), 0, [], []);
                             Screen('DrawLines', P.Screen.wPtr, P.Screen.allCoords,...
-                            P.textSizeNF, [255 255 255], [P.Screen.xCenter P.Screen.yCenter], 2);
+                            P.Screen.lineWidthPix, [255 255 255], [P.Screen.xCenter P.Screen.yCenter], 2);
                         end
 
                         P.Screen.vbl = Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.5) * P.Screen.ifi);

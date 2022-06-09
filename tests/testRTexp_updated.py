@@ -27,17 +27,13 @@ if testCase == 'PSC':
     #dstpath = 'F:/rtTestFolder'
     #srcpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectCecilia/dummy_data/20201119.LUCACHU_S20_SESS1.99622'
     #srcpath = 'C:/Users/gallir/Documents/OPENNFT/ProjectCecilia/dummy_data/testpath'
-<<<<<<< HEAD
     srcpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectBBL/dummy_data/20220524.EDEA_100.111112'
     dstpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectBBL/dummy_data/watch_folder'
-=======
     #srcpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectCecilia/dummy_data/20220430.MRI_DEV_Test_NFB.110734'
     #dstpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectCecilia/dummy_data/rtTestFolder'
-
     # in the BBL MRI
-    srcpath = 'Z:/20220430.Siemens_Service.Service_10849583_167114'
-    dstpath = 'D:/LABNIC/EDEA/offline_testing/watch_folder'
->>>>>>> d13febc61f0eb67182332acadb6001f8ddf7a879
+    #srcpath = 'Z:/20220430.Siemens_Service.Service_10849583_167114'
+    #dstpath = 'D:/LABNIC/EDEA/offline_testing/watch_folder'
    # srcpath = 'E:/rtQA_testing/data/rtDCM/NFB_r2'
    # dstpath = 'E:/rtTestFolder'
     #pause_in_sec = 0.8

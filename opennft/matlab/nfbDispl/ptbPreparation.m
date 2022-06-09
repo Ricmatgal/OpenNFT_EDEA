@@ -147,6 +147,7 @@ if strcmp(protName, 'ContTask')
     P.Screen.xCoords = [-P.Screen.fixCrossDimPix P.Screen.fixCrossDimPix 0 0];
     P.Screen.yCoords = [0 0 -P.Screen.fixCrossDimPix P.Screen.fixCrossDimPix];
     P.Screen.allCoords = [P.Screen.xCoords; P.Screen.yCoords];
+
     
     % scramble-image presentation parameters
     P.Screen.numSecs = P.Screen.ifi*2;     % presentation dur in sec (500ms)
@@ -288,7 +289,8 @@ if strcmp(protName, 'ContTask')
         P.stimFolderPath    = P.StimFolder;
 
         % wheelImage = 'wheel_illustrator_prf_2.png';
-        wheelImage = 'wheel_illustrator.png';
+        % wheelImage = 'wheel_illustrator.png';
+        wheelImage = 'wheel_illustrator_grayscale.png';
         P.imWheel           = imread([P.stimFolderPath, filesep, wheelImage]);
     
         P.wheelTex          = Screen('MakeTexture', P.Screen.wPtr, P.imWheel);
