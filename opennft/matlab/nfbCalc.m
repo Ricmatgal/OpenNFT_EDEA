@@ -125,10 +125,17 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
         mainLoopData.dispValues(indVolNorm) = dispValue;
         mainLoopData.dispValue = dispValue;
 
-    elseif condition == 4
+    elseif condition == 4 % sum NF end of NF block
         NFVols = P.ProtCond{2}{blockNF};
-
+        
+        % this block does not actually makes much sense as the dispValue
+        % produced here is ignored in displayFeedbakc (we take the
+        % finalDispVal coming from the scaling routine of condition NF
         dispValue = round(sum(mainLoopData.dispValues(NFVols))*1000);
+
+        % display a feedback value which "normalize" the total sum to
+        % something more interpretable (i.e. from 0 to 100)
+        % dispValue = round(round(mean(mainLoopData.dispValues(NFVols))*100)/max(mainLoopData.dispValues(NFVols)));
 
         mainLoopData.sumValues(indVolNorm) = dispValue;
         mainLoopData.dispValue = dispValue;

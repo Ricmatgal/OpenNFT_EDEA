@@ -139,7 +139,7 @@ if strcmp(protName, 'ContTask')
     P.Screen.fixCrossDimPix = 40;
     
     % Set the line width for fixation cross
-    P.Screen.lineWidthPix = 4;
+    P.Screen.lineWidthPix = 8;
 
     % Setting the coordinates
     P.Screen.wRect = [0, 0, P.Screen.w, P.Screen.h];

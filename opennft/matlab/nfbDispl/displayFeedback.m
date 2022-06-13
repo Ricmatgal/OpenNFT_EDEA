@@ -326,8 +326,19 @@ switch feedbackType
 
 
             case 4 % intermittent score (final value after regulation block)
+                
+                % this is calculated in nfbCalc already
+                % dispValue = ceil((sum(P.finalDispVal(P.ProtCond{3}{displayData.currNFblock})) / P.stepMax) * 10);
+                %P.sumFBscore(iteration-P.nrSkipVol) = dispValue;
 
-                dispValue = ceil((sum(P.finalDispVal(P.ProtCond{3}{displayData.currNFblock})) / P.stepMax) * 10);
+                % but if we want to take the P.finalDispVal then..
+                % dispValue = (round(mean(P.finalDispVal(P.ProtCond{3}{displayData.currNFblock}))...
+                %    *100)/max(P.finalDispVal(P.ProtCond{3}{displayData.currNFblock})));
+                
+                % rescaling the P.finalDispVal vector (rotation speed) from 0 to
+                % 100 for the precedent NF block, then taking the mean
+                % (i.e. giving a score 0-100 of how good they performed)
+                dispValue = round(mean(rescale(P.finalDispVal(P.ProtCond{3}{displayData.currNFblock}),0,100)));
                 P.sumFBscore(iteration-P.nrSkipVol) = dispValue;
 
                 k = cellfun(@(x) x(2) == (iteration-P.nrSkipVol), P.ProtCond{4});
