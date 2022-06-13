@@ -32,18 +32,25 @@ strings_operation = cell(0);
 
 % main routine
 
-    for run = 1:neqs
-        
+for run = 1:neqs
 
-        if ndigits == 2
-            strings_operation{run} = [' ', num2str(numbs(1,idx_numbs(1,(run)))), ' ', operators(idx_oper(1,(run))), ...
-            ' ', num2str(numbs(2,idx_numbs(2,(run))))];
 
-        elseif ndigits == 3
-            strings_operation{run} = [' ', num2str(numbs(1,idx_numbs(1,(run)))), ' ', operators(idx_oper(1,(run))), ...
-                ' ', num2str(numbs(2,idx_numbs(2,(run)))), ' ', operators(idx_oper(2,(run))), ...
-                ' ', num2str(numbs(3,idx_numbs(3,(run))))];
+    if ndigits == 2
+        strings_operation{run} = [num2str(numbs(1,idx_numbs(1,(run)))), ' ', operators(idx_oper(1,(run))), ...
+            ' ', num2str(numbs(2,idx_numbs(2,(run)))),' '];
+        if operators(idx_oper(1,(run))) == '-'
+            if numbs(2,idx_numbs(2,(run))) > numbs(1,idx_numbs(1,(run)))
+                        strings_operation{run} = [num2str(numbs(2,idx_numbs(2,(run)))), ' ', operators(idx_oper(1,(run))), ...
+                            ' ', num2str(numbs(1,idx_numbs(1,(run)))),' '];
+            end
         end
+
+    elseif ndigits == 3
+        strings_operation{run} = [num2str(numbs(1,idx_numbs(1,(run)))), ' ', operators(idx_oper(1,(run))), ...
+            ' ', num2str(numbs(2,idx_numbs(2,(run)))), ' ', operators(idx_oper(2,(run))), ...
+            ' ', num2str(numbs(3,idx_numbs(3,(run)))),' '];
     end
+
+end
 
 end
