@@ -418,6 +418,10 @@ class OpenNFT(QWidget):
                 lambda: self.onChooseFolder('WorkFolder', self.leWorkFolder))
             self.btnChooseWatchFolder.clicked.connect(
                 lambda: self.onChooseFolder('WatchFolder', self.leWatchFolder))
+            self.btnChooseProjectFolder.clicked.connect(
+                lambda: self.onChooseFolder('ProjectFolder', self.leProjectFolder))
+            self.btnChooseDoubleBlindDir.clicked.connect(
+                lambda: self.onChooseFolder('DoubleBlindDir', self.leDoubleBlindDir))
 
             self.btnStart.setEnabled(False)
         else:
@@ -2302,7 +2306,7 @@ class OpenNFT(QWidget):
             # --- top ---
             self.leProtocolFile.setText(self.settings.value('StimulationProtocol', ''))
             self.leWorkFolder.setText(self.settings.value('WorkFolder', ''))
-            self.leProjectFolder.setText(self.settings.value('ProjectFolder',''))
+            self.leProjectFolder.setText(self.settings.value('ProjectFolder', ''))
             self.leWatchFolder.setText(self.settings.value('WatchFolder', ''))
             if (self.settings.value('Type', '')) == 'DCM':
                 self.leRoiAnatFolder.setText(self.settings.value('RoiAnatFolder', ''))
