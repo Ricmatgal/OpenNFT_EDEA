@@ -52,19 +52,60 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
             firstNF = indVolNorm;
         end
 
-        % Get reference baseline in cumulated way across the RUN,
-        % or any other fashion
+
+
+        %% LUCAS IMPLEMENTATION
+
         i_blockBAS = [];
-        if blockNF<2
-            % according to json protocol
-            % index for Baseline == 1
-            i_blockBAS = P.ProtCond{ 2 }{blockNF}(end-6:end);
-        else
-            for iBas = 1:blockNF
-                i_blockBAS = [i_blockBAS P.ProtCond{ 2 }{iBas}(3:end)];
-                % ignore 2 scans for HRF shift, e.g. if TR = 2sec
+        % if NFB run is 1 
+        if P.NFRunNr == 1 
+            % if NFB block is 1
+            if blockNF<2
+                % we skip the first 60 (quite unstable) volumes of the
+                % baseline
+                i_blockBAS = P.ProtCond{2}{blockNF}(60:end);
+            % otherwise NFBrun > 1
+            else
+                % we skip the first baseline in the accumumaltion process
+                for iBas = 2:blockNF
+                    % this is now skipped but was used to take a different
+                    % number of volumes of the first baseline
+                    if iBas == 1
+                        i_blockBAS = [i_blockBAS P.ProtCond{2}(end-9:end)]; % 
+                    else
+                        i_blockBAS = [i_blockBAS P.ProtCond{2}{iBas}(end-9:end)]; %
+                    end
+                end
+            end
+        
+        % if NFB run is > 1
+        elseif P.NFRunNr > 1
+            % if NFB block is 1
+            if blockNF<2
+                % we take the last 10 voumes of the first baseline
+                i_blockBAS = P.ProtCond{2}{blockNF}(end-9:end);
+            % if NFB block is > 1
+            else
+                % we also skip the first baseline from accumulation
+                for iBas = 2:blockNF
+                    i_blockBAS = [i_blockBAS P.ProtCond{2}{iBas}(end-9:end)]; 
+                end
             end
         end
+
+%         % Get reference baseline in cumulated way across the RUN,
+%         % or any other fashion
+%         i_blockBAS = [];
+%         if blockNF<2
+%             % according to json protocol
+%             % index for Baseline == 1
+%             i_blockBAS = P.ProtCond{ 2 }{blockNF}(end-6:end);
+%         else
+%             for iBas = 1:blockNF
+%                 i_blockBAS = [i_blockBAS P.ProtCond{ 2 }{iBas}(3:end)];
+%                 % ignore 2 scans for HRF shift, e.g. if TR = 2sec
+%             end
+%         end
 
         %% Calculate NFB signal
         i_reg = indVolNorm-2:indVolNorm;
@@ -78,7 +119,16 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
             % point to point mean signal
             mCond2 = mainLoopData.scalProcTimeSeries(indRoi,i_reg);
             norm_percValues2(indRoi) = mean(mCond2);
+
+
+            % constProcTS PSC
+            tmpBas  = mainLoopData.constProcTimeSeries(indRoi, i_blockBAS);
+            tmpCond = mainLoopData.constProcTimeSeries(indRoi, i_reg);
+            psc(indRoi) = (mean(tmpCond) - median(tmpBas)) ./ median(tmpBas);
+
         end
+
+        
 
         % for indRoi = 1:loopNrROIs
         %     mBas = median(mainLoopData.scalProcTimeSeries(indRoi,i_blockBAS));

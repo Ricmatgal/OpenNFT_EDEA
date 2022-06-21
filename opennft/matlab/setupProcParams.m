@@ -51,7 +51,7 @@ if P.UseTCPData
     data.LastName = '';
     data.ID = '';
     data.FirstFileName = P.FirstFileName;
-    
+
     try tcp = evalin('base','tcp'); catch E
         if strcmp(E.identifier,'MATLAB:UndefinedFunction'), tcp = ImageTCPClass(P.TCPDataPort);
         else, throw(E); end
@@ -61,7 +61,7 @@ if P.UseTCPData
     if ~tcp.Open
         try tcp.WaitForConnection; catch E
             if strcmp(E.message,'No valid handler! already closed?')
-                
+
             else
                 throw(E);
             end
@@ -112,6 +112,8 @@ mainLoopData.kalmanProcTimeSeries = [];
 mainLoopData.displRawTimeSeries = [];
 mainLoopData.scalProcTimeSeries = [];
 mainLoopData.emaProcTimeSeries = [];
+%% LUCAS IMPLEMENTATION
+mainLoopData.constProcTimeSeries = [];
 
 mainLoopData.posMin = [];
 mainLoopData.posMax = [];
@@ -126,10 +128,10 @@ mainLoopData.firstNF = 0;
 %% DCM Settings
 if flags.isDCM
     % This is to simplify the P.Protocol parameter listings for DCM,
-    
+
     % -- read timing parameters from JSON file ----------------------------
     tim = loadTimings(P.ProtocolFile);
-    
+
     % in scans
     P.indNFTrial        = 0;
     P.lengthDCMTrial    = tim.trialLength;
@@ -222,7 +224,7 @@ if isfield(P,'ContrastActivation')
 end
 
 if ~P.isAutoRTQA
-    
+
     if ~P.iglmAR1
         % exclude constant regressor
         mainLoopData.basFct = SPM.xX.X(:,1:end-1);
@@ -238,6 +240,25 @@ if ~P.isAutoRTQA
 
     mainLoopData.signalPreprocGlmDesign = mainLoopData.basFct(:,contains(SPM.xX.name, P.SignalPreprocessingBasis));
     mainLoopData.nrSignalPreprocGlmDesign = size(mainLoopData.signalPreprocGlmDesign,2);
+
+    %% LUCAS IMPLEMENTATION
+
+    if P.NFRunNr > 1
+        lSpmDesign = size(mainLoopData.signalPreprocGlmDesign,1);
+        P.prevNfbDataFolder = fullfile(P.WorkFolder,['NF_Data_' sprintf('%d',P.NFRunNr-1)]);
+        % get motion correction parameters
+        pathPrevP = dir(fullfile(P.prevNfbDataFolder,'*_P.mat'));
+        prevP = load(fullfile(P.prevNfbDataFolder,pathPrevP.name));
+        % get time-series
+        pathPrevTS = dir(fullfile(P.prevNfbDataFolder,'*_raw_tsROIs.mat'));
+        mainLoopData.prevTS = load(fullfile(P.prevNfbDataFolder,pathPrevTS.name));
+        % construct regressors
+        tmpRegr = [ones(lSpmDesign,1) P.linRegr zscore(prevP.motCorrParam(end-(lSpmDesign-1):end,:))];
+        if P.cglmAR1
+            mainLoopData.prev_cX0 = arRegr(P.aAR1,tmpRegr);
+        end
+        mainLoopData.prev_cX0 = [tmpRegr, mainLoopData.signalPreprocGlmDesign];
+    end
 
     % DCM
     if flags.isDCM && strcmp(P.Prot, 'InterBlock')
@@ -374,7 +395,6 @@ if P.isRTQA
 
 end
 
-clear SPM
 
 % Realign preset
 A0=[];x1=[];x2=[];x3=[];wt=[];deg=[];b=[];
@@ -390,6 +410,15 @@ mainLoopData.x3 = x3;
 mainLoopData.wt = wt;
 mainLoopData.deg = deg;
 mainLoopData.b = b;
+
+% Save the beta estimates (LUCAS)
+mainLoopData.betRegr = cell(P.NrROIs,1);
+for i=1:P.NrROIs
+    mainLoopData.betRegr{i} = zeros(P.NrOfVolumes-P.nrSkipVol, 2+6+size(SPM.xX.X,2));
+end
+
+clear SPM
+
 
 % make output data folder
 if ~P.isAutoRTQA
@@ -453,8 +482,8 @@ end
 
 tim            = prt.dcmdef.timings;
 requiredFields = {'trialLength','numberOfTrials',...
-                  'feedbackDisplayDurationInScans',...
-                  'feedbackEstimationDurationInScans'};
+    'feedbackDisplayDurationInScans',...
+    'feedbackEstimationDurationInScans'};
 
 for fn = requiredFields
     if ~strcmp(fn{:},fieldnames(tim))
