@@ -42,65 +42,199 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
     firstNF = mainLoopData.firstNF;
 
     % NF estimation condition
-    if condition == 2
+    if condition == 3
 
         % count NF regulation blocks
-        % index for Regulation block == 2
-        k = cellfun(@(x) x(1) == indVolNorm, P.ProtCond{ 2 });
+        % index for Regulation block == 3
+        k = cellfun(@(x) x(1) == indVolNorm, P.ProtCond{ 3 });
         if any(k)
             blockNF = find(k);
             firstNF = indVolNorm;
         end
 
-        % Get reference baseline in cumulated way across the RUN,
-        % or any other fashion
+
+
+        %% LUCAS IMPLEMENTATION
+
         i_blockBAS = [];
-        if blockNF<2
-            % according to json protocol
-            % index for Baseline == 1
-            i_blockBAS = P.ProtCond{ 1 }{blockNF}(end-6:end);
-        else
-            for iBas = 1:blockNF
-                i_blockBAS = [i_blockBAS P.ProtCond{ 1 }{iBas}(3:end)];
-                % ignore 2 scans for HRF shift, e.g. if TR = 2sec
+        % if NFB run is 1 
+        if P.NFRunNr == 1 
+            % if NFB block is 1
+            if blockNF<2
+                % we skip the first 60 (quite unstable) volumes of the
+                % baseline
+                i_blockBAS = P.ProtCond{2}{blockNF}(60:end);
+            % otherwise NFBrun > 1
+            else
+                % we skip the first baseline in the accumumaltion process
+                for iBas = 2:blockNF
+                    % this is now skipped but was used to take a different
+                    % number of volumes of the first baseline
+                    if iBas == 1
+                        i_blockBAS = [i_blockBAS P.ProtCond{2}(end-9:end)]; % 
+                    else
+                        i_blockBAS = [i_blockBAS P.ProtCond{2}{iBas}(end-9:end)]; %
+                    end
+                end
+            end
+        
+        % if NFB run is > 1
+        elseif P.NFRunNr > 1
+            % if NFB block is 1
+            if blockNF<2
+                % we take the last 10 voumes of the first baseline
+                i_blockBAS = P.ProtCond{2}{blockNF}(end-9:end);
+            % if NFB block is > 1
+            else
+                % we also skip the first baseline from accumulation
+                for iBas = 2:blockNF
+                    i_blockBAS = [i_blockBAS P.ProtCond{2}{iBas}(end-9:end)]; 
+                end
             end
         end
 
-        for indRoi = 1:loopNrROIs
+%         % Get reference baseline in cumulated way across the RUN,
+%         % or any other fashion
+%         i_blockBAS = [];
+%         if blockNF<2
+%             % according to json protocol
+%             % index for Baseline == 1
+%             i_blockBAS = P.ProtCond{ 2 }{blockNF}(end-6:end);
+%         else
+%             for iBas = 1:blockNF
+%                 i_blockBAS = [i_blockBAS P.ProtCond{ 2 }{iBas}(3:end)];
+%                 % ignore 2 scans for HRF shift, e.g. if TR = 2sec
+%             end
+%         end
+
+        %% Calculate NFB signal
+        i_reg = indVolNorm-2:indVolNorm;
+        for indRoi = 1:P.NrROIs
+            % normalized PSC against last six blocks of baseline
             mBas = median(mainLoopData.scalProcTimeSeries(indRoi,i_blockBAS));
-            mCond = mainLoopData.scalProcTimeSeries(indRoi,indVolNorm);
-            norm_percValues(indRoi) = mCond - mBas;
+            mCond = mainLoopData.scalProcTimeSeries(indRoi,i_reg);
+
+            norm_percValues(indRoi) = mean(mCond) - mBas;
+
+            % point to point mean signal
+            mCond2 = mainLoopData.scalProcTimeSeries(indRoi,i_reg);
+            norm_percValues2(indRoi) = mean(mCond2);
+
+
+            % constProcTS PSC
+            tmpBas  = mainLoopData.constProcTimeSeries(indRoi, i_blockBAS);
+            tmpCond = mainLoopData.constProcTimeSeries(indRoi, i_reg);
+            psc(indRoi) = (mean(tmpCond) - median(tmpBas)) ./ median(tmpBas);
+
         end
 
-        % compute average %SC feedback value
-        tmp_fbVal = eval(P.RoiAnatOperation);
-        dispValue = round(P.MaxFeedbackVal*tmp_fbVal, P.FeedbackValDec);
+        
 
-        % [0...P.MaxFeedbackVal], for Display
-        if ~P.NegFeedback && dispValue < 0
-            dispValue = 0;
-        elseif P.NegFeedback && dispValue < P.MinFeedbackVal
-             dispValue = P.MinFeedbackVal;
-        end
-        if dispValue > P.MaxFeedbackVal
-            dispValue = P.MaxFeedbackVal;
+        % for indRoi = 1:loopNrROIs
+        %     mBas = median(mainLoopData.scalProcTimeSeries(indRoi,i_blockBAS));
+        %     mCond = mainLoopData.scalProcTimeSeries(indRoi,indVolNorm);
+        %     norm_percValues(indRoi) = mCond - mBas;
+        % end
+
+        if strcmp(P.Prot, 'ContTask')
+            % Differential feedback calculation is implemented here.
+            % Currently, when training roi_A > roi_B,
+            if P.V1_right > P.V1_left
+                tmp_fbVal = norm_percValues2(1)-norm_percValues2(2);
+%                 tmp_fbVal = psc(1)-psc(2);
+%                 tmp_fbVal = norm_percValues(1);
+
+            elseif P.V1_left > P.V1_right
+
+                tmp_fbVal = norm_percValues2(2)-norm_percValues2(1);
+%                 tmp_fbVal = psc(2)-psc(1);
+%                 tmp_fbVal = norm_percValues(2);
+
+            % just a check that not both boxes are checked. This should be
+            % done prior to acquisition but for now it's ok. It will just
+            % crash once the NFB will commence.
+            elseif P.V1_left == P.V1_right
+                fprintf('\nERROR: Select the correct ROI in GUI\n')
+                return
+            end
+
+        elseif strcmp(P.Prot, 'Cont')
+            % compute average %SC feedback value
+            tmp_fbVal = eval(P.RoiAnatOperation);
+
         end
 
+        % dispValue given to the screen function
+        dispValue = tmp_fbVal;
+        rawDispValues= dispValue;
+
+        %% Storing values
         mainLoopData.norm_percValues(indVolNorm,:) = norm_percValues;
+        mainLoopData.norm_percValues2(indVolNorm,:) = norm_percValues2;
+
         mainLoopData.dispValues(indVolNorm) = dispValue;
         mainLoopData.dispValue = dispValue;
+
+    elseif condition == 4 % sum NF end of NF block
+        NFVols = P.ProtCond{2}{blockNF};
+        
+        % this block does not actually makes much sense as the dispValue
+        % produced here is ignored in displayFeedbakc (we take the
+        % finalDispVal coming from the scaling routine of condition NF
+        dispValue = round(sum(mainLoopData.dispValues(NFVols))*1000);
+
+        % display a feedback value which "normalize" the total sum to
+        % something more interpretable (i.e. from 0 to 100)
+        % dispValue = round(round(mean(mainLoopData.dispValues(NFVols))*100)/max(mainLoopData.dispValues(NFVols)));
+
+        mainLoopData.sumValues(indVolNorm) = dispValue;
+        mainLoopData.dispValue = dispValue;
+
+        displayData.currNFblock = blockNF;
+        mainLoopData.currNFblock = blockNF;
+
+        tmp_fbVal = 0;
+        rawDispValues = 0;
     else
+
         tmp_fbVal = 0;
         mainLoopData.dispValue = 0;
+        rawDispValues = 0;
+
     end
+
+    %     % compute average %SC feedback value
+    %     tmp_fbVal = eval(P.RoiAnatOperation);
+    %     dispValue = round(P.MaxFeedbackVal*tmp_fbVal, P.FeedbackValDec);
+
+    %     % [0...P.MaxFeedbackVal], for Display
+    %     if ~P.NegFeedback && dispValue < 0
+    %         dispValue = 0;
+    %     elseif P.NegFeedback && dispValue < P.MinFeedbackVal
+    %          dispValue = P.MinFeedbackVal;
+    %     end
+    %     if dispValue > P.MaxFeedbackVal
+    %         dispValue = P.MaxFeedbackVal;
+    %     end
+
+    %     mainLoopData.norm_percValues(indVolNorm,:) = norm_percValues;
+    %     mainLoopData.dispValues(indVolNorm) = dispValue;
+    %     mainLoopData.dispValue = dispValue;
+    % else
+    %     tmp_fbVal = 0;
+    %     mainLoopData.dispValue = 0;
+    % end
 
     mainLoopData.vectNFBs(indVolNorm) = tmp_fbVal;
     mainLoopData.blockNF = blockNF;
     mainLoopData.firstNF = firstNF;
     mainLoopData.Reward = '';
+    mainLoopData.rawDispValues(indVolNorm) = rawDispValues;
 
     displayData.Reward = mainLoopData.Reward;
     displayData.dispValue = mainLoopData.dispValue;
+    displayData.rawDispValues(indVolNorm) = rawDispValues;
+    
 % else
 %     tmp_fbVal = 0;
 %     mainLoopData.dispValue = 0;

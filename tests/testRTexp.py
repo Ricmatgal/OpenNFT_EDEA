@@ -16,7 +16,7 @@ from pathlib import Path
 
 delete_files = True
 
-mask = "001_000008_000"
+mask = "001_000009_000"
 # fns = [1, 2, 3, 4, 6, 5, 7, 8]
 fns = None
 

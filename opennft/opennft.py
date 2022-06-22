@@ -249,7 +249,7 @@ class OpenNFT(QWidget):
 
         self.initializeUi()
         self.readAppSettings()
-        self.initialize(start=False)
+        self.initialize(start=True)
 
         self.calc_rtqa = None
         self.windowRTQA = None
@@ -418,6 +418,10 @@ class OpenNFT(QWidget):
                 lambda: self.onChooseFolder('WorkFolder', self.leWorkFolder))
             self.btnChooseWatchFolder.clicked.connect(
                 lambda: self.onChooseFolder('WatchFolder', self.leWatchFolder))
+            self.btnChooseProjectFolder.clicked.connect(
+                lambda: self.onChooseFolder('ProjectFolder', self.leProjectFolder))
+            self.btnChooseDoubleBlindDir.clicked.connect(
+                lambda: self.onChooseFolder('DoubleBlindDir', self.leDoubleBlindDir))
 
             self.btnStart.setEnabled(False)
         else:
@@ -692,7 +696,7 @@ class OpenNFT(QWidget):
 
             self.eng.mainLoopEntry(self.iteration, nargout=0)
 
-            self.displayData = self.eng.initDispalyData(self.iteration)
+            self.displayData = self.eng.initDisplayData(self.iteration)
 
             # t6, display instruction prior to data acquisition for current iteration
             self.recorder.recordEvent(erd.Times.t6, self.iteration)
@@ -700,7 +704,7 @@ class OpenNFT(QWidget):
             # display instruction prior to data acquisition for current iteration
             if self.P['Type'] in ['PSC', 'Corr']:
                 if config.USE_PTB:
-                    logger.info('instruction + {}', self.iteration)
+                    #logger.info('instruction + {}', self.iteration)
                     self.displayScreen()
 
                 if self.iteration > self.P['nrSkipVol'] and config.UDP_SEND_CONDITION:
@@ -955,8 +959,17 @@ class OpenNFT(QWidget):
                             # taskseq is set to one. While set to 1, Display in ptbScreen.py
                             # will use the taskse flag to call the ptbTask function.
                             # cond = self.eng.evalin('base', 'mainLoopData.displayData.condition')
+                            
                             cond = self.displayData['condition']
-                            if cond == 3 and int(self.P['TaskFirstVol'][0][self.iteration - 1]) == 1:
+
+                            # self.displayScreen()
+                            # QApplication.processEvents()
+                            # self.endDisplayEvent.wait()
+                            # self.endDisplayEvent.clear()
+
+
+
+                            if cond == 1 and int(self.P['TaskFirstVol'][0][self.iteration - 1]) == 1:
                                 self.displayData['taskseq'] = 1
                                 self.displayScreen()
                                 QApplication.processEvents()
@@ -964,12 +977,13 @@ class OpenNFT(QWidget):
                                 self.endDisplayEvent.clear()
                             else:
                                 self.displayData['taskseq'] = 0
-                                self.displayData['displayStage'] = 'feedback'
+                                # self.displayData['displayStage'] = 'feedback'
                                 self.displayScreen()
-                        else:
-                            self.displayData['taskseq'] = 0
-                            self.displayData['displayStage'] = 'feedback'
-                            self.displayScreen()
+                                QApplication.processEvents()
+                        # else:
+                        #     self.displayData['taskseq'] = 0
+                        #     self.displayData['displayStage'] = 'feedback'
+                        #     self.displayScreen()
 
         if self.displayData:
             if config.USE_SHAM:
@@ -1653,6 +1667,7 @@ class OpenNFT(QWidget):
         x = self.P['MatrixSizeX']
         y = self.P['MatrixSizeY']
         z = self.P['NrOfSlices']
+        #print(z)
         ROI_vols = np.zeros((nrROIs, x, y, z))
         ROI_mats = np.zeros((nrROIs, 4, 4))
         if self.P['Type'] == 'DCM':
@@ -2291,7 +2306,7 @@ class OpenNFT(QWidget):
             # --- top ---
             self.leProtocolFile.setText(self.settings.value('StimulationProtocol', ''))
             self.leWorkFolder.setText(self.settings.value('WorkFolder', ''))
-            self.leProjectFolder.setText(self.settings.value('ProjectFolder',''))
+            self.leProjectFolder.setText(self.settings.value('ProjectFolder', ''))
             self.leWatchFolder.setText(self.settings.value('WatchFolder', ''))
             if (self.settings.value('Type', '')) == 'DCM':
                 self.leRoiAnatFolder.setText(self.settings.value('RoiAnatFolder', ''))
@@ -2336,7 +2351,7 @@ class OpenNFT(QWidget):
             self.cbFeedbackPlot.setChecked(str(self.settings.value('PlotFeedback', 'true')).lower() == 'true')
 
             self.leShamFile.setText(self.settings.value('ShamFile', ''))
-            self.leDoubleBlindDir.setText(self.settings.values('DoubleBlindDir',''))
+            self.leDoubleBlindDir.setText(self.settings.value('DoubleBlindDir',''))
             
             self.cbUsePTB.setChecked(str(self.settings.value('UsePTB', 'false')).lower() == 'true')
             if not config.USE_PTB_HELPER:

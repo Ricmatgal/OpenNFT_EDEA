@@ -2387,7 +2387,7 @@
                         </layout>
                 </item>
                 <item row = "2" column = "1">
-                                <widget class="QCheckBox" name="cbBBLIND">
+                                <widget class="QCheckBox" name="cbDoubleBlind">
                                     <property name="text">
                                             <string>Double Blind</string>
                                     </property>

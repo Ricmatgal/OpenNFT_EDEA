@@ -35,24 +35,53 @@ P.DynROI = false;
 
 %% ROIs in a single folder
 if flags.isPSC || flags.isSVM || flags.isCorr || P.isAutoRTQA
-    roiDir = pathName;
-    roiNames = {};
-    roiNames = cellstr([spm_select('FPList', roiDir, '^.*.img$'); ...
-                        spm_select('FPList', roiDir, '^.*.nii$')]);
 
-    P.NrROIs = length(roiNames);
-    P.ROINames = roiNames;
+    if ~strcmp(P.Prot, 'ContTask')
 
-    for iFile = 1:P.NrROIs
-        [ROIs(iFile).mat, ROIs(iFile).dim, ROIs(iFile).vol] = ...
-            readVol(roiNames{iFile});
-        ROIs(iFile).vol(ROIs(iFile).vol < 0.5) = 0;
-        ROIs(iFile).vol(ROIs(iFile).vol >= 0.5) = 1;
-        ROIs(iFile).voxelIndex = find(ROIs(iFile).vol);
+        roiDir = pathName;
+        roiNames = {};
+        roiNames = cellstr([spm_select('FPList', roiDir, '^.*.img$'); ...
+                            spm_select('FPList', roiDir, '^.*.nii$')]);
+
+        P.NrROIs = length(roiNames);
+        P.ROINames = roiNames;
+
+        for iFile = 1:P.NrROIs
+            [ROIs(iFile).mat, ROIs(iFile).dim, ROIs(iFile).vol] = ...
+                readVol(roiNames{iFile});
+            ROIs(iFile).vol(ROIs(iFile).vol < 0.5) = 0;
+            ROIs(iFile).vol(ROIs(iFile).vol >= 0.5) = 1;
+            ROIs(iFile).voxelIndex = find(ROIs(iFile).vol);
+        end
+
+    elseif strcmp(P.Prot, 'ContTask')
+
+        roiDir = pathName;
+        roiNames = {};
+        roiNames = cellstr([spm_select('FPList', [roiDir filesep 'ROI_1'], '^.*.nii$'); ...
+            spm_select('FPList', [roiDir filesep 'ROI_2'], '^.*.nii$')]);
+
+        P.NrROIs = length(roiNames);
+        P.ROINames = roiNames;
+
+        for iFile = 1:P.NrROIs
+            [ROIs(iFile).mat, ROIs(iFile).dim, ROIs(iFile).vol] = ...
+                readVol(roiNames{iFile});
+            ROIs(iFile).vol(ROIs(iFile).vol < 0.5) = 0;
+            ROIs(iFile).vol(ROIs(iFile).vol >= 0.5) = 1;
+            ROIs(iFile).voxelIndex = find(ROIs(iFile).vol);
+        end
+
     end
 
     assignin('base', 'ROIs', ROIs);
+
 end
+
+
+
+%% ROIs in two different folders
+
 
 if flags.isSVM
     %% Weights

@@ -64,19 +64,43 @@ if (strcmp(P.Prot, 'Inter') ||  strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTa
         displayData.displayStage = 'instruction';
     end
     
-    if strcmp(P.Prot, 'ContTask')
-        if condition == 1
-            mainLoopData.flagEndPSC = 0;
-            mainLoopData.dispValue = 0;
-            mainLoopData.Reward = '';
-        elseif condition == 2
-            mainLoopData.flagEndPSC = 1;
-        elseif condition == 3
-            mainLoopData.flagEndPSC = 0;
-            mainLoopData.Reward = '';
+    %%===================== OUR TASK ===========================%%
+    % Condition is recorded in P.vectEncCond (loadProtocolData) where:
+    % 1 = Baseline, 2 = NF / Regulation, 3 = Task, 4 = SumFB
+    % Only for NF things will be different, we could collapse and make a
+    % simple if, and else statement.. 
+
+    if strcmp(P.Prot,'ContTask')
+        switch condition
+            case 1 % Task (VAS and END)
+                mainLoopData.flagEndPSC = 0;
+                mainLoopData.dispValue = 0; 
+                mainLoopData.Reward = '';
+                displayData.displayStage = 'VAS';
+            case 2 % Baseline
+                mainLoopData.flagEndPSC = 0;
+                mainLoopData.dispValue = 0;
+                mainLoopData.Reward = '';
+                displayData.displayStage = 'Baseline';
+            case 3 % NF
+                % set flanEndPSC to one so we record dispValue in nfbCalc
+                displayData.displayStage = 'Modulation';
+                mainLoopData.flagEndPSC = 1; 
+            case 4 % sumFB
+                mainLoopData.flagEndPSC = 0;
+                mainLoopData.dispValue = 0; 
+                mainLoopData.Reward = '';
+                displayData.displayStage = 'Feedback';
         end
-        displayData.displayStage = 'instruction';
+
+        %displayData.displayStage = 'instruction'; % this could be adjusted?
+        displayData.rawDispValues = mainLoopData.rawDispValues;
+        displayData.currNFblock = mainLoopData.currNFblock;
+
+    %%===============================================================%%
+
     end
+
 
     if strcmp(P.Prot, 'Inter')
         switch condition
@@ -95,6 +119,7 @@ if (strcmp(P.Prot, 'Inter') ||  strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTa
                 displayData.displayStage = 'feedback';
         end
     end
+
     % displayData assignment
     if strcmp(P.Prot, 'Inter')
         displayData.feedbackType = 'value_fixation';

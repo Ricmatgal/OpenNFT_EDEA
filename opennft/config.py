@@ -31,7 +31,7 @@ PTB_MATLAB_NAME = 'MATLAB_NFB_PTB'
 MODEL_HELPER_MATLAB_NAME = 'MATLAB_NFB_MODEL_HELPER'
 
 MAIN_MATLAB_STARTUP_OPTIONS = '-nodesktop'
-PTB_MATLAB_STARTUP_OPTIONS = '-nodesktop'
+PTB_MATLAB_STARTUP_OPTIONS = '-desktop'
 MODEL_HELPER_MATLAB_STARTUP_OPTIONS = '-nodesktop'
 
 MATLAB_NAME_SUFFIX = ''
@@ -128,11 +128,11 @@ USE_SLEEP_IN_STOP = False
 HIDE_TEST_BTN = True
 
 # Flag for new Siemens XA30 DICOM format
-DICOM_SIEMENS_XA30 = False
+DICOM_SIEMENS_XA30 = True
 
 # rtQA may cause linear performance loss on the big data
 # due to saving process of iGLM quality parameters
-USE_RTQA = True
+USE_RTQA = False
 USE_IGLM = True
 USE_ROI = True
 FIRST_SNR_VOLUME = 1
