@@ -286,7 +286,8 @@ for indRoi = 1:P.NrROIs
 %                 betaReg = pinv(comb_cX0) * comb_tmp_rawTimeSeries;
 %                 tmp_glmProcTimeSeries = (comb_tmp_rawTimeSeries - comb_cX0 * betaReg)';
 %             end
-            mainLoopData.betRegr{indRoi}(tmp_ind_end,:) = betaReg;
+%             mainLoopData.betRegr{indRoi}(tmp_ind_end,:) = betaReg; %
+%             giving an issue at the moment...
 
             if P.isRTQA
                 tContr = mainLoopData.tContr;

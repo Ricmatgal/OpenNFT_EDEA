@@ -44,6 +44,7 @@ else
     screenid = 0;
 end
 
+screenid = 2;
 fFullScreen = P.DisplayFeedbackFullscreen;
 
 if ~fFullScreen
@@ -289,8 +290,8 @@ if strcmp(protName, 'ContTask')
         P.stimFolderPath    = P.StimFolder;
 
         % wheelImage = 'wheel_illustrator_prf_2.png';
-        % wheelImage = 'wheel_illustrator.png';
-        wheelImage = 'wheel_illustrator_grayscale.png';
+        wheelImage = 'wheel_illustrator.png';
+        % wheelImage = 'wheel_illustrator_grayscale.png';
         P.imWheel           = imread([P.stimFolderPath, filesep, wheelImage]);
     
         P.wheelTex          = Screen('MakeTexture', P.Screen.wPtr, P.imWheel);

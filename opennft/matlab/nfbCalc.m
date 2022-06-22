@@ -63,7 +63,7 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
             if blockNF<2
                 % we skip the first 60 (quite unstable) volumes of the
                 % baseline
-                i_blockBAS = P.ProtCond{2}{blockNF}(60:end);
+                i_blockBAS = P.ProtCond{2}{blockNF}(10:end);
             % otherwise NFBrun > 1
             else
                 % we skip the first baseline in the accumumaltion process
@@ -140,14 +140,14 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
             % Differential feedback calculation is implemented here.
             % Currently, when training roi_A > roi_B,
             if P.V1_right > P.V1_left
-                tmp_fbVal = norm_percValues2(1)-norm_percValues2(2);
-%                 tmp_fbVal = psc(1)-psc(2);
+%                tmp_fbVal = norm_percValues2(1)-norm_percValues2(2);
+                tmp_fbVal = psc(1)-psc(2);
 %                 tmp_fbVal = norm_percValues(1);
 
             elseif P.V1_left > P.V1_right
 
-                tmp_fbVal = norm_percValues2(2)-norm_percValues2(1);
-%                 tmp_fbVal = psc(2)-psc(1);
+%               tmp_fbVal = norm_percValues2(2)-norm_percValues2(1);
+                 tmp_fbVal = psc(2)-psc(1);
 %                 tmp_fbVal = norm_percValues(2);
 
             % just a check that not both boxes are checked. This should be

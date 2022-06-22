@@ -31,6 +31,8 @@ if testCase == 'PSC':
     dstpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectBBL/dummy_data/watch_folder'
     #srcpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectCecilia/dummy_data/20220430.MRI_DEV_Test_NFB.110734'
     #dstpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectCecilia/dummy_data/rtTestFolder'
+    srcpath = 'E:/TBV-input/20220622.EDEA_P101.111468'
+    dstpath = 'E:/TBV-input/rtTestFolder'
     # in the BBL MRI
     #srcpath = 'Z:/20220430.Siemens_Service.Service_10849583_167114'
     #dstpath = 'D:/LABNIC/EDEA/offline_testing/watch_folder'
