@@ -241,25 +241,6 @@ if ~P.isAutoRTQA
     mainLoopData.signalPreprocGlmDesign = mainLoopData.basFct(:,contains(SPM.xX.name, P.SignalPreprocessingBasis));
     mainLoopData.nrSignalPreprocGlmDesign = size(mainLoopData.signalPreprocGlmDesign,2);
 
-    %% LUCAS IMPLEMENTATION
-
-    if P.NFRunNr > 1
-        lSpmDesign = size(mainLoopData.signalPreprocGlmDesign,1);
-        P.prevNfbDataFolder = fullfile(P.WorkFolder,['NF_Data_' sprintf('%d',P.NFRunNr-1)]);
-        % get motion correction parameters
-        pathPrevP = dir(fullfile(P.prevNfbDataFolder,'*_P.mat'));
-        prevP = load(fullfile(P.prevNfbDataFolder,pathPrevP.name));
-        % get time-series
-        pathPrevTS = dir(fullfile(P.prevNfbDataFolder,'*_raw_tsROIs.mat'));
-        mainLoopData.prevTS = load(fullfile(P.prevNfbDataFolder,pathPrevTS.name));
-        % construct regressors
-        tmpRegr = [ones(lSpmDesign,1) P.linRegr zscore(prevP.motCorrParam(end-(lSpmDesign-1):end,:))];
-        if P.cglmAR1
-            mainLoopData.prev_cX0 = arRegr(P.aAR1,tmpRegr);
-        end
-        mainLoopData.prev_cX0 = [tmpRegr, mainLoopData.signalPreprocGlmDesign];
-    end
-
     % DCM
     if flags.isDCM && strcmp(P.Prot, 'InterBlock')
         [mainLoopData.DCM_EN, mainLoopData.dcmParTag, ...
@@ -278,6 +259,25 @@ else
     mainLoopData.spmMaskTh = mean(SPM.xM.TH)*ones(size(SPM.xM.TH));
     mainLoopData.pVal = .1;
     mainLoopData.statMap3D_iGLM = [];
+end
+
+%% LUCAS IMPLEMENTATION
+
+if P.NFRunNr > 1
+    lSpmDesign = size(mainLoopData.signalPreprocGlmDesign,1);
+    P.prevNfbDataFolder = fullfile(P.WorkFolder,['NF_Data_' sprintf('%d',P.NFRunNr-1)]);
+    % get motion correction parameters
+    pathPrevP = dir(fullfile(P.prevNfbDataFolder,'*_P.mat'));
+    prevP = load(fullfile(P.prevNfbDataFolder,pathPrevP.name));
+    % get time-series
+    pathPrevTS = dir(fullfile(P.prevNfbDataFolder,'*_raw_tsROIs.mat'));
+    mainLoopData.prevTS = load(fullfile(P.prevNfbDataFolder,pathPrevTS.name));
+    % construct regressors
+    tmpRegr = [ones(lSpmDesign,1) P.linRegr zscore(prevP.motCorrParam(end-(lSpmDesign-1):end,:))];
+    if P.cglmAR1
+        mainLoopData.prev_cX0 = arRegr(P.aAR1,tmpRegr);
+    end
+    mainLoopData.prev_cX0 = [tmpRegr, mainLoopData.signalPreprocGlmDesign];
 end
 
 mainLoopData.mf = [];
@@ -413,8 +413,9 @@ mainLoopData.b = b;
 
 % Save the beta estimates (LUCAS)
 mainLoopData.betRegr = cell(P.NrROIs,1);
+
 for i=1:P.NrROIs
-    mainLoopData.betRegr{i} = zeros(P.NrOfVolumes-P.nrSkipVol, 2+6+size(SPM.xX.X,2));
+    mainLoopData.betRegr{i} = zeros(P.NrOfVolumes-P.nrSkipVol, 2+6+mainLoopData.nrSignalPreprocGlmDesign);
 end
 
 clear SPM
