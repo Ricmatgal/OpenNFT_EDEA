@@ -112,7 +112,8 @@ mainLoopData.kalmanProcTimeSeries = [];
 mainLoopData.displRawTimeSeries = [];
 mainLoopData.scalProcTimeSeries = [];
 mainLoopData.emaProcTimeSeries = [];
-%% LUCAS IMPLEMENTATION
+
+% constant preprocessing init
 mainLoopData.constProcTimeSeries = [];
 
 mainLoopData.posMin = [];
@@ -261,7 +262,8 @@ else
     mainLoopData.statMap3D_iGLM = [];
 end
 
-%% LUCAS IMPLEMENTATION
+% for constant preprocessing routine, upload the previous run data to merge
+% GLM design
 
 if P.NFRunNr > 1
     lSpmDesign = size(mainLoopData.signalPreprocGlmDesign,1);
@@ -411,11 +413,11 @@ mainLoopData.wt = wt;
 mainLoopData.deg = deg;
 mainLoopData.b = b;
 
-% Save the beta estimates (LUCAS)
+% Save the beta estimates for plotting
 mainLoopData.betRegr = cell(P.NrROIs,1);
 
 for i=1:P.NrROIs
-    mainLoopData.betRegr{i} = zeros(P.NrOfVolumes-P.nrSkipVol, 2+6+mainLoopData.nrSignalPreprocGlmDesign);
+    mainLoopData.betRegr{i} = zeros(P.NrOfVolumes-P.nrSkipVol, 2+6+mainLoopData.nrSignalPreprocGlmDesign); % constant + linear trend + 6 MC + SPM design matrix
 end
 
 clear SPM

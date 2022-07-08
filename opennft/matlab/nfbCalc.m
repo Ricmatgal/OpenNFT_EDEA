@@ -46,42 +46,38 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
 
         % count NF regulation blocks
         % index for Regulation block == 3
+        % find which NF block we are in and 
+
         k = cellfun(@(x) x(1) == indVolNorm, P.ProtCond{ 3 });
         if any(k)
             blockNF = find(k);
             firstNF = indVolNorm;
         end
 
-
-
-        %% LUCAS IMPLEMENTATION
+        % take different N of baseline volumes to use for normalization,
+        % also, we accumulate baseline across blocks
 
         i_blockBAS = [];
+
         % if NFB run is 1 
         if P.NFRunNr == 1 
             % if NFB block is 1
-            if blockNF<2
-                % we skip the first 60 (quite unstable) volumes of the
+            if blockNF < 2
+                % take the last 10 blocks of the first baseline
                 % baseline
-                i_blockBAS = P.ProtCond{2}{blockNF}(10:end);
+                i_blockBAS = P.ProtCond{2}{blockNF}(end-19:end);
             % otherwise NFBrun > 1
             else
-                % we skip the first baseline in the accumumaltion process
-                for iBas = 2:blockNF
-                    % this is now skipped but was used to take a different
-                    % number of volumes of the first baseline
-                    if iBas == 1
-                        i_blockBAS = [i_blockBAS P.ProtCond{2}(end-9:end)]; % 
-                    else
-                        i_blockBAS = [i_blockBAS P.ProtCond{2}{iBas}(end-9:end)]; %
-                    end
+                % we skip the first baseline in the accumulation process
+                for iBas = 2 : blockNF
+                    i_blockBAS = [i_blockBAS P.ProtCond{2}{iBas}(end-9:end)];
                 end
             end
         
         % if NFB run is > 1
         elseif P.NFRunNr > 1
             % if NFB block is 1
-            if blockNF<2
+            if blockNF < 2
                 % we take the last 10 voumes of the first baseline
                 i_blockBAS = P.ProtCond{2}{blockNF}(end-9:end);
             % if NFB block is > 1
@@ -107,10 +103,14 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
 %             end
 %         end
 
-        %% Calculate NFB signal
-        i_reg = indVolNorm-2:indVolNorm;
+        % Calculate NFB signal , i.e. take the regulation activity
+        % normalizing to baseline, constantly
+        
+        nVolumes = 2; % how many volumes we want to take?
+        i_reg = indVolNorm-nVolumes:indVolNorm;
+
         for indRoi = 1:P.NrROIs
-            % normalized PSC against last six blocks of baseline
+            % normalized PSC against last N blocks of baseline
             mBas = median(mainLoopData.scalProcTimeSeries(indRoi,i_blockBAS));
             mCond = mainLoopData.scalProcTimeSeries(indRoi,i_reg);
 
@@ -171,6 +171,7 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
         %% Storing values
         mainLoopData.norm_percValues(indVolNorm,:) = norm_percValues;
         mainLoopData.norm_percValues2(indVolNorm,:) = norm_percValues2;
+        mainLoopData.psc_values(indVolNorm,:) = psc;
 
         mainLoopData.dispValues(indVolNorm) = dispValue;
         mainLoopData.dispValue = dispValue;
@@ -195,6 +196,7 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
 
         tmp_fbVal = 0;
         rawDispValues = 0;
+
     else
 
         tmp_fbVal = 0;

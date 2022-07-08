@@ -44,6 +44,11 @@ else
 
 end
 
+% % adjust the limits
+% P.limLow = min(displayData.rawDispValues(displayData.rawDispValues>0));
+% P.limUp = max(displayData.rawDispValues(displayData.rawDispValues>0));
+
+
 
 
 
@@ -150,7 +155,8 @@ switch feedbackType
 
 
             case 3 % Regulation
-
+                
+                fprintf('Feedback Value from nfbCalc: %f \n',dispValue);
 
                 P.test.visit_case2(end+1) = now;
 
@@ -176,41 +182,53 @@ switch feedbackType
                         P.limUp   = max(rawDisp_s);
                     end
 
+
+                    
+
+
                     % Adaptive Feedback display for differential PSC, scaled according to limits (limlow, limup) of brain activity and steps
                     % and using a logarithmic scale
 
-                    logTest = 0;
+                    logTest = 1;
 
                     if ~logTest
 
-                        dispValue = ((dispValue- P.limLow) / (P.limUp - P.limLow)) * (P.stepMax - P.stepMin) + P.stepMin;
+                        dispValue = ((dispValue - P.limLow) / (P.limUp - P.limLow)) * (P.stepMax - P.stepMin) + P.stepMin;
 
                     else
 
-                        dispValue = ((dispValue- P.limLow) / (P.limUp - P.limLow));
+                        dispValue = ((dispValue - P.limLow) / (P.limUp - P.limLow));
+
+                        fprintf('Feedback Value from nfbCalc after scaling: %f with lims: %f, %f  \n',dispValue,P.limLow,P.limUp);
+                        P.scaledDispVal(iteration-P.nrSkipVol) = dispValue;
+                        
+                        while dispValue > -1 && dispValue < 1
+                            dispValue = dispValue * 10;
+                        end
+
 
                         % let's try with the log, values are normalized between -1 and 1.
                         % so we scale by 10 in order that we do not have values below 0
                         % then we take the log of the absolute value and assign a sign
                         % log e and log 2 allows a higher maximum speed
 
-                        scalingFactor = 10;
 
                         if dispValue > 0
-                            dispValue = log2(dispValue*scalingFactor);
+                            dispValue = log(dispValue);
                         elseif dispValue < 0
-                            dispValue = -log2(abs(dispValue)*scalingFactor);
+                            dispValue = -log(abs(dispValue));
                         else
                             dispValue = 0;
                         end
 
-                        P.logDispVal(iteration-P.nrSkipVol) = dispValue;
                     end
 
 
                     % we get the rotation value for the wheel
                     P.rotSpe  = dispValue;
+                    fprintf('Feedback value given to the wheel: %s \n',dispValue)
                     P.finalDispVal(iteration-P.nrSkipVol) = dispValue;
+
 
                 else
 
@@ -338,7 +356,9 @@ switch feedbackType
                 % rescaling the P.finalDispVal vector (rotation speed) from 0 to
                 % 100 for the precedent NF block, then taking the mean
                 % (i.e. giving a score 0-100 of how good they performed)
-                dispValue = round(mean(rescale(P.finalDispVal(P.ProtCond{3}{displayData.currNFblock}),0,100)));
+                minRescale = -10;
+                maxRescale = 10;
+                dispValue = round(mean(rescale(P.finalDispVal(P.ProtCond{3}{displayData.currNFblock}),minRescale,maxRescale)));
                 P.sumFBscore(iteration-P.nrSkipVol) = dispValue;
 
                 k = cellfun(@(x) x(2) == (iteration-P.nrSkipVol), P.ProtCond{4});

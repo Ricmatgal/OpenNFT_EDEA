@@ -176,7 +176,9 @@ for indRoi = 1:P.NrROIs
 
 
 
-    %% LUCAS IMPLEMENTATION
+    % Two different routines, if first run, normal routine. If run 2
+    % onwards, loading half of the previous GLM and attach it to the actual
+    % run
 
     if flags.isPSC || flags.isSVM || flags.isCorr || P.isAutoRTQA
         if P.NFRunNr == 1
@@ -297,11 +299,11 @@ for indRoi = 1:P.NrROIs
 
         else % second or subsequent run
 
-            % previous NFB run estimates, skip first ca 100 unstable
+            % previous NFB run estimates, skip first half of the run
             vols2skip = P.NrOfVolumes/2;
             prevRunL  = size(mainLoopData.prevTS.rawTimeSeries,2);
             currRunL  = size(mainLoopData.prev_cX0,1); % length defined on current run length in setupProcParams
-            diffRunL  = prevRunL-currRunL;
+            diffRunL  = prevRunL-currRunL; % baselines are different between 1st and following runs, i.e. different number of volumes per run
 
             comb_tmp_rawTimeSeries = [mainLoopData.prevTS.rawTimeSeries(indRoi,vols2skip+diffRunL:end)'; tmp_rawTimeSeries];
 
@@ -372,7 +374,8 @@ for indRoi = 1:P.NrROIs
             tmp_glmProcTimeSeries(end);
 
     end
-
+    
+    % routine without combined matrix
     %     if flags.isPSC || flags.isSVM || flags.isCorr || P.isAutoRTQA
     %         if (tmp_ind_end < regrStep)
     %             tmpRegr = ones(tmp_ind_end,1);
@@ -572,7 +575,7 @@ mainLoopData.mposMin(indVolNorm)= mean(mainLoopData.posMin(:, indVolNorm));
 output.posMin = [mainLoopData.posMin; mainLoopData.mposMin];
 output.posMax = [mainLoopData.posMax; mainLoopData.mposMax];
 output.scalProcTimeSeries = mainLoopData.scalProcTimeSeries;
-
+output.constProcTimeSeries = mainLoopData.constProcTimeSeries;
 output.glmProcTimeSeries = mainLoopData.glmProcTimeSeries;
 output.kalmanProcTimeSeries = mainLoopData.kalmanProcTimeSeries;
 output.displRawTimeSeries = mainLoopData.displRawTimeSeries;
