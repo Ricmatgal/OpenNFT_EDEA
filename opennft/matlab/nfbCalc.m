@@ -58,6 +58,7 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
         % also, we accumulate baseline across blocks
 
         i_blockBAS = [];
+        i_nVolBas = 9; % last 10 blocks
 
         % if NFB run is 1 
         if P.NFRunNr == 1 
@@ -65,12 +66,12 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
             if blockNF < 2
                 % take the last 10 blocks of the first baseline
                 % baseline
-                i_blockBAS = P.ProtCond{2}{blockNF}(end-19:end);
+                i_blockBAS = P.ProtCond{2}{blockNF}(end-i_nVolBas:end);
             % otherwise NFBrun > 1
             else
                 % we skip the first baseline in the accumulation process
                 for iBas = 2 : blockNF
-                    i_blockBAS = [i_blockBAS P.ProtCond{2}{iBas}(end-9:end)];
+                    i_blockBAS = [i_blockBAS P.ProtCond{2}{iBas}(end-i_nVolBas:end)];
                 end
             end
         
@@ -79,12 +80,12 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
             % if NFB block is 1
             if blockNF < 2
                 % we take the last 10 voumes of the first baseline
-                i_blockBAS = P.ProtCond{2}{blockNF}(end-9:end);
+                i_blockBAS = P.ProtCond{2}{blockNF}(end-i_nVolBas:end);
             % if NFB block is > 1
             else
                 % we also skip the first baseline from accumulation
                 for iBas = 2:blockNF
-                    i_blockBAS = [i_blockBAS P.ProtCond{2}{iBas}(end-9:end)]; 
+                    i_blockBAS = [i_blockBAS P.ProtCond{2}{iBas}(end-i_nVolBas:end)]; 
                 end
             end
         end
@@ -106,7 +107,7 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
         % Calculate NFB signal , i.e. take the regulation activity
         % normalizing to baseline, constantly
         
-        nVolumes = 2; % how many volumes we want to take?
+        nVolumes = 3; % how many volumes we want to take?
         i_reg = indVolNorm-nVolumes:indVolNorm;
 
         for indRoi = 1:P.NrROIs

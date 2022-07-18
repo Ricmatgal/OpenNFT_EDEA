@@ -176,18 +176,49 @@ if strcmp(protName, 'ContTask')
 
     
     %% Cecilia Task Parameters
-    P.nrEqBlock = 3;
-    P.nrAnglesBlock = 2;
-    P.nrEq      = length(P.ProtCond{2})*P.nrEqBlock; % number of blocks which requires the equations to be generated for
+
+    nLongBasVolumes = length([P.ProtCond{2}{1}]); % N volumes in long (1st) bas
+    nShortBasBlocks = length([P.ProtCond{2}])-1; % N block with short (2nd onwards) bas
+    nShortBasVolumes = (length([P.ProtCond{2}{:}]) - nLongBasVolumes)/nShortBasBlocks; % N volumes in short (2nd onwards) bas
+
+    eqSkipVolumes = 6; % every n volumes we change the equation
+    angleSkipVolumes = 3; % every n volumes we change the presented wheel orientation
+    
+    nTotalBasVolumes = nLongBasVolumes + nShortBasVolumes * nShortBasBlocks;
+    % P.nrEq = nTotalBasVolumes * eqSkipVolumes;
+    
     P.nrDigits = 2; % how many digits per equation?
+    P.strings_operation = repelem(ptbCreateOperations(ceil(nTotalBasVolumes/eqSkipVolumes), P.nrDigits),2*eqSkipVolumes); % times 2 because function visited twice
+    
+    angleLongBas = 360/nLongBasVolumes*angleSkipVolumes:360/nLongBasVolumes*angleSkipVolumes:360; % angles list for long bas
+    angleShortBas = 360/nShortBasVolumes*angleSkipVolumes:360/nShortBasVolumes*angleSkipVolumes:360; % angles list for short bas
+
+    % shuffle
+    nAngleLongBas = length(angleLongBas);
+    nAngleShortBas = length(angleShortBas);
+    angleLongBas = angleLongBas(randperm(nAngleLongBas));
+
+    angleShortBasAll = [];
+    for i = 1:nShortBasBlocks
+        angleShortBas = angleShortBas(randperm(nAngleShortBas));
+        angleShortBasAll = [angleShortBasAll,angleShortBas];
+    end
+    
+    P.rotation_angle_BAS = repelem([angleLongBas,angleShortBasAll],2 * angleSkipVolumes);
+
+    
+    %P.nrEqBlock = 3;
+    %P.nrAnglesBlock = 2;
+    %P.nrEq      = length(P.ProtCond{2})*P.nrEqBlock; % number of blocks which requires the equations to be generated for
+    %P.nrDigits = 2; % how many digits per equation?
     % (all baseline blocks - 2 per baseline block)
     P.nrFigs    = 2; % number of textures on screen
     P.dim       = 100; % Texture dimensions
     P.yPos      = P.Screen.yCenter;
     P.xPos      = linspace(w * 0.15, w * 0.85, P.nrFigs);
-    P.strings_operation = repelem(ptbCreateOperations(P.nrEq, P.nrDigits),ceil(length(P.ProtCond{2}{1})*2/P.nrEqBlock)); % times 2 because function visited twice
-    list_angles = 360/length(P.ProtCond{2}):360/length(P.ProtCond{2}):360;
-    P.rotation_angle_BAS = repelem(list_angles(randperm(length(list_angles))),floor(length(P.ProtCond{2}{1})*2/P.nrAnglesBlock)); % times 2 because function visited twice
+    %P.strings_operation = repelem(ptbCreateOperations(P.nrEq, P.nrDigits),ceil(length(P.ProtCond{2}{1})*2/P.nrEqBlock)); % times 2 because function visited twice
+    %list_angles = 360/length(P.ProtCond{2}):360/length(P.ProtCond{2}):360;
+    %P.rotation_angle_BAS = repelem(list_angles(randperm(length(list_angles))),floor(length(P.ProtCond{2}{1})*2/P.nrAnglesBlock)); % times 2 because function visited twice
     P.K_rot = 0;
     P.k_eq = 0;
     P.rotAng = 0;
@@ -380,8 +411,8 @@ if strcmp(protName, 'ContTask')
         % its only the initial range and will be updated as soon as new display
         % values come in.. it helps to make the first FB block less eratic
         if P.NFRunNr == 1
-            P.limLow  = -0.1;
-            P.limUp   = 0.1;
+            P.limLow  = -0.01;
+            P.limUp   = 0.01;
         else
             prevNfbPtbP   = fullfile(P.WorkFolder,['taskFolder', filesep, 'taskResults', filesep,...
                                            'NFB_taskResults_r' sprintf('%d',P.NFRunNr-1)]);

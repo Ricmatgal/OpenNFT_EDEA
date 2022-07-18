@@ -169,21 +169,20 @@ switch feedbackType
 
                     % send Trigger Regulation
                     % outp(P.parportAddr,P.triggers(2))
-
+                    
+                    nFirstBasVolumes = max(P.ProtCond{2}{1});
                     NfirstVolumes = 10;
-                    if (length(rawDisp_s) > 1 && length(rawDisp_s) <= NfirstVolumes)
+                    if (length(rawDisp_s) - nFirstBasVolumes > 1 && length(rawDisp_s) - nFirstBasVolumes <= NfirstVolumes)
                         if max(rawDisp_s) > P.limUp
                             P.limUp   = rawDisp_s(1);
                         elseif min(rawDisp_s) <  P.limLow
                             P.limLow  = rawDisp_s(end);
                         end
-                    elseif length(rawDisp_s) > NfirstVolumes
+                    elseif length(rawDisp_s) - nFirstBasVolumes > NfirstVolumes
                         P.limLow  = min(rawDisp_s);
                         P.limUp   = max(rawDisp_s);
                     end
 
-
-                    
 
 
                     % Adaptive Feedback display for differential PSC, scaled according to limits (limlow, limup) of brain activity and steps
@@ -193,11 +192,19 @@ switch feedbackType
 
                     if ~logTest
 
+                    %if blockNF > 1
+                        
                         dispValue = ((dispValue - P.limLow) / (P.limUp - P.limLow)) * (P.stepMax - P.stepMin) + P.stepMin;
+                    
+                    %end
 
                     else
+                        
+                        %if blockNF > 1
 
-                        dispValue = ((dispValue - P.limLow) / (P.limUp - P.limLow));
+                            dispValue = ((dispValue - P.limLow) / (P.limUp - P.limLow));
+
+                        %end
 
                         fprintf('Feedback Value from nfbCalc after scaling: %f with lims: %f, %f  \n',dispValue,P.limLow,P.limUp);
                         P.scaledDispVal(iteration-P.nrSkipVol) = dispValue;

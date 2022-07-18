@@ -113,7 +113,7 @@ mainLoopData.displRawTimeSeries = [];
 mainLoopData.scalProcTimeSeries = [];
 mainLoopData.emaProcTimeSeries = [];
 
-% constant preprocessing init
+% Constant preprocessing init
 mainLoopData.constProcTimeSeries = [];
 
 mainLoopData.posMin = [];

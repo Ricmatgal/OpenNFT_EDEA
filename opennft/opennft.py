@@ -2652,6 +2652,7 @@ class OpenNFT(QWidget):
 
         if self.P['Prot'] == 'ContTask':
             self.settings.setValue('TaskFolder', self.P['TaskFolder'])
+            self.settings.setValue('StimFolder', self.P['StimFolder'])
 
         # --- middle ---
         self.settings.setValue('ProjectName', self.P['ProjectName'])
@@ -2683,6 +2684,7 @@ class OpenNFT(QWidget):
         self.settings.setValue('PlotFeedback', self.P['PlotFeedback'])
 
         self.settings.setValue('ShamFile', self.P['ShamFile'])
+        self.settings.setValue('DoubleBlindDir', self.P['DoubleBlindDir'])
 
         self.settings.setValue('UsePTB', self.cbUsePTB.isChecked())
         self.settings.setValue('DisplayFeedbackScreenID', self.cbScreenId.currentIndex())

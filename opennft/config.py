@@ -128,7 +128,7 @@ USE_SLEEP_IN_STOP = False
 HIDE_TEST_BTN = True
 
 # Flag for new Siemens XA30 DICOM format
-DICOM_SIEMENS_XA30 = True
+DICOM_SIEMENS_XA30 = True # the dicom format from Syngo MR
 
 # rtQA may cause linear performance loss on the big data
 # due to saving process of iGLM quality parameters
@@ -142,7 +142,7 @@ zeroPaddingFlag = False
 nrZeroPadVol = 3
 
 # FD defaults
-DEFAULT_FD_RADIUS = 50  # radius multiplying angular displacement in FD compution
+DEFAULT_FD_RADIUS = 50  # radius multiplying angular displacement in FD computation
 DEFAULT_FD_THRESHOLDS = [0.1, 0.2, 0.5]  # FD thresholds to display by default
 
 # DVARS
