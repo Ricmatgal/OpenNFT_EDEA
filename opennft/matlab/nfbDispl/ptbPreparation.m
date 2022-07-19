@@ -179,10 +179,10 @@ if strcmp(protName, 'ContTask')
 
     nLongBasVolumes = length([P.ProtCond{2}{1}]); % N volumes in long (1st) bas
     nShortBasBlocks = length([P.ProtCond{2}])-1; % N block with short (2nd onwards) bas
-    nShortBasVolumes = (length([P.ProtCond{2}{:}]) - nLongBasVolumes)/nShortBasBlocks; % N volumes in short (2nd onwards) bas
+    nShortBasVolumes = length([P.ProtCond{2}{2}]); % N volumes in short (2nd onwards) bas
 
-    eqSkipVolumes = 6; % every n volumes we change the equation
-    angleSkipVolumes = 3; % every n volumes we change the presented wheel orientation
+    eqSkipVolumes = 4; % every n volumes we change the equation
+    angleSkipVolumes = 4; % every n volumes we change the presented wheel orientation
     
     nTotalBasVolumes = nLongBasVolumes + nShortBasVolumes * nShortBasBlocks;
     % P.nrEq = nTotalBasVolumes * eqSkipVolumes;
@@ -190,21 +190,22 @@ if strcmp(protName, 'ContTask')
     P.nrDigits = 2; % how many digits per equation?
     P.strings_operation = repelem(ptbCreateOperations(ceil(nTotalBasVolumes/eqSkipVolumes), P.nrDigits),2*eqSkipVolumes); % times 2 because function visited twice
     
-    angleLongBas = 360/nLongBasVolumes*angleSkipVolumes:360/nLongBasVolumes*angleSkipVolumes:360; % angles list for long bas
-    angleShortBas = 360/nShortBasVolumes*angleSkipVolumes:360/nShortBasVolumes*angleSkipVolumes:360; % angles list for short bas
+    angleLongBas = 0:360/nLongBasVolumes*angleSkipVolumes:360; % angles list for long bas
+    angleShortBas = 0:360/nShortBasVolumes*angleSkipVolumes:360; % angles list for short bas
+    angleLongBas = angleLongBas(2:end);
+    angleShortBas = angleShortBas(2:end);
 
     % shuffle
     nAngleLongBas = length(angleLongBas);
     nAngleShortBas = length(angleShortBas);
     angleLongBas = angleLongBas(randperm(nAngleLongBas));
-
     angleShortBasAll = [];
     for i = 1:nShortBasBlocks
         angleShortBas = angleShortBas(randperm(nAngleShortBas));
         angleShortBasAll = [angleShortBasAll,angleShortBas];
     end
     
-    P.rotation_angle_BAS = repelem([angleLongBas,angleShortBasAll],2 * angleSkipVolumes);
+    P.rotation_angle_BAS = repelem([angleLongBas,angleShortBasAll],2*angleSkipVolumes);
 
     
     %P.nrEqBlock = 3;
