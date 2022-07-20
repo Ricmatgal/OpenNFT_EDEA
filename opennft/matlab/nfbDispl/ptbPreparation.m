@@ -44,7 +44,7 @@ else
     screenid = 0;
 end
 
-%screenid = 2;
+screenid = 2;
 fFullScreen = P.DisplayFeedbackFullscreen;
 
 if ~fFullScreen
