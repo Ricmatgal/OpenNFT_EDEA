@@ -412,8 +412,8 @@ if strcmp(protName, 'ContTask')
         % its only the initial range and will be updated as soon as new display
         % values come in.. it helps to make the first FB block less eratic
         if P.NFRunNr == 1
-            P.limLow  = -0.00001;
-            P.limUp   = 0.00001;
+            P.limLow  = -0.001;
+            P.limUp   = 0.001;
         else
             prevNfbPtbP   = fullfile(P.WorkFolder,['taskFolder', filesep, 'taskResults', filesep,...
                                            'NFB_taskResults_r' sprintf('%d',P.NFRunNr-1)]);

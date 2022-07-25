@@ -39,8 +39,8 @@ if isfield(P, 'shamData')
 else
     % if its not a sham nfb we retrieve the subject specific
     % rawdisplay values as saved in the displayData structure.
-    rawDispV = displayData.rawDispValues(displayData.rawDispValues>0);
-    rawDisp_s = sort(rawDispV, 'descend');
+    rawDispV = displayData.rawDispValues;
+    rawDisp_s = sort(rawDispV(displayData.rawDispValues>0), 'descend');
 
 end
 
@@ -172,13 +172,13 @@ switch feedbackType
                     
                     nFirstBasVolumes = max(P.ProtCond{2}{1});
                     NfirstVolumes = 10;
-                    if (length(rawDisp_s) - nFirstBasVolumes > 1 && length(rawDisp_s) - nFirstBasVolumes <= NfirstVolumes)
+                    if (length(rawDispV) - nFirstBasVolumes > 1 && length(rawDispV) - nFirstBasVolumes <= NfirstVolumes)
                         if max(rawDisp_s) > P.limUp
                             P.limUp   = rawDisp_s(1);
                         elseif min(rawDisp_s) <  P.limLow
                             P.limLow  = rawDisp_s(end);
                         end
-                    elseif length(rawDisp_s) - nFirstBasVolumes > NfirstVolumes
+                    elseif length(rawDispV) - nFirstBasVolumes > NfirstVolumes
                         P.limLow  = min(rawDisp_s);
                         P.limUp   = max(rawDisp_s);
                     end
@@ -189,6 +189,7 @@ switch feedbackType
                     % and using a logarithmic scale
 
                     logTest = 1;
+                    tanhTest = 1;
 
                     if ~logTest
 
@@ -209,9 +210,6 @@ switch feedbackType
                         fprintf('Feedback Value from nfbCalc after scaling: %f with lims: %f, %f  \n',dispValue,P.limLow,P.limUp);
                         P.scaledDispVal(iteration-P.nrSkipVol) = dispValue;
                         
-                        while dispValue > -1 && dispValue < 1
-                            dispValue = dispValue * 10;
-                        end
 
 
                         % let's try with the log, values are normalized between -1 and 1.
@@ -220,12 +218,24 @@ switch feedbackType
                         % log e and log 2 allows a higher maximum speed
 
 
-                        if dispValue > 0
-                            dispValue = log(dispValue);
-                        elseif dispValue < 0
-                            dispValue = -log(abs(dispValue));
+                        if ~ tanhTest
+
+                        while dispValue > -1 && dispValue < 1
+                            dispValue = dispValue * 10;
+                        end
+    
+                            if dispValue > 0
+                                dispValue = log2(dispValue);
+                            elseif dispValue < 0
+                                dispValue = -log2(abs(dispValue));
+                            else
+                                dispValue = 0;
+                            end
+
                         else
-                            dispValue = 0;
+
+                            dispValue = tanh(dispValue)*10;
+
                         end
 
                     end

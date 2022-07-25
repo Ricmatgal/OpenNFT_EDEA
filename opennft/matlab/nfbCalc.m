@@ -1,5 +1,5 @@
 function displayData = nfbCalc(indVol, displayData, ...
-                               dcmTagLE, dcmOppLE, isDcmCalculated)
+    dcmTagLE, dcmOppLE, isDcmCalculated)
 % Function to estimate the feedback.
 %
 % input:
@@ -46,7 +46,7 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
 
         % count NF regulation blocks
         % index for Regulation block == 3
-        % find which NF block we are in and 
+        % find which NF block we are in and
 
         k = cellfun(@(x) x(1) == indVolNorm, P.ProtCond{ 3 });
         if any(k)
@@ -60,53 +60,53 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
         i_blockBAS = [];
         i_nVolBas = 9; % last 10 blocks
 
-        % if NFB run is 1 
-        if P.NFRunNr == 1 
+        % if NFB run is 1
+        if P.NFRunNr == 1
             % if NFB block is 1
             if blockNF < 2
                 % take the last 10 blocks of the first baseline
                 % baseline
                 i_blockBAS = P.ProtCond{2}{blockNF}(end-i_nVolBas:end);
-            % otherwise NFBrun > 1
+                % otherwise NFBrun > 1
             else
                 % we skip the first baseline in the accumulation process
                 for iBas = 2 : blockNF
                     i_blockBAS = [i_blockBAS P.ProtCond{2}{iBas}(end-i_nVolBas:end)];
                 end
             end
-        
-        % if NFB run is > 1
+
+            % if NFB run is > 1
         elseif P.NFRunNr > 1
             % if NFB block is 1
             if blockNF < 2
                 % we take the last 10 voumes of the first baseline
                 i_blockBAS = P.ProtCond{2}{blockNF}(end-i_nVolBas:end);
-            % if NFB block is > 1
+                % if NFB block is > 1
             else
                 % we also skip the first baseline from accumulation
                 for iBas = 2:blockNF
-                    i_blockBAS = [i_blockBAS P.ProtCond{2}{iBas}(end-i_nVolBas:end)]; 
+                    i_blockBAS = [i_blockBAS P.ProtCond{2}{iBas}(end-i_nVolBas:end)];
                 end
             end
         end
 
-%         % Get reference baseline in cumulated way across the RUN,
-%         % or any other fashion
-%         i_blockBAS = [];
-%         if blockNF<2
-%             % according to json protocol
-%             % index for Baseline == 1
-%             i_blockBAS = P.ProtCond{ 2 }{blockNF}(end-6:end);
-%         else
-%             for iBas = 1:blockNF
-%                 i_blockBAS = [i_blockBAS P.ProtCond{ 2 }{iBas}(3:end)];
-%                 % ignore 2 scans for HRF shift, e.g. if TR = 2sec
-%             end
-%         end
+        %         % Get reference baseline in cumulated way across the RUN,
+        %         % or any other fashion
+        %         i_blockBAS = [];
+        %         if blockNF<2
+        %             % according to json protocol
+        %             % index for Baseline == 1
+        %             i_blockBAS = P.ProtCond{ 2 }{blockNF}(end-6:end);
+        %         else
+        %             for iBas = 1:blockNF
+        %                 i_blockBAS = [i_blockBAS P.ProtCond{ 2 }{iBas}(3:end)];
+        %                 % ignore 2 scans for HRF shift, e.g. if TR = 2sec
+        %             end
+        %         end
 
         % Calculate NFB signal , i.e. take the regulation activity
         % normalizing to baseline, constantly
-        
+
         nVolumes = 3; % how many volumes we want to take?
         i_reg = indVolNorm-nVolumes:indVolNorm;
 
@@ -122,14 +122,18 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
             norm_percValues2(indRoi) = mean(mCond2);
 
 
-            % constProcTS PSC
+            % constProcTS PSC with baseline normalization
             tmpBas  = mainLoopData.constProcTimeSeries(indRoi, i_blockBAS);
             tmpCond = mainLoopData.constProcTimeSeries(indRoi, i_reg);
             psc(indRoi) = (mean(tmpCond) - median(tmpBas)) ./ median(tmpBas);
 
+            % constProcTS PSC with point to point mean signal subtraction
+            mCond3 = mainLoopData.constProcTimeSeries(indRoi, i_reg - nVolumes);
+            psc2(indRoi) = mean(mainLoopData.constProcTimeSeries(indRoi,i_reg)) - mean(mCond3);
+
         end
 
-        
+
 
         % for indRoi = 1:loopNrROIs
         %     mBas = median(mainLoopData.scalProcTimeSeries(indRoi,i_blockBAS));
@@ -141,19 +145,21 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
             % Differential feedback calculation is implemented here.
             % Currently, when training roi_A > roi_B,
             if P.V1_right > P.V1_left
-%                tmp_fbVal = norm_percValues2(1)-norm_percValues2(2);
+                %tmp_fbVal = norm_percValues2(1)-norm_percValues2(2);
                 tmp_fbVal = psc(1)-psc(2);
-%                 tmp_fbVal = norm_percValues(1);
+                %tmp_fbVal = norm_percValues(1);
+                %tmp_fbVal = psc2(1)-psc2(2);
 
             elseif P.V1_left > P.V1_right
 
-%               tmp_fbVal = norm_percValues2(2)-norm_percValues2(1);
-                 tmp_fbVal = psc(2)-psc(1);
-%                 tmp_fbVal = norm_percValues(2);
+                %tmp_fbVal = norm_percValues2(2)-norm_percValues2(1);
+                tmp_fbVal = psc(2)-psc(1);
+                %tmp_fbVal = norm_percValues(2);
+                %tmp_fbVal = psc2(1)-psc2(2);
 
-            % just a check that not both boxes are checked. This should be
-            % done prior to acquisition but for now it's ok. It will just
-            % crash once the NFB will commence.
+                % just a check that not both boxes are checked. This should be
+                % done prior to acquisition but for now it's ok. It will just
+                % crash once the NFB will commence.
             elseif P.V1_left == P.V1_right
                 fprintf('\nERROR: Select the correct ROI in GUI\n')
                 return
@@ -173,13 +179,14 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
         mainLoopData.norm_percValues(indVolNorm,:) = norm_percValues;
         mainLoopData.norm_percValues2(indVolNorm,:) = norm_percValues2;
         mainLoopData.psc_values(indVolNorm,:) = psc;
+        mainLoopData.psc_values2(indVolNorm,:) = psc2;
 
         mainLoopData.dispValues(indVolNorm) = dispValue;
         mainLoopData.dispValue = dispValue;
 
     elseif condition == 4 % sum NF end of NF block
         NFVols = P.ProtCond{2}{blockNF};
-        
+
         % this block does not actually makes much sense as the dispValue
         % produced here is ignored in displayFeedbakc (we take the
         % finalDispVal coming from the scaling routine of condition NF
@@ -237,15 +244,15 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
     displayData.Reward = mainLoopData.Reward;
     displayData.dispValue = mainLoopData.dispValue;
     displayData.rawDispValues(indVolNorm) = rawDispValues;
-    
-% else
-%     tmp_fbVal = 0;
-%     mainLoopData.dispValue = 0;
-%     mainLoopData.vectNFBs(indVolNorm) = tmp_fbVal;
-%     mainLoopData.Reward = '';
-%
-%     displayData.Reward = mainLoopData.Reward;
-%     displayData.dispValue = mainLoopData.dispValue;
+
+    % else
+    %     tmp_fbVal = 0;
+    %     mainLoopData.dispValue = 0;
+    %     mainLoopData.vectNFBs(indVolNorm) = tmp_fbVal;
+    %     mainLoopData.Reward = '';
+    %
+    %     displayData.Reward = mainLoopData.Reward;
+    %     displayData.dispValue = mainLoopData.dispValue;
 end
 
 %% Intermittent PSC NF
@@ -275,7 +282,7 @@ if  strcmp(P.Prot, 'Inter') && (flags.isPSC || flags.isCorr)
             else
                 i_blockNF = P.ProtCond{ 2 }{blockNF}(end-6:end);
                 i_blockBAS = [P.ProtCond{ 1 }{blockNF}(end-5:end) ...
-                              P.ProtCond{ 1 }{blockNF}(end)+1];
+                    P.ProtCond{ 1 }{blockNF}(end)+1];
             end
 
             if flags.isPSC
@@ -384,7 +391,7 @@ if flags.isDCM
     % Reward threshold for DCM is hard-coded per day, see Intermittent PSC
     % NF for generalzad reward data transfer aross the runs.
     thReward = 3; % set the threshold for logBF,
-                  % e.g. constant per run or per day
+    % e.g. constant per run or per day
 
     if isDcmCalculated
         logBF = dcmTagLE - dcmOppLE;
@@ -432,7 +439,7 @@ if flags.isSVM
 
         for indRoi = 1:loopNrROIs
             norm_percValues(indRoi) = ...
-                       mainLoopData.scalProcTimeSeries(indRoi, indVolNorm);
+                mainLoopData.scalProcTimeSeries(indRoi, indVolNorm);
         end
 
         % compute average feedback value

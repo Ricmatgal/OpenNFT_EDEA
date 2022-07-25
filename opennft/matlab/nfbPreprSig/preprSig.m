@@ -178,7 +178,7 @@ for indRoi = 1:P.NrROIs
 
     % Two different routines, if first run, normal routine. If run 2
     % onwards, loading half of the previous GLM and attach it to the actual
-    % run
+    % run 
 
     if flags.isPSC || flags.isSVM || flags.isCorr || P.isAutoRTQA
         if P.NFRunNr == 1
@@ -534,7 +534,8 @@ for indRoi = 1:P.NrROIs
         mainLoopData.fNegatDerivSpike(indRoi));
     rtQA_matlab.kalmanSpikesPos(indRoi,indVolNorm) = mainLoopData.fPositDerivSpike(indRoi);
     rtQA_matlab.kalmanSpikesNeg(indRoi,indVolNorm) = mainLoopData.fNegatDerivSpike(indRoi);
-
+    
+    % adding the constant betas to the Kalman filter output
     mainLoopData.constProcTimeSeries(indRoi,indVolNorm) = ...
         mainLoopData.kalmanProcTimeSeries(indRoi,indVolNorm) + ...
         mainLoopData.betRegr{indRoi}(indVolNorm,1);
