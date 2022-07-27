@@ -44,12 +44,19 @@ else
 
 end
 
-% % adjust the limits
-% P.limLow = min(displayData.rawDispValues(displayData.rawDispValues>0));
-% P.limUp = max(displayData.rawDispValues(displayData.rawDispValues>0));
 
+idxFirstBasVolumes = max(P.ProtCond{2}{1});
+idxFistNFvolumes = max(P.ProtCond{3}{1});
+NfirstVolumes = 10;
+limitScalStart = idxFistNFvolumes;
 
+if iteration-P.nrSkipVol > limitScalStart
+    P.limLow  = min(rawDispV(limitScalStart-NfirstVolumes:end));
+    P.limUp   = max(rawDispV(limitScalStart-NfirstVolumes:end));
+end
 
+logTest = 1;
+tanhTest = 1;
 
 
 
@@ -170,26 +177,22 @@ switch feedbackType
                     % send Trigger Regulation
                     % outp(P.parportAddr,P.triggers(2))
                     
-                    nFirstBasVolumes = max(P.ProtCond{2}{1});
-                    NfirstVolumes = 10;
-                    if (length(rawDispV) - nFirstBasVolumes > 1 && length(rawDispV) - nFirstBasVolumes <= NfirstVolumes)
-                        if max(rawDisp_s) > P.limUp
-                            P.limUp   = rawDisp_s(1);
-                        elseif min(rawDisp_s) <  P.limLow
-                            P.limLow  = rawDisp_s(end);
-                        end
-                    elseif length(rawDispV) - nFirstBasVolumes > NfirstVolumes
-                        P.limLow  = min(rawDisp_s);
-                        P.limUp   = max(rawDisp_s);
-                    end
+%                     if (length(rawDispV) - nFirstBasVolumes > 0 && length(rawDispV) - nFirstBasVolumes <= NfirstVolumes)
+%                         if max(rawDisp_s) > P.limUp
+%                             P.limUp   = rawDisp_s(1);
+%                         elseif min(rawDisp_s) <  P.limLow
+%                             P.limLow  = rawDisp_s(end);
+%                         end
+%                     elseif length(rawDispV) - nFirstBasVolumes > NfirstVolumes
+%                         P.limLow  = min(rawDisp_s);
+%                         P.limUp   = max(rawDisp_s);
+%                     end
 
 
 
                     % Adaptive Feedback display for differential PSC, scaled according to limits (limlow, limup) of brain activity and steps
                     % and using a logarithmic scale
 
-                    logTest = 1;
-                    tanhTest = 1;
 
                     if ~logTest
 
@@ -202,13 +205,21 @@ switch feedbackType
                     else
                         
                         %if blockNF > 1
+                            
+                        if iteration-P.nrSkipVol > limitScalStart % we have already 2 volumes in, and therefore a min and max to normalize against
 
                             dispValue = ((dispValue - P.limLow) / (P.limUp - P.limLow)); % we normalize according to own min and max activity
+                            
 
+                            fprintf('Feedback Value from nfbCalc after self-normalization: %f with lims: %f, %f  \n',dispValue,P.limLow,P.limUp);
+                            P.scaledDispVal(iteration-P.nrSkipVol) = dispValue;
+
+                        else
+
+                            P.scaledDispVal(iteration-P.nrSkipVol) = 0;
+
+                        end
                         %end
-
-                        fprintf('Feedback Value from nfbCalc after scaling: %f with lims: %f, %f  \n',dispValue,P.limLow,P.limUp);
-                        P.scaledDispVal(iteration-P.nrSkipVol) = dispValue;
                         
 
 
@@ -376,6 +387,9 @@ switch feedbackType
                 minRescale = -10;
                 maxRescale = 10;
                 dispValue = round(mean(rescale(P.finalDispVal(P.ProtCond{3}{displayData.currNFblock}),minRescale,maxRescale)));
+                if tanhTest
+                    dispValue = round(mean(P.finalDispVal(P.ProtCond{3}{displayData.currNFblock})));
+                end
                 P.sumFBscore(iteration-P.nrSkipVol) = dispValue;
 
                 k = cellfun(@(x) x(2) == (iteration-P.nrSkipVol), P.ProtCond{4});

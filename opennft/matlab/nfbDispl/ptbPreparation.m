@@ -200,6 +200,7 @@ if strcmp(protName, 'ContTask')
     nAngleShortBas = length(angleShortBas);
     angleLongBas = angleLongBas(randperm(nAngleLongBas));
     angleShortBasAll = [];
+
     for i = 1:nShortBasBlocks
         angleShortBas = angleShortBas(randperm(nAngleShortBas));
         angleShortBasAll = [angleShortBasAll,angleShortBas];
@@ -412,8 +413,8 @@ if strcmp(protName, 'ContTask')
         % its only the initial range and will be updated as soon as new display
         % values come in.. it helps to make the first FB block less eratic
         if P.NFRunNr == 1
-            P.limLow  = -0.01;
-            P.limUp   = 0.01;
+            P.limLow  = [];
+            P.limUp   = [];
         else
             prevNfbPtbP   = fullfile(P.WorkFolder,['taskFolder', filesep, 'taskResults', filesep,...
                                            'NFB_taskResults_r' sprintf('%d',P.NFRunNr-1)]);
