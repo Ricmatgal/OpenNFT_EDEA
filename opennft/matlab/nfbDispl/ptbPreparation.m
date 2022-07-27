@@ -140,7 +140,7 @@ if strcmp(protName, 'ContTask')
     P.Screen.fixCrossDimPix = 40;
     
     % Set the line width for fixation cross
-    P.Screen.lineWidthPix = 8;
+    P.Screen.lineWidthPix = 4;
 
     % Setting the coordinates
     P.Screen.wRect = [0, 0, P.Screen.w, P.Screen.h];
@@ -412,8 +412,8 @@ if strcmp(protName, 'ContTask')
         % its only the initial range and will be updated as soon as new display
         % values come in.. it helps to make the first FB block less eratic
         if P.NFRunNr == 1
-            P.limLow  = -0.001;
-            P.limUp   = 0.001;
+            P.limLow  = -0.01;
+            P.limUp   = 0.01;
         else
             prevNfbPtbP   = fullfile(P.WorkFolder,['taskFolder', filesep, 'taskResults', filesep,...
                                            'NFB_taskResults_r' sprintf('%d',P.NFRunNr-1)]);

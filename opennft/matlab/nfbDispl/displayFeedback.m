@@ -203,7 +203,7 @@ switch feedbackType
                         
                         %if blockNF > 1
 
-                            dispValue = ((dispValue - P.limLow) / (P.limUp - P.limLow));
+                            dispValue = ((dispValue - P.limLow) / (P.limUp - P.limLow)); % we normalize according to own min and max activity
 
                         %end
 
@@ -234,7 +234,7 @@ switch feedbackType
 
                         else
 
-                            dispValue = tanh(dispValue)*10;
+                            dispValue = tanh(dispValue)*10; % fit inside a tahn function for smoothing and upscaling
 
                         end
 
@@ -268,13 +268,13 @@ switch feedbackType
                 % change color according to the rotation speed value
                 % (>0 good job, <0 wrong), direction of rotation is
                 % taken care of later, the rotation speed comes from the nfbCalc V1 right/V1 left routine
-                if P.rotSpe > 0
+                if P.rotSpe > 0 % green
                     fixCol = [0, 128, 0];
-                elseif P.rotSpe < 0
+                elseif P.rotSpe < 0 % red
                     fixCol = [255, 0, 0];
                 elseif P.rotAng == 0 || P.TRANSF == 1
                     % if no movement, fixation cross is white
-                    fixCol = [255, 255, 255];
+                    fixCol = P.Screen.white;
                 end
 
                 wheelAngles = [];
@@ -302,7 +302,7 @@ switch feedbackType
                             if any(fvol)
                                 P.rotAng = P.rotation_angle_BAS(P.K_rot);
                                 P.rotSpe = 0;
-                                fixCol = [255, 255, 255];
+                                fixCol = P.Screen.white;
                             end
 
                             Screen('DrawTextures', P.Screen.wPtr, P.wheelTex, [],...
@@ -323,22 +323,21 @@ switch feedbackType
                             Screen('DrawTextures', P.Screen.wPtr, P.wheelTex, [],...
                                 P.dstRects(:, 1:2), 0, [], []);
                             Screen('DrawLines', P.Screen.wPtr, P.Screen.allCoords,...
-                            P.Screen.lineWidthPix, [255 255 255], [P.Screen.xCenter P.Screen.yCenter], 2);
+                            P.Screen.lineWidthPix, P.Screen.white, [P.Screen.xCenter P.Screen.yCenter], 2);
                         end
 
                         P.Screen.vbl = Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.5) * P.Screen.ifi);
                     end
 
                     % Increment the angle if rotation is clockwise
-                    % Decrement the angle if rotation is counter
-                    % clockwise
+                    % Decrement the angle if rotation is counter clockwise
                     if P.leftRot == 1
                         P.rotAng = P.rotAng - P.rotSpe;
                     elseif P.rightRot == 1
                         P.rotAng = P.rotAng + P.rotSpe;
                     end
                     
-                    wheelAngles(end+1) = P.rotAng;
+                    wheelAngles(end+1) = P.rotAng; % updated the wheelAngles list to store info
 
                 end
 
@@ -373,6 +372,7 @@ switch feedbackType
                 % rescaling the P.finalDispVal vector (rotation speed) from 0 to
                 % 100 for the precedent NF block, then taking the mean
                 % (i.e. giving a score 0-100 of how good they performed)
+                
                 minRescale = -10;
                 maxRescale = 10;
                 dispValue = round(mean(rescale(P.finalDispVal(P.ProtCond{3}{displayData.currNFblock}),minRescale,maxRescale)));
@@ -389,17 +389,17 @@ switch feedbackType
 
                     % Total Score center message
                     Screen('TextSize',P.Screen.wPtr,50);
-                    DrawFormattedText(P.Screen.wPtr, 'Total Score: ','center', 'center', dispColor);
+                    DrawFormattedText(P.Screen.wPtr, 'Total Score: ','center', 'center', P.Screen.white);
                     % if regular run:
                     if P.TRANSF == 0
                         % feedback value
                         Screen('TextSize',P.Screen.wPtr,P.textSizeSUM);
                         DrawFormattedText(P.Screen.wPtr, mat2str(dispValue), ...
-                            'center',  P.Screen.h * 0.65, dispColor);
+                            'center',  P.Screen.h * 0.65, P.Screen.white);
                         % if transfer run:
                     elseif P.TRANSF == 1
                         DrawFormattedText(P.Screen.wPtr, 'XXX',...
-                            'center', P.Screen.h * 0.65, dispColor);
+                            'center', P.Screen.h * 0.65, P.Screen.white);
                     end
                     % record onset event
                     if size(P.Onsets.SumFB_fix,2) < P.Task.trialCounter

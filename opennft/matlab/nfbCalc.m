@@ -107,7 +107,7 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
         % Calculate NFB signal , i.e. take the regulation activity
         % normalizing to baseline, constantly
 
-        nVolumes = 3; % how many volumes we want to take?
+        nVolumes = 5; % how many volumes we want to take for average?
         i_reg = indVolNorm-nVolumes:indVolNorm;
 
         for indRoi = 1:P.NrROIs
@@ -128,7 +128,7 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
             psc(indRoi) = (mean(tmpCond) - median(tmpBas)) ./ median(tmpBas);
 
             % constProcTS PSC with point to point mean signal subtraction
-            mCond3 = mainLoopData.constProcTimeSeries(indRoi, i_reg - nVolumes);
+            mCond3 = mainLoopData.constProcTimeSeries(indRoi, i_reg - (nVolumes+1)); % baseline as n blocks before first block used for mean regulation
             psc2(indRoi) = mean(mainLoopData.constProcTimeSeries(indRoi,i_reg)) - mean(mCond3);
 
         end
@@ -146,16 +146,16 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
             % Currently, when training roi_A > roi_B,
             if P.V1_right > P.V1_left
                 %tmp_fbVal = norm_percValues2(1)-norm_percValues2(2);
-                tmp_fbVal = psc(1)-psc(2);
+                %tmp_fbVal = psc(1)-psc(2);
                 %tmp_fbVal = norm_percValues(1);
-                %tmp_fbVal = psc2(1)-psc2(2);
+                tmp_fbVal = psc2(1)-psc2(2);
 
             elseif P.V1_left > P.V1_right
 
                 %tmp_fbVal = norm_percValues2(2)-norm_percValues2(1);
-                tmp_fbVal = psc(2)-psc(1);
+                %tmp_fbVal = psc(2)-psc(1);
                 %tmp_fbVal = norm_percValues(2);
-                %tmp_fbVal = psc2(1)-psc2(2);
+                tmp_fbVal = psc2(2)-psc2(1);
 
                 % just a check that not both boxes are checked. This should be
                 % done prior to acquisition but for now it's ok. It will just
