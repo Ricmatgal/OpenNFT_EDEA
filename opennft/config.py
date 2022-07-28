@@ -161,3 +161,28 @@ PLOT_PEN_COLORS = [
     pg.mkPen(pg.mkColor(145, 130, 43), width=1.2),
     pg.mkPen(pg.mkColor(0, 0, 0), width=1.2)
 ]
+
+# type of time series processing (see nfbCalc)
+
+TSPROCESSINGFLAG = 4
+
+# 1 = normalized PSC against last N blocks of baseline
+# 2 = normalized PSC with point to point mean signal
+# 3 = constant PSC with cumulative baseline normalization
+# 4 = constant PSC with point to point mean signal subtraction
+
+# self-normalization (scaling) beginning
+
+SELFSCALINGFLAG = 1
+
+# 1 = self-normalization
+# False = No scaling
+
+SELFSCALINGVOLUMES = 5 # N of volumes to skip before values are counted for scaling
+
+WHEELSCALINGFLAG = 3
+
+# 1 = stepmin/stepmax scaling
+# 2 = log scaling
+# 3 = tanh scaling
+

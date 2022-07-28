@@ -1431,6 +1431,30 @@ class OpenNFT(QWidget):
 
             self.roiSelectorBtn.setEnabled(True)
 
+            if config.TSPROCESSINGFLAG:
+                self.P['tsProcessingFlag'] = config.TSPROCESSINGFLAG
+                logger.info("Time series processing flag set to: {}, check config.py".format(config.TSPROCESSINGFLAG))
+            else:
+                logger.warning("Specify time series processing routine")
+
+            if config.SELFSCALINGFLAG:
+                self.P['selfScalingFlag'] = config.SELFSCALINGFLAG
+                if config.SELFSCALINGVOLUMES:
+                    self.P['selfScalingNVolumes'] = config.SELFSCALINGVOLUMES
+                    logger.info(
+                    "Self-scaling flag set to: {} with N volumes: {}, check config.py".format(config.SELFSCALINGFLAG,config.SELFSCALINGVOLUMES))
+                else:
+                    logger.warning("Specify self-scaling limits")
+            else:
+                logger.warning("No self-scaling applied")
+
+            if config.WHEELSCALINGFLAG:
+                self.P['wheelScalingFlag'] = config.WHEELSCALINGFLAG
+                logger.info(
+                    "Wheel speed scaling flag set to: {}, check config.py".format(config.WHEELSCALINGFLAG))
+            else:
+                logger.warning("Specify wheel speed scaling routine")
+
             if config.USE_SHAM:
                 logger.warning("Sham feedback has been selected")
                 fext = Path(self.P['ShamFile']).suffix

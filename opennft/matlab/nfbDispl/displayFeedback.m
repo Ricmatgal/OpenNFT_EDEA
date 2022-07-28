@@ -33,30 +33,39 @@ end
 if isfield(P, 'shamData')
     dispValue = cell2mat(P.shamData(iteration-P.nrSkipVol));
     rawDispV = cell2mat(P.shamDataRaw(1:iteration-P.nrSkipVol));
-    rawDispV = rawDispV(rawDispV>0);
-    rawDisp_s = sort(rawDispV(1:end-1), 'descend');
+    rawDispV = rawDispV(rawDispV~=0);
+    %rawDisp_s = sort(rawDispV(1:end-1), 'descend');
 
 else
     % if its not a sham nfb we retrieve the subject specific
     % rawdisplay values as saved in the displayData structure.
     rawDispV = displayData.rawDispValues;
-    rawDisp_s = sort(rawDispV(displayData.rawDispValues>0), 'descend');
+    rawDispV = rawDispV(rawDispV~=0);
+    %rawDisp_s = sort(rawDispV(displayData.rawDispValues>0), 'descend');
 
 end
 
+if isfield(P,'selfScalingFlag')
 
-idxFirstBasVolumes = max(P.ProtCond{2}{1});
-idxFistNFvolumes = max(P.ProtCond{3}{1});
-NfirstVolumes = 10;
-limitScalStart = idxFistNFvolumes;
+    selfScalingFlag = true;
 
-if iteration-P.nrSkipVol > limitScalStart
-    P.limLow  = min(rawDispV(limitScalStart-NfirstVolumes:end));
-    P.limUp   = max(rawDispV(limitScalStart-NfirstVolumes:end));
+    NSkipVolumes = P.selfScalingNVolumes;
+
+    limitScalStart = min(P.ProtCond{3}{1}) + NSkipVolumes;
+
+    if iteration-P.nrSkipVol > limitScalStart
+
+        P.limLow  = min(rawDispV);
+        P.limUp   = max(rawDispV);
+
+    end
+
+else
+
+    selfScalingFlag = false;
+
 end
 
-logTest = 1;
-tanhTest = 1;
 
 
 
@@ -93,47 +102,47 @@ switch feedbackType
         end
         P.Screen.vbl = Screen('Flip', P.Screen.wPtr, ...
             P.Screen.vbl + P.Screen.ifi/2);
-    
-    % %% Continuous PSC with task block
-    % case 'bar_count_task'
-    %     dispValue  = dispValue*(floor(P.Screen.h/2) - floor(P.Screen.h/10))/100;
-    %     switch condition
-    %         case 1 % Baseline
-    %             % Text "COUNT"
-    %             Screen('TextSize', P.Screen.wPtr , P.Screen.h/10);
-    %             Screen('DrawText', P.Screen.wPtr, 'COUNT', ...
-    %                 floor(P.Screen.w/2-P.Screen.h/4), ...
-    %                 floor(P.Screen.h/2-P.Screen.h/10), instrColor);
-                
-    %              P.Screen.vbl = Screen('Flip', P.Screen.wPtr, ...
-    %                  P.Screen.vbl + P.Screen.ifi/2);
-                
-    %         case 2 % Regualtion
-    %             % Fixation Point
-    %             Screen('FillOval', P.Screen.wPtr, [255 255 255], ...
-    %                 [floor(P.Screen.w/2-P.Screen.w/200), ...
-    %                 floor(P.Screen.h/2-P.Screen.w/200), ...
-    %                 floor(P.Screen.w/2+P.Screen.w/200), ...
-    %                 floor(P.Screen.h/2+P.Screen.w/200)]);
-    %             % draw target bar
-    %             Screen('DrawLines', P.Screen.wPtr, ...
-    %                 [floor(P.Screen.w/2-P.Screen.w/20), ...
-    %                 floor(P.Screen.w/2+P.Screen.w/20); ...
-    %                 floor(P.Screen.h/10), floor(P.Screen.h/10)], ...
-    %                 P.Screen.lw, [255 0 0]);
-    %             % draw activity bar
-    %             Screen('DrawLines', P.Screen.wPtr, ...
-    %                 [floor(P.Screen.w/2-P.Screen.w/20), ...
-    %                 floor(P.Screen.w/2+P.Screen.w/20); ...
-    %                 floor(P.Screen.h/2-dispValue), ...
-    %                 floor(P.Screen.h/2-dispValue)], P.Screen.lw, [0 255 0]);
-                
-    %                 P.Screen.vbl = Screen('Flip', P.Screen.wPtr, ...
-    %                     P.Screen.vbl + P.Screen.ifi/2);
-    %         case 3
-    %             % ptbTask sequence called seperetaly in python
-                
-    %     end
+
+        % %% Continuous PSC with task block
+        % case 'bar_count_task'
+        %     dispValue  = dispValue*(floor(P.Screen.h/2) - floor(P.Screen.h/10))/100;
+        %     switch condition
+        %         case 1 % Baseline
+        %             % Text "COUNT"
+        %             Screen('TextSize', P.Screen.wPtr , P.Screen.h/10);
+        %             Screen('DrawText', P.Screen.wPtr, 'COUNT', ...
+        %                 floor(P.Screen.w/2-P.Screen.h/4), ...
+        %                 floor(P.Screen.h/2-P.Screen.h/10), instrColor);
+
+        %              P.Screen.vbl = Screen('Flip', P.Screen.wPtr, ...
+        %                  P.Screen.vbl + P.Screen.ifi/2);
+
+        %         case 2 % Regualtion
+        %             % Fixation Point
+        %             Screen('FillOval', P.Screen.wPtr, [255 255 255], ...
+        %                 [floor(P.Screen.w/2-P.Screen.w/200), ...
+        %                 floor(P.Screen.h/2-P.Screen.w/200), ...
+        %                 floor(P.Screen.w/2+P.Screen.w/200), ...
+        %                 floor(P.Screen.h/2+P.Screen.w/200)]);
+        %             % draw target bar
+        %             Screen('DrawLines', P.Screen.wPtr, ...
+        %                 [floor(P.Screen.w/2-P.Screen.w/20), ...
+        %                 floor(P.Screen.w/2+P.Screen.w/20); ...
+        %                 floor(P.Screen.h/10), floor(P.Screen.h/10)], ...
+        %                 P.Screen.lw, [255 0 0]);
+        %             % draw activity bar
+        %             Screen('DrawLines', P.Screen.wPtr, ...
+        %                 [floor(P.Screen.w/2-P.Screen.w/20), ...
+        %                 floor(P.Screen.w/2+P.Screen.w/20); ...
+        %                 floor(P.Screen.h/2-dispValue), ...
+        %                 floor(P.Screen.h/2-dispValue)], P.Screen.lw, [0 255 0]);
+
+        %                 P.Screen.vbl = Screen('Flip', P.Screen.wPtr, ...
+        %                     P.Screen.vbl + P.Screen.ifi/2);
+        %         case 3
+        %             % ptbTask sequence called seperetaly in python
+
+        %     end
 
         %%===================== Type of feedback we use ===============================================%%
         %% Continuous PSC with task block
@@ -150,19 +159,19 @@ switch feedbackType
                 P.k_eq = P.k_eq + 1; % update the equation index
                 P.K_rot = P.K_rot + 1; % update the wheel orientation index
 
-                
+
                 Screen('TextSize',P.Screen.wPtr,P.textSizeBAS);
 
                 Screen('DrawTextures', P.Screen.wPtr, P.wheelTex, [],...
                     P.dstRects(:, 1:2), P.rotation_angle_BAS(P.K_rot),[],[]); % need to adjust the rotation angle update
 
                 DrawFormattedText(P.Screen.wPtr, P.strings_operation{P.k_eq}, 'center','center', P.Screen.white);
-                
+
                 Screen('Flip',P.Screen.wPtr);
 
 
             case 3 % Regulation
-                
+
                 fprintf('Feedback Value from nfbCalc: %f \n',dispValue);
 
                 P.test.visit_case2(end+1) = now;
@@ -176,86 +185,85 @@ switch feedbackType
 
                     % send Trigger Regulation
                     % outp(P.parportAddr,P.triggers(2))
-                    
-%                     if (length(rawDispV) - nFirstBasVolumes > 0 && length(rawDispV) - nFirstBasVolumes <= NfirstVolumes)
-%                         if max(rawDisp_s) > P.limUp
-%                             P.limUp   = rawDisp_s(1);
-%                         elseif min(rawDisp_s) <  P.limLow
-%                             P.limLow  = rawDisp_s(end);
-%                         end
-%                     elseif length(rawDispV) - nFirstBasVolumes > NfirstVolumes
-%                         P.limLow  = min(rawDisp_s);
-%                         P.limUp   = max(rawDisp_s);
-%                     end
+
+                    %                     if (length(rawDispV) - nFirstBasVolumes > 0 && length(rawDispV) - nFirstBasVolumes <= NfirstVolumes)
+                    %                         if max(rawDisp_s) > P.limUp
+                    %                             P.limUp   = rawDisp_s(1);
+                    %                         elseif min(rawDisp_s) <  P.limLow
+                    %                             P.limLow  = rawDisp_s(end);
+                    %                         end
+                    %                     elseif length(rawDispV) - nFirstBasVolumes > NfirstVolumes
+                    %                         P.limLow  = min(rawDisp_s);
+                    %                         P.limUp   = max(rawDisp_s);
+                    %                     end
 
 
+                    if selfScalingFlag
 
-                    % Adaptive Feedback display for differential PSC, scaled according to limits (limlow, limup) of brain activity and steps
-                    % and using a logarithmic scale
-
-
-                    if ~logTest
-
-                    %if blockNF > 1
-                        
-                        dispValue = ((dispValue - P.limLow) / (P.limUp - P.limLow)) * (P.stepMax - P.stepMin) + P.stepMin;
-                    
-                    %end
-
-                    else
-                        
-                        %if blockNF > 1
-                            
-                        if iteration-P.nrSkipVol > limitScalStart % we have already 2 volumes in, and therefore a min and max to normalize against
-
-                            dispValue = ((dispValue - P.limLow) / (P.limUp - P.limLow)); % we normalize according to own min and max activity
-                            
-
+                        if iteration-P.nrSkipVol > limitScalStart
+    
+                            % Adaptive Feedback display for differential PSC, scaled according to limits (limlow, limup) of brain activity
+    
+                            dispValue = ((dispValue - P.limLow) / (P.limUp - P.limLow));
                             fprintf('Feedback Value from nfbCalc after self-normalization: %f with lims: %f, %f  \n',dispValue,P.limLow,P.limUp);
                             P.scaledDispVal(iteration-P.nrSkipVol) = dispValue;
-
-                        else
-
-                            P.scaledDispVal(iteration-P.nrSkipVol) = 0;
-
-                        end
-                        %end
-                        
-
-
-                        % let's try with the log, values are normalized between -1 and 1.
-                        % so we scale by 10 in order that we do not have values below 0
-                        % then we take the log of the absolute value and assign a sign
-                        % log e and log 2 allows a higher maximum speed
-
-
-                        if ~ tanhTest
-
-                        while dispValue > -1 && dispValue < 1
-                            dispValue = dispValue * 10;
-                        end
     
-                            if dispValue > 0
-                                dispValue = log2(dispValue);
-                            elseif dispValue < 0
-                                dispValue = -log2(abs(dispValue));
-                            else
-                                dispValue = 0;
-                            end
-
                         else
+    
+                            P.scaledDispVal(iteration-P.nrSkipVol) = 0;
+    
+                        end
+                    end
 
-                            dispValue = tanh(dispValue)*10; % fit inside a tahn function for smoothing and upscaling
+                    if P.wheelScalingFlag
 
+                        switch P.wheelScalingFlag
+
+                            case 1
+
+                                dispValue = dispValue * (P.stepMax - P.stepMin) + P.stepMin;
+                                P.rotSpe  = dispValue;
+                                fprintf('Feedback value given to the wheel: %s \n',dispValue)
+                                P.finalDispVal(iteration-P.nrSkipVol) = dispValue;
+
+
+                            case 2
+
+                                % let's try with the log, values are normalized between -1 and 1.
+                                % so we scale by 10 in order that we do not have values below 0
+                                % then we take the log of the absolute value and assign a sign
+                                % log e and log 2 allows a higher maximum speed
+
+                                while dispValue > -1 && dispValue < 1
+                                    dispValue = dispValue * 10;
+                                end
+
+                                if dispValue > 0
+                                    dispValue = log2(dispValue);
+                                elseif dispValue < 0
+                                    dispValue = -log2(abs(dispValue));
+                                else
+                                    dispValue = 0;
+                                end
+
+                                P.rotSpe  = dispValue;
+                                fprintf('Feedback value given to the wheel: %s \n',dispValue)
+                                P.finalDispVal(iteration-P.nrSkipVol) = dispValue;
+
+                            case 3
+                                
+                                if dispValue ~= 0
+                                    dispValue = tanh(dispValue)*10; % fit inside a tahn function for smoothing and upscaling
+                                else
+                                    dispValue = 0;
+                                end
+
+                                P.rotSpe  = dispValue;
+                                fprintf('Feedback value given to the wheel: %s \n',dispValue)
+                                P.finalDispVal(iteration-P.nrSkipVol) = dispValue;
                         end
 
                     end
-
-
-                    % we get the rotation value for the wheel
-                    P.rotSpe  = dispValue;
-                    fprintf('Feedback value given to the wheel: %s \n',dispValue)
-                    P.finalDispVal(iteration-P.nrSkipVol) = dispValue;
 
 
                 else
@@ -274,7 +282,7 @@ switch feedbackType
                 % close as possible to the acquition time but NOT
                 % longer.
                 tic
-                
+
 
                 % change color according to the rotation speed value
                 % (>0 good job, <0 wrong), direction of rotation is
@@ -307,7 +315,7 @@ switch feedbackType
                         % the fixation cross color to white.
 
                         if P.TRANSF == 0
-                            
+
                             % intialize the wheels according to the specific angle
                             fvol = cellfun(@(x) x(1) == (iteration-P.nrSkipVol), P.ProtCond{3});
                             if any(fvol)
@@ -320,7 +328,7 @@ switch feedbackType
                                 P.dstRects(:, 1:2), P.rotAng, [], []);
                             % fixation cross while regulation
                             Screen('DrawLines', P.Screen.wPtr, P.Screen.allCoords,...
-                            P.Screen.lineWidthPix, fixCol, [P.Screen.xCenter P.Screen.yCenter], 2); % last arguments is the smoothing
+                                P.Screen.lineWidthPix, fixCol, [P.Screen.xCenter P.Screen.yCenter], 2); % last arguments is the smoothing
 
                             % cue while regulation
                             % Screen('TextSize',P.Screen.wPtr,120);
@@ -334,7 +342,7 @@ switch feedbackType
                             Screen('DrawTextures', P.Screen.wPtr, P.wheelTex, [],...
                                 P.dstRects(:, 1:2), 0, [], []);
                             Screen('DrawLines', P.Screen.wPtr, P.Screen.allCoords,...
-                            P.Screen.lineWidthPix, P.Screen.white, [P.Screen.xCenter P.Screen.yCenter], 2);
+                                P.Screen.lineWidthPix, P.Screen.white, [P.Screen.xCenter P.Screen.yCenter], 2);
                         end
 
                         P.Screen.vbl = Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.5) * P.Screen.ifi);
@@ -347,7 +355,7 @@ switch feedbackType
                     elseif P.rightRot == 1
                         P.rotAng = P.rotAng + P.rotSpe;
                     end
-                    
+
                     wheelAngles(end+1) = P.rotAng; % updated the wheelAngles list to store info
 
                 end
@@ -371,7 +379,7 @@ switch feedbackType
 
 
             case 4 % intermittent score (final value after regulation block)
-                
+
                 % this is calculated in nfbCalc already
                 % dispValue = ceil((sum(P.finalDispVal(P.ProtCond{3}{displayData.currNFblock})) / P.stepMax) * 10);
                 %P.sumFBscore(iteration-P.nrSkipVol) = dispValue;
@@ -379,17 +387,14 @@ switch feedbackType
                 % but if we want to take the P.finalDispVal then..
                 % dispValue = (round(mean(P.finalDispVal(P.ProtCond{3}{displayData.currNFblock}))...
                 %    *100)/max(P.finalDispVal(P.ProtCond{3}{displayData.currNFblock})));
-                
+
                 % rescaling the P.finalDispVal vector (rotation speed) from 0 to
                 % 100 for the precedent NF block, then taking the mean
                 % (i.e. giving a score 0-100 of how good they performed)
-                
-                minRescale = -10;
-                maxRescale = 10;
-                dispValue = round(mean(rescale(P.finalDispVal(P.ProtCond{3}{displayData.currNFblock}),minRescale,maxRescale)));
-                if tanhTest
-                    dispValue = round(mean(P.finalDispVal(P.ProtCond{3}{displayData.currNFblock})));
-                end
+
+                NFvalues = P.finalDispVal(P.ProtCond{3}{displayData.currNFblock});
+
+                dispValue = round(median(NFvalues));
                 P.sumFBscore(iteration-P.nrSkipVol) = dispValue;
 
                 k = cellfun(@(x) x(2) == (iteration-P.nrSkipVol), P.ProtCond{4});
@@ -431,9 +436,9 @@ switch feedbackType
                 end
         end
 
-        
-    %% Intermittent PSC
-case 'value_fixation'
+
+        %% Intermittent PSC
+    case 'value_fixation'
         indexSmiley = round(dispValue);
         if indexSmiley == 0
             indexSmiley = 1;
@@ -455,7 +460,7 @@ case 'value_fixation'
                         pause(randi([30,100])/1000)
                     end
                 end
-                
+
             case 2  % Regulation
                 for i = 1:2
                     % arrow
@@ -479,7 +484,7 @@ case 'value_fixation'
                         pause(randi([30,100])/1000);
                     end
                 end
-                
+
             case 3 % NF
                 % feedback value
                 Screen('DrawText', P.Screen.wPtr, mat2str(dispValue), ...
@@ -493,8 +498,8 @@ case 'value_fixation'
                 P.Screen.vbl = Screen('Flip', P.Screen.wPtr, ...
                     P.Screen.vbl + P.Screen.ifi/2);
         end
-        
-    %% Trial-based DCM
+
+        %% Trial-based DCM
     case 'DCM'
         nrP = P.nrP;
         nrN = P.nrN;
