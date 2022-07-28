@@ -394,7 +394,7 @@ switch feedbackType
 
                 NFvalues = P.finalDispVal(P.ProtCond{3}{displayData.currNFblock});
 
-                dispValue = round(median(NFvalues));
+                dispValue = round(mean(NFvalues));
                 P.sumFBscore(iteration-P.nrSkipVol) = dispValue;
 
                 k = cellfun(@(x) x(2) == (iteration-P.nrSkipVol), P.ProtCond{4});

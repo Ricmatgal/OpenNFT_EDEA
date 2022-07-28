@@ -192,7 +192,7 @@ if strcmp(protName, 'ContTask')
     
     angleLongBas = 0:360/nLongBasVolumes*angleSkipVolumes:360; % angles list for long bas
     angleShortBas = 0:360/nShortBasVolumes*angleSkipVolumes:360; % angles list for short bas
-    angleLongBas = angleLongBas(2:end);
+    angleLongBas = angleLongBas;
     angleShortBas = angleShortBas(2:end);
 
     % shuffle

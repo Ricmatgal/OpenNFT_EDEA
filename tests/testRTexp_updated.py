@@ -35,7 +35,7 @@ if testCase == 'PSC':
     dstpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectBBL/dummy_data/watch_folder'
     # EEG-MRI
     #srcpath = "C:/Users/gallir/Documents/OpenNFT/projects/ProjectBBL/dummy_data/sasha_EEG/dcm_1.3.12.2.1107.5.2.50.167114.30000022070608475877600000010/dcm_1.3.12.2.1107.5.2.50.167114.30000022070608475877600000010/EDEA_resting_state"
-    srcpath = "C:/Users/gallir/Documents/OpenNFT/projects/ProjectBBL/dummy_data/20220720.EDEA_P7.111856/run1"
+    srcpath = "C:/Users/gallir/Documents/OpenNFT/projects/ProjectBBL/dummy_data/20220720.EDEA_P7.111856/run2"
     # in the BBL MRI
     #srcpath = 'Z:/20220430.Siemens_Service.Service_10849583_167114'
     #dstpath = 'D:/LABNIC/EDEA/offline_testing/watch_folder'
