@@ -21,8 +21,12 @@ function ptbPreparation(screenId, workFolder, protName)
 
 P = evalin('base', 'P');
 
+PsychDefaultSetup(2)
 Screen('CloseAll');
-Screen('Preference', 'SkipSyncTests', 2);
+Screen('Preference', 'Verbosity', 0);
+Screen('Preference', 'SkipSyncTests',1);
+Screen('Preference', 'VisualDebugLevel',0);
+Screen('Preference', 'ScreenToHead', 0, 1, 1);
 
 if ~ismac
     % Because this command messes the coordinate system on the Mac OS
