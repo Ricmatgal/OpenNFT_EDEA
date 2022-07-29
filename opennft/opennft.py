@@ -1397,6 +1397,20 @@ class OpenNFT(QWidget):
             if not self.P['isAutoRTQA']:
                 self.createMusterInfo()
 
+            if config.TSPROCESSINGFLAG:
+                self.P['tsProcessingFlag'] = config.TSPROCESSINGFLAG
+                logger.info("Time series processing flag set to: {}, check config.py".format(config.TSPROCESSINGFLAG))
+                if config.TSPROCESSINGFLAG == 1:
+                    self.P['RoiAnatOperation'] = "norm_PSC_baseline"
+                elif config.TSPROCESSINGFLAG == 2:
+                    self.P['RoiAnatOperation'] = "norm_PSC_mean"
+                elif config.TSPROCESSINGFLAG == 3:
+                    self.P['RoiAnatOperation'] = "const_PSC_baseline"
+                elif config.TSPROCESSINGFLAG == 4:
+                    self.P['RoiAnatOperation'] = "const_PSC_mean"
+            else:
+                logger.warning("Specify time series processing routine")
+
             self.setupRoiPlots()
             self.setupMcPlots()
 
@@ -1430,12 +1444,6 @@ class OpenNFT(QWidget):
             action.setCheckable(False)
 
             self.roiSelectorBtn.setEnabled(True)
-
-            if config.TSPROCESSINGFLAG:
-                self.P['tsProcessingFlag'] = config.TSPROCESSINGFLAG
-                logger.info("Time series processing flag set to: {}, check config.py".format(config.TSPROCESSINGFLAG))
-            else:
-                logger.warning("Specify time series processing routine")
 
             if config.SELFSCALINGFLAG:
                 self.P['selfScalingFlag'] = config.SELFSCALINGFLAG
