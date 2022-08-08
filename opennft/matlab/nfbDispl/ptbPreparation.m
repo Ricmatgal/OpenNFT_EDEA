@@ -83,9 +83,10 @@ P.textSizeSUM = 100;
 
 % Text "HELLO WORLD" - also to check that PTB-3 function 'DrawText' is working
 Screen('TextSize', P.Screen.wPtr , P.Screen.h/10);
-Screen('DrawText', P.Screen.wPtr, 'HELLO WORLD', ...
-    floor(P.Screen.w/2-P.Screen.w/6), ...
-    floor(P.Screen.h/2-P.Screen.h/10), [200 200 200]);
+%Screen('DrawText', P.Screen.wPtr, 'HELLO WORLD', ...
+%    floor(P.Screen.w/2-P.Screen.w/2), ...
+%    floor(P.Screen.h/2-P.Screen.h/10), [200 200 200]);
+DrawFormattedText(P.Screen.wPtr, 'HELLO WORLD','center','center',[200 200 200]);
 P.Screen.vbl=Screen('Flip', P.Screen.wPtr,P.Screen.vbl+P.Screen.ifi/2);
 
 pause(1);
