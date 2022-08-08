@@ -32,7 +32,7 @@ if testCase == 'PSC':
     #srcpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectCecilia/dummy_data/20220430.MRI_DEV_Test_NFB.110734'
     #dstpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectCecilia/dummy_data/rtTestFolder'
     #srcpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectBBL/dummy_data/robin_brain'
-    dstpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectBBL/dummy_data/watch_folder'
+    dstpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectRiccardo/watch_folder'
     # EEG-MRI
     #srcpath = "C:/Users/gallir/Documents/OpenNFT/projects/ProjectBBL/dummy_data/sasha_EEG/dcm_1.3.12.2.1107.5.2.50.167114.30000022070608475877600000010/dcm_1.3.12.2.1107.5.2.50.167114.30000022070608475877600000010/EDEA_resting_state"
     srcpath = "C:/Users/gallir/Documents/OpenNFT/projects/ProjectBBL/dummy_data/20220720.EDEA_P7.111856/run2"

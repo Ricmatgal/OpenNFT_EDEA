@@ -35,20 +35,20 @@ end
 
 AssertOpenGL();
 
-myscreens = Screen('Screens');
-if length(myscreens) == 3
-    % two monitors: [0 1 2]
-    % screenid = myscreens(screenId + 1);
-    screenid = 1;
-elseif length(myscreens) == 2
-    % one monitor: [0 1]
-    screenid = myscreens(screenId);
-else
-    % if different, configure your mode
-    screenid = 0;
-end
+% myscreens = Screen('Screens');
+% if length(myscreens) == 3
+%     % two monitors: [0 1 2]
+%     % screenid = myscreens(screenId + 1);
+%     screenid = 1;
+% elseif length(myscreens) == 2
+%     % one monitor: [0 1]
+%     screenid = myscreens(screenId);
+% else
+%     % if different, configure your mode
+%     screenid = 0;
+% end
 
-screenid = 2;
+screenid = double(P.DisplayFeedbackScreenID); 
 fFullScreen = P.DisplayFeedbackFullscreen;
 
 if ~fFullScreen
@@ -81,10 +81,10 @@ P.textSizeBAS = 60;
 P.textSizeNF = 10; % width of the fixation cross while regulating
 P.textSizeSUM = 100;
 
-% Text "HELLO" - also to check that PTB-3 function 'DrawText' is working
+% Text "HELLO WORLD" - also to check that PTB-3 function 'DrawText' is working
 Screen('TextSize', P.Screen.wPtr , P.Screen.h/10);
-Screen('DrawText', P.Screen.wPtr, 'HELLO', ...
-    floor(P.Screen.w/2-P.Screen.h/6), ...
+Screen('DrawText', P.Screen.wPtr, 'HELLO WORLD', ...
+    floor(P.Screen.w/2-P.Screen.w/6), ...
     floor(P.Screen.h/2-P.Screen.h/10), [200 200 200]);
 P.Screen.vbl=Screen('Flip', P.Screen.wPtr,P.Screen.vbl+P.Screen.ifi/2);
 

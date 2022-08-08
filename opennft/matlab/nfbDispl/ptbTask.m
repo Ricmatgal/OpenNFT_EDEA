@@ -112,7 +112,7 @@ if P.END_run_msg == 0
 elseif P.END_run_msg == 1
 
     % Draw end run message to buffer
-    DrawFormattedText(P.Screen.wPtr, strcat('THANKS! END OF THE RUN NUMBER: ',num2str(P.NFRunNr)), 'center','center', [255 255 255]);
+    DrawFormattedText(P.Screen.wPtr, strcat('THANKS! END OF THE RUN: ',num2str(P.NFRunNr)), 'center','center', [255 255 255]);
 
     % Flip message to the screen
 %     P.Screen.vbl=Screen('Flip', P.Screen.wPtr);

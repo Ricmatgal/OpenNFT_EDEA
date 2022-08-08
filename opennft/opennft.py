@@ -1504,6 +1504,9 @@ class OpenNFT(QWidget):
                     # if self.P['Prot'] == 'ContTask':
                     #     ptbP['TaskFolder'] = self.P['TaskFolder']
 
+                    # had to force again to get the value for some reason...
+                    self.P['tsProcessingFlag'] = config.TSPROCESSINGFLAG
+
                     self.ptbScreen.initialize(
                         sid, self.P['WorkFolder'], self.P['Prot'], self.P)
 
@@ -2593,6 +2596,7 @@ class OpenNFT(QWidget):
             self.P['TCPDataIP'] = self.leTCPDataIP.text()
             self.P['TCPDataPort'] = int(self.leTCPDataPort.text())
         self.P['DisplayFeedbackFullscreen'] = self.cbDisplayFeedbackFullscreen.isChecked()
+        self.P['DisplayFeedbackScreenID'] = self.cbScreenId.currentIndex() + 1
 
         # --- bottom right ---
         self.P['DataType'] = str(self.cbDataType.currentText())
