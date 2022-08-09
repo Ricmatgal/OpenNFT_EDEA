@@ -201,30 +201,29 @@ switch feedbackType
                     if selfScalingFlag
 
                         if iteration-P.nrSkipVol > limitScalStart
-    
+
                             % Adaptive Feedback display for differential PSC, scaled according to limits (limlow, limup) of brain activity
-    
+
                             dispValue = ((dispValue - P.limLow) / (P.limUp - P.limLow));
                             fprintf('Feedback Value from nfbCalc after self-normalization: %f with lims: %f, %f  \n',dispValue,P.limLow,P.limUp);
                             P.scaledDispVal(iteration-P.nrSkipVol) = dispValue;
-    
+
                         else
-    
+
                             P.scaledDispVal(iteration-P.nrSkipVol) = 0;
-    
+
                         end
                     end
 
                     if P.wheelScalingFlag
+
+                        signDispValue = sign(dispValue);
 
                         switch P.wheelScalingFlag
 
                             case 1
 
                                 dispValue = dispValue * (P.stepMax - P.stepMin) + P.stepMin;
-                                P.rotSpe  = dispValue;
-                                fprintf('Feedback value given to the wheel: %s \n',dispValue)
-                                P.finalDispVal(iteration-P.nrSkipVol) = dispValue;
 
 
                             case 2
@@ -246,22 +245,30 @@ switch feedbackType
                                     dispValue = 0;
                                 end
 
-                                P.rotSpe  = dispValue;
-                                fprintf('Feedback value given to the wheel: %s \n',dispValue)
-                                P.finalDispVal(iteration-P.nrSkipVol) = dispValue;
 
                             case 3
-                                
+
                                 if dispValue ~= 0
                                     dispValue = tanh(dispValue)*10; % fit inside a tahn function for smoothing and upscaling
                                 else
                                     dispValue = 0;
                                 end
 
-                                P.rotSpe  = dispValue;
-                                fprintf('Feedback value given to the wheel: %s \n',dispValue)
-                                P.finalDispVal(iteration-P.nrSkipVol) = dispValue;
                         end
+
+
+                        if signDispValue > 0
+
+                            dispValue = dispValue + P.wheelSpeedCorrection;
+
+                        else
+                            dispValue = dispValue - P.wheelSpeedCorrection;
+
+                        end
+
+                        P.rotSpe  = dispValue;
+                        fprintf('Feedback value given to the wheel: %s \n',dispValue)
+                        P.finalDispVal(iteration-P.nrSkipVol) = dispValue;
 
                     end
 
@@ -299,7 +306,7 @@ switch feedbackType
                 wheelAngles = [];
 
                 % Draw the wheels and rotate them
-                times2repeat = ceil(((double(P.TR)/1000)/2)/(P.Screen.numFrames*P.Screen.ifi));
+                times2repeat = floor(((double(P.TR)/1000)/2)/(P.Screen.numFrames*P.Screen.ifi));
                 for ii = 1:times2repeat
 
                     % Here we carefully control for how many frames we
@@ -345,7 +352,7 @@ switch feedbackType
                                 P.Screen.lineWidthPix, P.Screen.white, [P.Screen.xCenter P.Screen.yCenter], 2);
                         end
 
-                        P.Screen.vbl = Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.5) * P.Screen.ifi);
+                        P.Screen.vbl = Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.4) * P.Screen.ifi);
                     end
 
                     % Increment the angle if rotation is clockwise
