@@ -258,10 +258,9 @@ switch feedbackType
 
 
                         if signDispValue > 0
-
                             dispValue = dispValue + P.wheelSpeedCorrection;
 
-                        else
+                        elseif signDispValue < 0
                             dispValue = dispValue - P.wheelSpeedCorrection;
 
                         end
