@@ -329,7 +329,8 @@ if strcmp(protName, 'ContTask')
 
         % wheelImage = 'wheel_illustrator_prf_2.png';
         % wheelImage = 'wheel_illustrator.png';
-        wheelImage = 'wheel_illustrator_grayscale.png';
+        % wheelImage = 'wheel_illustrator_grayscale.png';
+        wheelImage = 'wheel_illustrator_newshape.png'; % wheel adjusted from Soraya
         P.imWheel           = imread([P.stimFolderPath, filesep, wheelImage]);
     
         P.wheelTex          = Screen('MakeTexture', P.Screen.wPtr, P.imWheel);
