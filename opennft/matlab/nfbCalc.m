@@ -148,39 +148,84 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
                 % Differential feedback calculation is implemented here.
                 % Currently, when training roi_A > roi_B,
 
-                if P.V1_right > P.V1_left
-                    switch P.tsProcessingFlag
-                        case 1
-                            tmp_fbVal = norm_percValues2(1)-norm_percValues2(2);
-                        case 2
-                            tmp_fbVal = psc(1)-psc(2);
-                        case 3
-                            tmp_fbVal = norm_percValues(1)-norm_percValues(2);
-                        case 4
-                            tmp_fbVal = psc2(1)-psc2(2);
+                % normalization of lateralization index (i.e. roi1-roi2/roi1+roi2)
+                normDiffIndex = 0;
+
+                if ~normDiffIndex
+
+                    if P.V1_right > P.V1_left
+                        switch P.tsProcessingFlag
+                            case 1
+                                tmp_fbVal = norm_percValues2(1)-norm_percValues2(2);
+                            case 2
+                                tmp_fbVal = psc(1)-psc(2);
+                            case 3
+                                tmp_fbVal = norm_percValues(1)-norm_percValues(2);
+                            case 4
+                                tmp_fbVal = psc2(1)-psc2(2);
+                        end
+
+                    elseif P.V1_left > P.V1_right
+
+                        switch P.tsProcessingFlag
+                            case 1
+                                tmp_fbVal = norm_percValues2(2)-norm_percValues2(1);
+                            case 2
+                                tmp_fbVal = psc(2)-psc(1);
+                            case 3
+                                tmp_fbVal = norm_percValues(2)-norm_percValues(1);
+                            case 4
+                                tmp_fbVal = psc2(2)-psc2(1);
+                        end
+
+                        % just a check that not both boxes are checked. This should be
+                        % done prior to acquisition but for now it's ok. It will just
+                        % crash once the NFB will commence.
+
+                    elseif P.V1_left == P.V1_right
+                        fprintf('\nERROR: Select the correct ROI in GUI\n')
+                        return
                     end
 
-                elseif P.V1_left > P.V1_right
+                else
 
-                    switch P.tsProcessingFlag
-                        case 1
-                            tmp_fbVal = norm_percValues2(2)-norm_percValues2(1);
-                        case 2
-                            tmp_fbVal = psc(2)-psc(1);
-                        case 3
-                            tmp_fbVal = norm_percValues(2)-norm_percValues(1);
-                        case 4
-                            tmp_fbVal = psc2(2)-psc2(1);
+                    if P.V1_right > P.V1_left
+                        switch P.tsProcessingFlag
+                            case 1
+                                tmp_fbVal = norm_percValues2(1)-norm_percValues2(2)/(norm_percValues2(1)+norm_percValues2(2));
+                            case 2
+                                tmp_fbVal = psc(1)-psc(2)/(psc(1)+psc(2));
+                            case 3
+                                tmp_fbVal = norm_percValues(1)-norm_percValues(2)/(norm_percValues(1)+norm_percValues(2));
+                            case 4
+                                tmp_fbVal = psc2(1)-psc2(2)/(psc2(1)+psc2(2));
+                        end
+
+                    elseif P.V1_left > P.V1_right
+
+                        switch P.tsProcessingFlag
+                            case 1
+                                tmp_fbVal = norm_percValues2(2)-norm_percValues2(1)/(norm_percValues2(2)+norm_percValues2(1));
+                            case 2
+                                tmp_fbVal = psc(2)-psc(1)/(psc(2)+psc(1));
+                            case 3
+                                tmp_fbVal = norm_percValues(2)-norm_percValues(1)/(norm_percValues(2)+norm_percValues(1));
+                            case 4
+                                tmp_fbVal = psc2(2)-psc2(1)/(psc2(2)+psc2(1));
+                        end
+
+                        % just a check that not both boxes are checked. This should be
+                        % done prior to acquisition but for now it's ok. It will just
+                        % crash once the NFB will commence.
+
+                    elseif P.V1_left == P.V1_right
+                        fprintf('\nERROR: Select the correct ROI in GUI\n')
+                        return
                     end
 
-                    % just a check that not both boxes are checked. This should be
-                    % done prior to acquisition but for now it's ok. It will just
-                    % crash once the NFB will commence.
-
-                elseif P.V1_left == P.V1_right
-                    fprintf('\nERROR: Select the correct ROI in GUI\n')
-                    return
                 end
+
+
 
             elseif strcmp(P.Prot, 'Cont')
                 % compute average %SC feedback value
