@@ -32,7 +32,7 @@ MODEL_HELPER_MATLAB_NAME = 'MATLAB_NFB_MODEL_HELPER'
 
 MAIN_MATLAB_STARTUP_OPTIONS = '-nodesktop'
 PTB_MATLAB_STARTUP_OPTIONS = '-nodesktop'
-MODEL_HELPER_MATLAB_STARTUP_OPTIONS = '-desktop'
+MODEL_HELPER_MATLAB_STARTUP_OPTIONS = '-nodesktop'
 
 MATLAB_NAME_SUFFIX = ''
 
@@ -164,7 +164,7 @@ PLOT_PEN_COLORS = [
 
 # type of time series processing (see nfbCalc)
 
-TSPROCESSINGFLAG = 4
+TSPROCESSINGFLAG = 3
 
 # 1 = normalized PSC against last N blocks of baseline
 # 2 = normalized PSC with point to point mean signal
@@ -178,7 +178,7 @@ SELFSCALINGFLAG = 1
 # 1 = self-normalization
 # False = No scaling
 
-SELFSCALINGVOLUMES = 5 # N of volumes to skip before values are counted for scaling
+SELFSCALINGVOLUMES = 10 # N of volumes to skip before values are counted for scaling
 
 WHEELSCALINGFLAG = 3
 
