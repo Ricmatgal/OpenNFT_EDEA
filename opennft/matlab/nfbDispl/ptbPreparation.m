@@ -197,7 +197,7 @@ if strcmp(protName, 'ContTask')
     
     angleLongBas = 0:360/nLongBasVolumes*angleSkipVolumes:360; % angles list for long bas
     angleShortBas = 0:360/nShortBasVolumes*angleSkipVolumes:360; % angles list for short bas
-    angleLongBas = angleLongBas;
+    angleLongBas = angleLongBas(2:end);
     angleShortBas = angleShortBas(2:end);
 
     % shuffle
@@ -212,7 +212,11 @@ if strcmp(protName, 'ContTask')
     end
     
     P.rotation_angle_BAS = repelem([angleLongBas,angleShortBasAll],2*angleSkipVolumes);
-
+    if length(P.rotation_angle_BAS) < nTotalBasVolumes*2
+        diff = abs(length(P.rotation_angle_BAS) - nTotalBasVolumes*2);
+        pick = randsample(P.rotation_angle_BAS,diff);
+        P.rotation_angle_BAS = [P.rotation_angle_BAS,pick];
+    end
     
     %P.nrEqBlock = 3;
     %P.nrAnglesBlock = 2;

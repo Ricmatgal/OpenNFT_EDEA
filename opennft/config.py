@@ -30,7 +30,7 @@ MAIN_MATLAB_NAME = 'MATLAB_NFB_MAIN'
 PTB_MATLAB_NAME = 'MATLAB_NFB_PTB'
 MODEL_HELPER_MATLAB_NAME = 'MATLAB_NFB_MODEL_HELPER'
 
-MAIN_MATLAB_STARTUP_OPTIONS = '-nodesktop'
+MAIN_MATLAB_STARTUP_OPTIONS = '-desktop'
 PTB_MATLAB_STARTUP_OPTIONS = '-nodesktop'
 MODEL_HELPER_MATLAB_STARTUP_OPTIONS = '-nodesktop'
 
@@ -172,6 +172,10 @@ TSPROCESSINGFLAG = 3
 # 4 = constant PSC with point to point mean signal subtraction
 
 # self-normalization (scaling) beginning
+
+HEMISPHERENORMFLAG = True
+
+# ROI difference normalized by sum of activity
 
 SELFSCALINGFLAG = 1
 

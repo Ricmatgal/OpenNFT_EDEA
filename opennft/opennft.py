@@ -1411,6 +1411,13 @@ class OpenNFT(QWidget):
             else:
                 logger.warning("Specify time series processing routine")
 
+            if config.HEMISPHERENORMFLAG:
+                self.P['hemisphereNorm'] = config.HEMISPHERENORMFLAG
+                logger.info("Hemisphere activity difference normalization ON")
+            else:
+                logger.info("No Hemisphere activity difference normalization")
+
+
             self.setupRoiPlots()
             self.setupMcPlots()
 
@@ -1506,6 +1513,7 @@ class OpenNFT(QWidget):
 
                     # had to force again to get the value for some reason...
                     self.P['tsProcessingFlag'] = config.TSPROCESSINGFLAG
+                    self.P['hemisphereNorm'] = config.HEMISPHERENORMFLAG
 
                     self.ptbScreen.initialize(
                         sid, self.P['WorkFolder'], self.P['Prot'], self.P)

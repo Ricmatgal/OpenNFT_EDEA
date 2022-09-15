@@ -149,7 +149,11 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
                 % Currently, when training roi_A > roi_B,
 
                 % normalization of lateralization index (i.e. roi1-roi2/roi1+roi2)
-                normDiffIndex = 0;
+                % normDiffIndex = 0; % for debug
+                if isfield(P,'hemisphereNorm')
+                    normDiffIndex = P.hemisphereNorm;
+                    disp('normalization check')
+                end
 
                 if ~normDiffIndex
 
@@ -188,6 +192,7 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
                     end
 
                 else
+                    disp('normalization check')
 
                     if P.V1_right > P.V1_left
                         switch P.tsProcessingFlag
