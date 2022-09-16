@@ -40,11 +40,11 @@ if P.END_run_msg == 0
         waitframes  = 1;
 
 %         % Send Trigger Task onset
-%         outp(P.parportAddr,P.triggers(8));
+         outp(P.parportAddr,P.triggers(8));
 %         % wait abit
-%         WaitSecs(0.05);
+         WaitSecs(0.05);
 %         % close trigger port
-%         outp(P.parportAddr,0);
+         outp(P.parportAddr,0);
 
 
         %%======== MOTIVATION VAS ===============%%%

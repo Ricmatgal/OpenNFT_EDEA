@@ -110,20 +110,20 @@ if strcmp(protName, 'ContTask')
     % ----------------------- PHYSIOLOGY ------------------------
     % -----------------------------------------------------------
     % Initialize the inpout32.dll I/O driver:
-%     config_io;
-%     % Set condition code to zero:
-%     outp(57392, 0);
-%     % Set automatic BIOPAC and eye tracker recording to "stop":
-%     outp(57394, bitset(inp(57394), 3, 0));
-%     % Close pneumatic valve:
-%     outp(57394, bitset(inp(57394), 4, 1));
-%
-%     usingMRI = 1;
-%     if usingMRI
-%         P.parportAddr = hex2dec('2FD8');
-%     else
-%         P.parportAddr = hex2dec('378');
-%     end
+    config_io;
+    % Set condition code to zero:
+    outp(57392, 0);
+    % Set automatic BIOPAC and eye tracker recording to "stop":
+    outp(57394, bitset(inp(57394), 3, 0));
+    % Close pneumatic valve:
+    outp(57394, bitset(inp(57394), 4, 1));
+
+    usingMRI = 1;
+    if usingMRI
+        P.parportAddr = hex2dec('2FD8');
+    else
+        P.parportAddr = hex2dec('378');
+    end
 
     % Define Triggers
     % 3 = VAS onset, 64 = motivation probe, 1 = Baseline, 2 = Regulation

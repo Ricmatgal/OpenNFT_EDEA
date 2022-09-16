@@ -153,7 +153,7 @@ switch feedbackType
             case 2 % Baseline
 
                 % Send Trigger Baseline
-                % outp(P.parportAddr,P.triggers(1))
+                outp(P.parportAddr,P.triggers(1))
 
 
                 P.k_eq = P.k_eq + 1; % update the equation index
@@ -184,7 +184,7 @@ switch feedbackType
                 if iteration > P.NFBC.it_curr(end)
 
                     % send Trigger Regulation
-                    % outp(P.parportAddr,P.triggers(2))
+                    outp(P.parportAddr,P.triggers(2))
 
                     %                     if (length(rawDispV) - nFirstBasVolumes > 0 && length(rawDispV) - nFirstBasVolumes <= NfirstVolumes)
                     %                         if max(rawDisp_s) > P.limUp
@@ -410,7 +410,7 @@ switch feedbackType
                 if any(k)
 
                     % trigger for FB
-                    % outp(P.parportAddr,P.triggers(6))
+                    outp(P.parportAddr,P.triggers(6))
 
                     % Total Score center message
                     Screen('TextSize',P.Screen.wPtr,50);
