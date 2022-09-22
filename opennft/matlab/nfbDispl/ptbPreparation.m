@@ -109,27 +109,33 @@ if strcmp(protName, 'ContTask')
     % -----------------------------------------------------------
     % ----------------------- PHYSIOLOGY ------------------------
     % -----------------------------------------------------------
-    % Initialize the inpout32.dll I/O driver:
-    config_io;
-    % Set condition code to zero:
-    outp(57392, 0);
-    % Set automatic BIOPAC and eye tracker recording to "stop":
-    outp(57394, bitset(inp(57394), 3, 0));
-    % Close pneumatic valve:
-    outp(57394, bitset(inp(57394), 4, 1));
+    P.triggerON = 0;
 
-    usingMRI = 1;
-    if usingMRI
-        P.parportAddr = hex2dec('2FD8');
-    else
-        P.parportAddr = hex2dec('378');
+    if P.triggerON
+        % Initialize the inpout32.dll I/O driver:
+        config_io;
+        % Set condition code to zero:
+        outp(12248, 0);
+        % Set automatic BIOPAC and eye tracker recording to "stop":
+        outp(12250, bitset(inp(12250), 3, 0));
+        % Close pneumatic valve:
+        outp(12250, bitset(inp(12250), 4, 1));
+    
+        usingMRI = 1;
+
+        if usingMRI
+            P.parportAddr = hex2dec('2FD8'); % Shadow-BBL hexadecimal
+    
+            % Start automatic BIOPAC recording: 
+            outp(12250, bitset(inp(12250), 3, 1));
+        end
+        
     end
 
     % Define Triggers
-    % 3 = VAS onset, 64 = motivation probe, 1 = Baseline, 2 = Regulation
-    % 4 = Task, 8 = Detection, 16 = Recognition, 32 = SumFB, 5 = run
-    % offset;
-    P.triggers = [1, 2, 4, 8, 16, 32, 64, 3, 5];
+    % 2 = Baseline, 4 = Regulation, 6 = SumFB, 
+    % 1 = VAS onset, 8 = NF run offset
+    P.triggers = [1, 2, 4, 6, 8];
 
     % -----------------------------------------------------------
     % -----------------------------------------------------------
@@ -212,10 +218,11 @@ if strcmp(protName, 'ContTask')
     end
     
     P.rotation_angle_BAS = repelem([angleLongBas,angleShortBasAll],2*angleSkipVolumes);
+
     if length(P.rotation_angle_BAS) < nTotalBasVolumes*2
         diff = abs(length(P.rotation_angle_BAS) - nTotalBasVolumes*2);
-        pick = randsample(P.rotation_angle_BAS,diff);
-        P.rotation_angle_BAS = [P.rotation_angle_BAS,pick];
+        pick = randsample(P.rotation_angle_BAS,ceil(diff/(angleSkipVolumes*2)));
+        P.rotation_angle_BAS = [P.rotation_angle_BAS,repelem(pick,2*angleSkipVolumes)];
     end
     
     %P.nrEqBlock = 3;
@@ -223,17 +230,21 @@ if strcmp(protName, 'ContTask')
     %P.nrEq      = length(P.ProtCond{2})*P.nrEqBlock; % number of blocks which requires the equations to be generated for
     %P.nrDigits = 2; % how many digits per equation?
     % (all baseline blocks - 2 per baseline block)
+
     P.nrFigs    = 2; % number of textures on screen
     P.dim       = 100; % Texture dimensions
     P.yPos      = P.Screen.yCenter;
     P.xPos      = linspace(w * 0.15, w * 0.85, P.nrFigs);
+
     %P.strings_operation = repelem(ptbCreateOperations(P.nrEq, P.nrDigits),ceil(length(P.ProtCond{2}{1})*2/P.nrEqBlock)); % times 2 because function visited twice
     %list_angles = 360/length(P.ProtCond{2}):360/length(P.ProtCond{2}):360;
     %P.rotation_angle_BAS = repelem(list_angles(randperm(length(list_angles))),floor(length(P.ProtCond{2}{1})*2/P.nrAnglesBlock)); % times 2 because function visited twice
+    
     P.K_rot = 0;
     P.k_eq = 0;
     P.rotAng = 0;
     P.rotSpe = 0;
+    
     % we have to double the amount of strings operation and rotation angles BAS that we should need because the diplay function is called twice durin each iteration
 
     %  hemifield and wheel parameters

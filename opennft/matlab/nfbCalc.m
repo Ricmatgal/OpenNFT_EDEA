@@ -152,7 +152,7 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
                 % normDiffIndex = 0; % for debug
                 if isfield(P,'hemisphereNorm')
                     normDiffIndex = P.hemisphereNorm;
-                    disp('normalization check')
+                    %disp('normalization check')
                 end
 
                 if ~normDiffIndex
@@ -192,7 +192,7 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
                     end
 
                 else
-                    disp('normalization check')
+                    %disp('normalization check')
 
                     if P.V1_right > P.V1_left
                         switch P.tsProcessingFlag

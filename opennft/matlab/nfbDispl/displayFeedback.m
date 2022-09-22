@@ -48,10 +48,14 @@ end
 if isfield(P,'selfScalingFlag')
 
     selfScalingFlag = true;
+    
+    if isfield(P,'selfScalingNVolumes')
+        NSkipVolumes = P.selfScalingNVolumes;
+    else
+        NSkipVolumes = 0;
+    end
 
-    NSkipVolumes = P.selfScalingNVolumes;
-
-    limitScalStart = min(P.ProtCond{3}{1}) + NSkipVolumes;
+    limitScalStart = min(P.ProtCond{3}{2}) + NSkipVolumes; % start from the second block
 
     if iteration-P.nrSkipVol > limitScalStart
 
@@ -151,9 +155,11 @@ switch feedbackType
         switch condition
 
             case 2 % Baseline
-
-                % Send Trigger Baseline
-                outp(P.parportAddr,P.triggers(1))
+                
+                if P.triggerON
+                    % Send Trigger Baseline
+                    outp(P.parportAddr,P.triggers(2))
+                end
 
 
                 P.k_eq = P.k_eq + 1; % update the equation index
@@ -182,9 +188,11 @@ switch feedbackType
                 % acquisition of a volume. If we are still in the same
                 % volume we don't want an update on the speed.
                 if iteration > P.NFBC.it_curr(end)
-
-                    % send Trigger Regulation
-                    outp(P.parportAddr,P.triggers(2))
+                    
+                    if P.triggerON
+                        % send Trigger Regulation
+                        outp(P.parportAddr,P.triggers(3))
+                    end
 
                     %                     if (length(rawDispV) - nFirstBasVolumes > 0 && length(rawDispV) - nFirstBasVolumes <= NfirstVolumes)
                     %                         if max(rawDisp_s) > P.limUp
@@ -408,9 +416,11 @@ switch feedbackType
                 % contains the last contNF value, this will be updated after
                 % the acquisition of the first Sum volume).
                 if any(k)
-
-                    % trigger for FB
-                    outp(P.parportAddr,P.triggers(6))
+                    
+                    if P.triggerON
+                        % trigger for sum FB
+                        outp(P.parportAddr,P.triggers(4))  
+                    end
 
                     % Total Score center message
                     Screen('TextSize',P.Screen.wPtr,50);
@@ -615,7 +625,9 @@ end
 
 save([P.WorkFolder, filesep, 'TaskFolder', filesep, 'taskResults', filesep, 'displayFeedback_r' num2str(P.NFRunNr)], 'P')
 
-% close trigger port
-% outp(P.parportAddr,0);
+if P.triggerON
+    % close trigger port
+    outp(P.parportAddr,0);
+end
 
 assignin('base', 'P', P);
