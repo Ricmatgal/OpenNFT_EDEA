@@ -30,7 +30,7 @@ MAIN_MATLAB_NAME = 'MATLAB_NFB_MAIN'
 PTB_MATLAB_NAME = 'MATLAB_NFB_PTB'
 MODEL_HELPER_MATLAB_NAME = 'MATLAB_NFB_MODEL_HELPER'
 
-MAIN_MATLAB_STARTUP_OPTIONS = '-desktop'
+MAIN_MATLAB_STARTUP_OPTIONS = '-nodesktop'
 PTB_MATLAB_STARTUP_OPTIONS = '-nodesktop'
 MODEL_HELPER_MATLAB_STARTUP_OPTIONS = '-nodesktop'
 
@@ -182,7 +182,7 @@ SELFSCALINGFLAG = 1
 # 1 = self-normalization
 # False = No scaling
 
-SELFSCALINGVOLUMES = 10 # N of volumes to skip before values are counted for scaling
+SELFSCALINGVOLUMES = 1 # N of volumes to skip before values are counted for scaling
 
 WHEELSCALINGFLAG = 3
 
