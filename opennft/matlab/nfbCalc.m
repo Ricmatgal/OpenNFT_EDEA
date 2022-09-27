@@ -197,26 +197,26 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
                     if P.V1_right > P.V1_left
                         switch P.tsProcessingFlag
                             case 1
-                                tmp_fbVal = norm_percValues2(1)-norm_percValues2(2)/(norm_percValues2(1)+norm_percValues2(2));
+                                tmp_fbVal = (norm_percValues2(1)-norm_percValues2(2))/(norm_percValues2(1)+norm_percValues2(2));
                             case 2
-                                tmp_fbVal = psc(1)-psc(2)/(psc(1)+psc(2));
+                                tmp_fbVal = (psc(1)-psc(2))/(psc(1)+psc(2));
                             case 3
-                                tmp_fbVal = norm_percValues(1)-norm_percValues(2)/(norm_percValues(1)+norm_percValues(2));
+                                tmp_fbVal = (norm_percValues(1)-norm_percValues(2))/(norm_percValues(1)+norm_percValues(2));
                             case 4
-                                tmp_fbVal = psc2(1)-psc2(2)/(psc2(1)+psc2(2));
+                                tmp_fbVal = (psc2(1)-psc2(2))/(psc2(1)+psc2(2));
                         end
 
                     elseif P.V1_left > P.V1_right
 
                         switch P.tsProcessingFlag
                             case 1
-                                tmp_fbVal = norm_percValues2(2)-norm_percValues2(1)/(norm_percValues2(2)+norm_percValues2(1));
+                                tmp_fbVal = (norm_percValues2(2)-norm_percValues2(1))/(norm_percValues2(2)+norm_percValues2(1));
                             case 2
-                                tmp_fbVal = psc(2)-psc(1)/(psc(2)+psc(1));
+                                tmp_fbVal = (psc(2)-psc(1))/(psc(2)+psc(1));
                             case 3
-                                tmp_fbVal = norm_percValues(2)-norm_percValues(1)/(norm_percValues(2)+norm_percValues(1));
+                                tmp_fbVal = (norm_percValues(2)-norm_percValues(1))/(norm_percValues(2)+norm_percValues(1));
                             case 4
-                                tmp_fbVal = psc2(2)-psc2(1)/(psc2(2)+psc2(1));
+                                tmp_fbVal = (psc2(2)-psc2(1))/(psc2(2)+psc2(1));
                         end
 
                         % just a check that not both boxes are checked. This should be
