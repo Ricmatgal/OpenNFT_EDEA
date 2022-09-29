@@ -1,4 +1,4 @@
-function setupProcParams()
+function warning_overwrite = setupProcParams()
 % Function to set up data processing parameters.
 %
 % input:
@@ -280,6 +280,13 @@ if P.NFRunNr > 1
         mainLoopData.prev_cX0 = arRegr(P.aAR1,tmpRegr);
     end
     mainLoopData.prev_cX0 = [tmpRegr, mainLoopData.signalPreprocGlmDesign];
+end
+
+% quick check to not overwrite
+if size(dir(fullfile(P.WorkFolder,['NF_Data_' sprintf('%d',P.NFRunNr)])),1) > 2 % because of .. and .
+    warning_overwrite = 1;
+else
+    warning_overwrite = 0;
 end
 
 mainLoopData.mf = [];

@@ -618,7 +618,12 @@ class OpenNFT(QWidget):
 
         self.eng.workspace['rtQA_matlab'] = self.rtQA_matlab
 
-        self.eng.setupProcParams(nargout=0)
+        check_overwrite = self.eng.setupProcParams(nargout=1)
+
+        # check the current NFbRUN with the old one
+
+        if bool(check_overwrite):
+            logger.warning('Did you update the NF run number? Check to not overwrite results!')
 
         if self.P['isRTQA']:
             self.eng.epiWholeBrainROI(nargout=0)
