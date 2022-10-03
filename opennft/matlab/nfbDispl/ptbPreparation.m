@@ -51,15 +51,12 @@ AssertOpenGL();
 screenid = double(P.DisplayFeedbackScreenID); 
 fFullScreen = P.DisplayFeedbackFullscreen;
 
+% screenid = 2;
+
 if ~fFullScreen
     % part of the screen, e.g. for test mode
-    if strcmp(protName, 'Cont')
-        P.Screen.wPtr = Screen('OpenWindow', screenid, [0 0 0], ...
-            [40 40 640 520]);
-    else
-        P.Screen.wPtr = Screen('OpenWindow', screenid, [0 0 0], ...
-            [40 40 720 720]);
-    end
+    P.Screen.wPtr = Screen('OpenWindow', screenid, [0 0 0], ...
+        [40 40 720 720]);
 else
     % full screen
     P.Screen.wPtr = Screen('OpenWindow', screenid, [0 0 0]);
