@@ -173,7 +173,7 @@ TSPROCESSINGFLAG = 3
 
 # self-normalization (scaling) beginning
 
-HEMISPHERENORMFLAG = True
+HEMISPHERENORMFLAG = False
 
 # ROI difference normalized by sum of activity
 
@@ -182,7 +182,7 @@ SELFSCALINGFLAG = 1
 # 1 = self-normalization
 # False = No scaling
 
-SELFSCALINGVOLUMES = 1 # N of volumes to skip before values are counted for scaling
+SELFSCALINGVOLUMES = 10 # N of volumes to use for computing mean limits in self-scaling
 
 WHEELSCALINGFLAG = 3
 
