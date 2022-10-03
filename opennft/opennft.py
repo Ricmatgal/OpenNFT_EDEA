@@ -2901,9 +2901,13 @@ class OpenNFT(QWidget):
         dataNorm = np.array(self.outputSamples['scalProcTimeSeries'], ndmin=2)[self.selectedRoi, :]
         
         if self.P['PlotFeedback']:
-            dataNorm = np.concatenate(
-                (dataNorm, np.array([self.displaySamples]) / self.P['MaxFeedbackVal'])
+#            dataNorm = np.concatenate(
+#                (dataNorm, np.array([self.displaySamples]) / self.P['MaxFeedbackVal'])
+#            )
+                dataNorm = np.concatenate(
+                (dataNorm, np.array([self.displaySamples]))
             )
+
 
         if config.USE_BBLIND: # get the black line data
             dataBlackLine = np.array(np.zeros(self.iteration - self.P['nrSkipVol'] + 1), ndmin=2)
