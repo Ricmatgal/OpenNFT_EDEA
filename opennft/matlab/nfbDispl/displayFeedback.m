@@ -34,14 +34,14 @@ if isfield(P, 'shamData')
     dispValue = cell2mat(P.shamData(iteration-P.nrSkipVol));
     rawDispV = cell2mat(P.shamDataRaw(1:iteration-P.nrSkipVol));
     rawDispV = rawDispV(rawDispV~=0);
-    %rawDisp_s = sort(rawDispV(1:end-1), 'descend');
+    rawDispVSorted = sort(rawDispV, 'descend');
 
 else
     % if its not a sham nfb we retrieve the subject specific
     % rawdisplay values as saved in the displayData structure.
     rawDispV = displayData.rawDispValues;
     rawDispV = rawDispV(rawDispV~=0);
-    %rawDisp_s = sort(rawDispV(displayData.rawDispValues>0), 'descend');
+    rawDispVSorted = sort(rawDispV, 'descend');
 
 end
 
@@ -50,17 +50,19 @@ if isfield(P,'selfScalingFlag')
     selfScalingFlag = true;
     
     if isfield(P,'selfScalingNVolumes')
-        NSkipVolumes = P.selfScalingNVolumes;
+        NLimitsVolumes = P.selfScalingNVolumes;
     else
-        NSkipVolumes = 0;
+        NLimitsVolumes = 0;
     end
 
-    limitScalStart = min(P.ProtCond{3}{2}) + NSkipVolumes; % start from the second block
+    limitScalStart = min(P.ProtCond{3}{2}); % start from the second block
 
     if iteration-P.nrSkipVol > limitScalStart
-
-        P.limLow  = min(rawDispV);
-        P.limUp   = max(rawDispV);
+        
+        % as limits we take the mean of N volums of best and worst
+        % performance
+        P.limLow  = mean(rawDispVSorted(end-NLimitsVolumes:end));
+        P.limUp   = mean(rawDispVSorted(1:NLimitsVolumes));
 
     end
 
@@ -212,7 +214,7 @@ switch feedbackType
 
                             % Adaptive Feedback display for differential PSC, scaled according to limits (limlow, limup) of brain activity
 
-                            dispValue = ((dispValue - P.limLow) / (P.limUp - P.limLow));
+                            dispValue = (dispValue - P.limLow) / (P.limUp - P.limLow);
                             fprintf('Feedback Value from nfbCalc after self-normalization: %f with lims: %f, %f  \n',dispValue,P.limLow,P.limUp);
                             P.scaledDispVal(iteration-P.nrSkipVol) = dispValue;
 
