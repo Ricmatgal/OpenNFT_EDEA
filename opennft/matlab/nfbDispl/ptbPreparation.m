@@ -130,9 +130,10 @@ if strcmp(protName, 'ContTask')
     end
 
     % Define Triggers
-    % 2 = Baseline, 4 = Regulation, 6 = SumFB, 
-    % 1 = VAS onset, 8 = NF run offset
-    P.triggers = [1, 2, 4, 6, 8];
+    % 2 = Baseline, 4 = Regulation, 8 = SumFB, 
+    % 1 = VAS onset, 16 = NF run offset
+    % 32 = Positive Regulation, 64 = Negative Regulation
+    P.triggers = [1, 2, 4, 8, 16, 32, 64];
 
     % -----------------------------------------------------------
     % -----------------------------------------------------------
@@ -176,6 +177,7 @@ if strcmp(protName, 'ContTask')
     % accepted response keys
     P.Screen.leftKey = KbName('1!');
     P.Screen.rightKey = KbName('2@');
+    P.Screen.thirdKey = KbName('3#');
 
     % show initial fixation dot
     P.Screen.fix = [w/2-w/150, h/2-w/150, w/2+w/150, h/2+w/150];
@@ -389,7 +391,9 @@ if strcmp(protName, 'ContTask')
         % set the flag to 1 so each run the first task iteration will be VAS
         P.VAS_flag = 1;
     
-        P.VAS_duration = 3; % in seconds
+        P.VAS_duration = 3.5; % in seconds
+        P.CHOOSE_duration = 8; % in seconds (3 secs more than vas duration)
+        P.firstTASKcall = 0; % to be updated only once
         % =====================================================================
     
         % set flag to 0. We flip it to 1 after the last task block so the final

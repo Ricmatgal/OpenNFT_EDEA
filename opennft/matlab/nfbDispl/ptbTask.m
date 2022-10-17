@@ -19,7 +19,7 @@ P   = evalin('base', 'P');
 
 % fixation cross
 Screen('DrawLines', P.Screen.wPtr, P.Screen.allCoords,...
-4, 1, [P.Screen.xCenter P.Screen.yCenter], 2);
+    4, 1, [P.Screen.xCenter P.Screen.yCenter], 2);
 
 P.Task.fixOns(1,P.Task.trialCounter) = Screen('Flip', P.Screen.wPtr);
 
@@ -28,88 +28,143 @@ P.Task.fixOns(1,P.Task.trialCounter) = Screen('Flip', P.Screen.wPtr);
 % re-adjust textsize for response options on screen
 Screen('TextSize',P.Screen.wPtr, P.textSizeVAS);
 
+% if it is the first call
+if P.firstTASKcall == 0
+    P.firstTASKcall = GetSecs;
+end
 
 if P.END_run_msg == 0
 
-    if P.VAS_flag == 1
+    % start_timer = GetSecs;
+    vas_timer   = 0;
+    waitframes  = 1;
 
-        start_timer = GetSecs;
-        vas_timer   = 0;
-        waitframes  = 1;
-
-         if P.triggerON
-             % Send Trigger Task onset
-             outp(P.parportAddr,P.triggers(1));
-             % Wait a bit
-             WaitSecs(0.05);
-             % Close trigger port
-             outp(P.parportAddr,0);
-         end
+    if P.triggerON
+        % Send Trigger Task onset
+        outp(P.parportAddr,P.triggers(1));
+        % Wait a bit
+        WaitSecs(0.05);
+        % Close trigger port
+        outp(P.parportAddr,0);
+    end
 
 
-        %%======== MOTIVATION VAS ===============%%%
+    %%======== MOTIVATION VAS ===============%%%
 
-        % Loop the animation until the escape key is pressed
-        P.Screen.vbl = Screen('Flip', P.Screen.wPtr);
-        while vas_timer < P.VAS_duration
+    % Loop the animation until the escape key is pressed
+    P.Screen.vbl = Screen('Flip', P.Screen.wPtr);
+    while vas_timer < P.VAS_duration
 
-            % Check the keyboard to see if a button has been pressed
-            [keyIsDown,secs, keyCode] = KbCheck;
+        % Check the keyboard to see if a button has been pressed
+        [keyIsDown,secs, keyCode] = KbCheck;
 
-            % Depending on the button press,
-            if keyCode(P.Screen.leftKey)
-                P.X = P.X - P.pixelsPerPress;
-            elseif keyCode(P.Screen.rightKey)
-                P.X = P.X + P.pixelsPerPress;
-            end
-
-            % Boundaries
-            if P.X < P.Screen.w/2 - P.HSize(3)/2
-                P.X = P.Screen.w/2 - P.HSize(3)/2;
-            elseif P.X > P.Screen.w/2 + P.HSize(3)/2
-                P.X = P.Screen.w/2 + P.HSize(3)/2;
-            end
-
-            % Lines
-            Screen('FillRect', P.Screen.wPtr, P.HColor, P.HLine);
-            P.VLine = CenterRectOnPointd(P.VSize, P.X, P.Screen.h * 0.6);
-            Screen('FillRect', P.Screen.wPtr, P.VColor, P.VLine);
-
-            % Text
-            DrawFormattedText(P.Screen.wPtr, 'HOW MOTIVATED ARE YOU?', 'center',P.Screen.h * 0.3, [255 255 255]);
-
-            Screen('TextSize', P.Screen.wPtr, 40); %Screen('TextFont', P.Screen.wPtr, 'Courier New');
-            DrawFormattedText(P.Screen.wPtr, '0', P.Screen.w * 0.15 , P.Screen.h * 0.61, [255 255 255]);
-            Screen('TextSize', P.Screen.wPtr, 40); %Screen('TextFont', P.Screen.wPtr, 'Courier New');
-            DrawFormattedText(P.Screen.wPtr, '100', P.Screen.w * 0.85 , P.Screen.h * 0.61, [255 255 255]);
-
-            % Flip to the screen
-            P.Screen.vbl=Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.5) * P.Screen.ifi);
-
-            % update timer
-            vas_timer = GetSecs - start_timer;
-
+        % Depending on the button press,
+        if keyCode(P.Screen.leftKey)
+            P.X = P.X - P.pixelsPerPress;
+        elseif keyCode(P.Screen.rightKey)
+            P.X = P.X + P.pixelsPerPress;
         end
 
-        % record motivation score
-        P.VAS_score = (P.X-(P.Screen.w-P.HSize(3))/2)/10;
+        % Boundaries
+        if P.X < P.Screen.w/2 - P.HSize(3)/2
+            P.X = P.Screen.w/2 - P.HSize(3)/2;
+        elseif P.X > P.Screen.w/2 + P.HSize(3)/2
+            P.X = P.Screen.w/2 + P.HSize(3)/2;
+        end
 
-        % set VAS flag to zero so next task blocks will just be the task
-        P.VAS_flag = 0;
-        P.END_run_msg = 1;
+        % Lines
+        Screen('FillRect', P.Screen.wPtr, P.HColor, P.HLine);
+        P.VLine = CenterRectOnPointd(P.VSize, P.X, P.Screen.h * 0.6);
+        Screen('FillRect', P.Screen.wPtr, P.VColor, P.VLine);
+
+        % Text
+        DrawFormattedText(P.Screen.wPtr, 'HOW MOTIVATED ARE YOU?', 'center',P.Screen.h * 0.3, [255 255 255]);
+
+        Screen('TextSize', P.Screen.wPtr, 40); %Screen('TextFont', P.Screen.wPtr, 'Courier New');
+        DrawFormattedText(P.Screen.wPtr, '0', P.Screen.w * 0.15 , P.Screen.h * 0.61, [255 255 255]);
+        % Screen('TextSize', P.Screen.wPtr, 40); %Screen('TextFont', P.Screen.wPtr, 'Courier New');
+        DrawFormattedText(P.Screen.wPtr, '100', P.Screen.w * 0.85 , P.Screen.h * 0.61, [255 255 255]);
+
+        % Flip to the screen
+        P.Screen.vbl=Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.5) * P.Screen.ifi);
+
+        % update timer
+        vas_timer = GetSecs - P.firstTASKcall;
+
+    end
+    
+    % time over or response given
+    DrawFormattedText(P.Screen.wPtr, '','center','center');
+    P.Screen.vbl=Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.5) * P.Screen.ifi);
+
+    % record motivation score
+    P.VAS_score = (P.X-(P.Screen.w-P.HSize(3))/2)/10;
+    
+    % so that people take away the finger from the button box
+    WaitSecs(1)
+
+    % show a screen with the different stategies options
+    not_response = 1;
+
+    while (vas_timer < P.CHOOSE_duration) && (not_response)
+
+
+        % Check the keyboard to see if a button has been pressed
+        [keyIsDown,secs, keyCode] = KbCheck;
+
+        % Depending on the button press,
+        if keyCode(P.Screen.leftKey)
+            P.strategyAnswer = "imagine1";
+            not_response = 0;
+        elseif keyCode(P.Screen.rightKey)
+            P.strategyAnswer = "imagine2";
+            not_response = 0;
+        elseif keyCode(P.Screen.thirdKey)
+            P.strategyAnswer = "covert_attend";
+            not_response = 0;
+        else
+            P.strategyAnswer = "none";
+        end
+
+        % Draw CHOOSE....
+        DrawFormattedText(P.Screen.wPtr, 'CHOOSE:\n\n\n1 - IMAGINE1\n\n2 - IMAGINE2\n\n3 - DIRECT ATTENTION', 'center',P.Screen.h * 0.3, [255 255 255]);
+        % Flip to the screen
+        P.Screen.vbl=Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.5) * P.Screen.ifi);
+
+        % update timer
+        vas_timer = GetSecs - P.firstTASKcall;
 
     end
 
+    % Draw what they decided for feedback
+
+    if P.strategyAnswer == "imagine1"
+        DrawFormattedText(P.Screen.wPtr, 'CHOOSEN:\n\n\n\n\n1', 'center',P.Screen.h * 0.3, [255 255 255]);
+    elseif P.strategyAnswer == "imagine2"
+        DrawFormattedText(P.Screen.wPtr, 'CHOOSEN:\n\n\n\n\n\n2', 'center',P.Screen.h * 0.3, [255 255 255]);
+    elseif P.strategyAnswer == "covert_attend"
+        DrawFormattedText(P.Screen.wPtr, 'CHOOSEN:\n\n\n\n\n\n\n3', 'center',P.Screen.h * 0.3, [255 255 255]);
+    else
+        DrawFormattedText(P.Screen.wPtr, 'CHOOSEN:\n\n\n\n\n\n\n\nNONE', 'center',P.Screen.h * 0.3, [255 255 255]);
+    end
+
+    P.Screen.vbl=Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.5) * P.Screen.ifi);
+
+
+    % set End run message to 1 so next time task is called we will not
+    % have the VAS and Choose task
+    P.END_run_msg = 1;
+
 elseif P.END_run_msg == 1
-    
-     if P.triggerON
-         % Send Trigger run offset
-         outp(P.parportAddr,P.triggers(5));
-         % Wait a bit
-         WaitSecs(0.05);
-         % Close trigger port
-         outp(P.parportAddr,0);
-     end
+
+    if P.triggerON
+        % Send Trigger run offset
+        outp(P.parportAddr,P.triggers(5));
+        % Wait a bit
+        WaitSecs(0.05);
+        % Close trigger port
+        outp(P.parportAddr,0);
+    end
 
     % Draw end run message to buffer
     DrawFormattedText(P.Screen.wPtr, strcat('THANKS! END OF THE RUN: ',num2str(P.NFRunNr)), 'center','center', [255 255 255]);
@@ -117,8 +172,6 @@ elseif P.END_run_msg == 1
     % Flip message to the screen
     Screen('Flip', P.Screen.wPtr);
 
-    % Wait a bit
-    % WaitSecs(3)
 
 end
 

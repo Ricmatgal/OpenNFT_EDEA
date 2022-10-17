@@ -303,10 +303,27 @@ switch feedbackType
                 % change color according to the rotation speed value
                 % (>0 good job, <0 wrong), direction of rotation is
                 % taken care of later, the rotation speed comes from the nfbCalc V1 right/V1 left routine
+                
                 if P.rotSpe > 0 % green
+
                     fixCol = [0, 128, 0];
+
+                    if P.triggerON
+                        % Send Trigger Good Regulation
+                        outp(P.parportAddr,P.triggers(6))
+                    end
+
+
                 elseif P.rotSpe < 0 % red
+
                     fixCol = [255, 0, 0];
+
+                    if P.triggerON
+                        % Send Trigger Bad Regulation
+                        outp(P.parportAddr,P.triggers(7))
+                    end
+
+
                 elseif P.rotAng == 0 || P.TRANSF == 1
                     % if no movement, fixation cross is white
                     fixCol = P.Screen.white;
