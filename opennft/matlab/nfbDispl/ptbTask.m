@@ -122,12 +122,15 @@ if P.END_run_msg == 0
         elseif keyCode(P.Screen.thirdKey)
             P.strategyAnswer = "covert_attend";
             not_response = 0;
+        elseif keyCode(P.Screen.otherKey)
+            not_response = 0;
+            P.strategyAnswer = "other";
         else
             P.strategyAnswer = "none";
         end
 
         % Draw CHOOSE....
-        DrawFormattedText(P.Screen.wPtr, 'CHOOSE:\n\n\n1 - IMAGINE1\n\n2 - IMAGINE2\n\n3 - DIRECT ATTENTION', 'center',P.Screen.h * 0.3, [255 255 255]);
+        DrawFormattedText(P.Screen.wPtr, 'CHOOSE:\n\n\n1 - IMAGINE1\n\n2 - IMAGINE2\n\n3 - DIRECT ATTENTION\n\n4 - OTHER', 'center',P.Screen.h * 0.3, [255 255 255]);
         % Flip to the screen
         P.Screen.vbl=Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.5) * P.Screen.ifi);
 
@@ -139,13 +142,15 @@ if P.END_run_msg == 0
     % Draw what they decided for feedback
 
     if P.strategyAnswer == "imagine1"
-        DrawFormattedText(P.Screen.wPtr, 'CHOOSEN:\n\n\n\n\n1', 'center',P.Screen.h * 0.3, [255 255 255]);
+        DrawFormattedText(P.Screen.wPtr, 'CHOOSEN:\n\n\n\n\n1 - IMAGINE1', 'center',P.Screen.h * 0.3, [255 255 255]);
     elseif P.strategyAnswer == "imagine2"
-        DrawFormattedText(P.Screen.wPtr, 'CHOOSEN:\n\n\n\n\n\n2', 'center',P.Screen.h * 0.3, [255 255 255]);
+        DrawFormattedText(P.Screen.wPtr, 'CHOOSEN:\n\n\n\n\n\n2 - IMAGINE2', 'center',P.Screen.h * 0.3, [255 255 255]);
     elseif P.strategyAnswer == "covert_attend"
-        DrawFormattedText(P.Screen.wPtr, 'CHOOSEN:\n\n\n\n\n\n\n3', 'center',P.Screen.h * 0.3, [255 255 255]);
+        DrawFormattedText(P.Screen.wPtr, 'CHOOSEN:\n\n\n\n\n\n\n3 - DIRECT ATTENTION', 'center',P.Screen.h * 0.3, [255 255 255]);
+    elseif P.strategyAnswer == "other"
+        DrawFormattedText(P.Screen.wPtr, 'CHOOSEN:\n\n\n\n\n\n\n\n\n4 - OTHER', 'center',P.Screen.h * 0.3, [255 255 255]);
     else
-        DrawFormattedText(P.Screen.wPtr, 'CHOOSEN:\n\n\n\n\n\n\n\nNONE', 'center',P.Screen.h * 0.3, [255 255 255]);
+        DrawFormattedText(P.Screen.wPtr, 'CHOOSEN:\n\n\n\n\n\n\n\n\n\nNONE', 'center',P.Screen.h * 0.3, [255 255 255]);
     end
 
     P.Screen.vbl=Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.5) * P.Screen.ifi);

@@ -178,6 +178,7 @@ if strcmp(protName, 'ContTask')
     P.Screen.leftKey = KbName('1!');
     P.Screen.rightKey = KbName('2@');
     P.Screen.thirdKey = KbName('3#');
+    P.Screen.otherKey = KbName('4$');
 
     % show initial fixation dot
     P.Screen.fix = [w/2-w/150, h/2-w/150, w/2+w/150, h/2+w/150];
