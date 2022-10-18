@@ -30,9 +30,9 @@ MAIN_MATLAB_NAME = 'MATLAB_NFB_MAIN'
 PTB_MATLAB_NAME = 'MATLAB_NFB_PTB'
 MODEL_HELPER_MATLAB_NAME = 'MATLAB_NFB_MODEL_HELPER'
 
-MAIN_MATLAB_STARTUP_OPTIONS = '-desktop'
-PTB_MATLAB_STARTUP_OPTIONS = '-desktop'
-MODEL_HELPER_MATLAB_STARTUP_OPTIONS = '-desktop'
+MAIN_MATLAB_STARTUP_OPTIONS = '-nodesktop'
+PTB_MATLAB_STARTUP_OPTIONS = '-nodesktop'
+MODEL_HELPER_MATLAB_STARTUP_OPTIONS = '-nodesktop'
 
 MATLAB_NAME_SUFFIX = ''
 
@@ -128,7 +128,7 @@ USE_SLEEP_IN_STOP = False
 HIDE_TEST_BTN = True
 
 # Flag for new Siemens XA30 DICOM format
-DICOM_SIEMENS_XA30 = True
+DICOM_SIEMENS_XA30 = True # the dicom format from Syngo MR
 
 # rtQA may cause linear performance loss on the big data
 # due to saving process of iGLM quality parameters
@@ -142,7 +142,7 @@ zeroPaddingFlag = False
 nrZeroPadVol = 3
 
 # FD defaults
-DEFAULT_FD_RADIUS = 50  # radius multiplying angular displacement in FD compution
+DEFAULT_FD_RADIUS = 50  # radius multiplying angular displacement in FD computation
 DEFAULT_FD_THRESHOLDS = [0.1, 0.2, 0.5]  # FD thresholds to display by default
 
 # DVARS
@@ -161,3 +161,33 @@ PLOT_PEN_COLORS = [
     pg.mkPen(pg.mkColor(145, 130, 43), width=1.2),
     pg.mkPen(pg.mkColor(0, 0, 0), width=1.2)
 ]
+
+# type of time series processing (see nfbCalc)
+
+TSPROCESSINGFLAG = 3
+
+# 1 = normalized PSC against last N blocks of baseline
+# 2 = normalized PSC with point to point mean signal
+# 3 = constant PSC with cumulative baseline normalization
+# 4 = constant PSC with point to point mean signal subtraction
+
+# self-normalization (scaling) beginning
+
+HEMISPHERENORMFLAG = False
+
+# ROI difference normalized by sum of activity
+
+SELFSCALINGFLAG = 1
+
+# 1 = self-normalization
+# False = No scaling
+
+SELFSCALINGVOLUMES = 10 # N of volumes to use for computing mean limits in self-scaling
+
+WHEELSCALINGFLAG = 3
+
+# 1 = stepmin/stepmax scaling
+# 2 = log scaling
+# 3 = tanh scaling
+
+USE_PTB = True

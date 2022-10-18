@@ -19,26 +19,11 @@ delete_files = True
 
 #mask = "001_000005_000"
 #fns = list(range(1,211))
-#fns = list(range(1,93))
 fns = None
 testCase = 'PSC'
 if testCase == 'PSC':
-    #srcpath = 'F:/MRI_DATA/20201119.LUCACHU_S20_SESS1.99622'
-    #dstpath = 'F:/rtTestFolder'
-    #srcpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectCecilia/dummy_data/20201119.LUCACHU_S20_SESS1.99622'
-    #srcpath = 'C:/Users/gallir/Documents/OPENNFT/ProjectCecilia/dummy_data/testpath'
-    srcpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectBBL/dummy_data/20220524.EDEA_100.111112'
-    dstpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectBBL/dummy_data/watch_folder'
-    #srcpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectCecilia/dummy_data/20220430.MRI_DEV_Test_NFB.110734'
-    #dstpath = 'C:/Users/gallir/Documents/OpenNFT/projects/ProjectCecilia/dummy_data/rtTestFolder'
-    srcpath = 'E:/TBV-input/20220622.EDEA_P101.111468'
-    dstpath = 'E:/TBV-input/rtTestFolder'
-    # in the BBL MRI
-    #srcpath = 'Z:/20220430.Siemens_Service.Service_10849583_167114'
-    #dstpath = 'D:/LABNIC/EDEA/offline_testing/watch_folder'
-   # srcpath = 'E:/rtQA_testing/data/rtDCM/NFB_r2'
-   # dstpath = 'E:/rtTestFolder'
-    #pause_in_sec = 0.8
+    dstpath = 'D:/watch_folder'
+    srcpath = 'D:/TBV-input/20220923.EDEA_S02_SESS3.112417/NF_RUN6'
     pause_in_sec = 0.8
 elif testCase == 'SVM':
     srcpath = 'C:/_RT/rtData/NF_SVM/NF_Run_1_src'

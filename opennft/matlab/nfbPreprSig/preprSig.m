@@ -51,26 +51,26 @@ rawTimeSeries = mainLoopData.rawTimeSeries;
 % number of regressors of no interest to correct with cGLM
 if ~P.isAutoRTQA
     % 6 MC regressors, linear trend, constant
-    nrRegrToCorrect = 8; 
+    nrRegrToCorrect = 8;
 else
     % 2 linear trend, constant, because 6 MC regressors are nrBasFct
-    nrRegrToCorrect = 2; 
+    nrRegrToCorrect = 2;
 end
 
 for indRoi = 1:P.NrROIs
-    
+
     %% Get Raw time-series
     if flags.isPSC || flags.isCorr || P.isAutoRTQA
         rawTimeSeries(indRoi, indVolNorm) = mean(...
             mainLoopData.procVol(ROIs(indRoi).voxelIndex));
     end
-    
+
     if flags.isSVM
         roiVect = mainLoopData.procVol(ROIs(indRoi).voxelIndex);
         weightVect = WEIGHTs.vol(ROIs(indRoi).voxelIndex);
         rawTimeSeries(indRoi, indVolNorm) = dot(roiVect,weightVect);
     end
-    
+
     if flags.isDCM
         indNFTrial = P.indNFTrial;
         if indRoi == P.NrROIs && P.isRTQA
@@ -118,13 +118,13 @@ for indRoi = 1:P.NrROIs
                     mainLoopData.adaptROIs(indRoi, indNFTrial+1) = 1;
                 end
             end
-    
+
             clear tmpVect tmpOptRoiVect
 
         end
 
     end
-    
+
     %% Signal Processing
     % 1. Limits for scaling
     if flags.isDCM
@@ -135,11 +135,11 @@ for indRoi = 1:P.NrROIs
     % Raw for Display
     mainLoopData.displRawTimeSeries(indRoi,indVolNorm) = ...
         rawTimeSeries(indRoi, indVolNorm)-rawTimeSeries(indRoi, 1);
-    
+
     % 2. cumulative cGLM
     % to avoid NaNs given alignment to zero, see preprVol()
     P.motCorrParam(1,:) = 0.00001;
-    
+
     if flags.isPSC || flags.isSVM || flags.isCorr || P.isAutoRTQA
         % continuous cGLM corrections
         tmp_ind_end = indVolNorm;
@@ -152,7 +152,7 @@ for indRoi = 1:P.NrROIs
         tmp_begin = lTrial + 1;
     end
     tmp_rawTimeSeries = rawTimeSeries(indRoi, tmp_begin:end)';
-    
+
     % 2.1. time-series AR(1) filtering
     if P.cglmAR1
         % initialize first AR(1) value
@@ -169,16 +169,18 @@ for indRoi = 1:P.NrROIs
         tmp_rawTimeSeries = mainLoopData.tmp_rawTimeSeriesAR1(indRoi, ...
             tmp_begin:end)';
     end
- 
+
     % 2.2. exemplary step-wise addition of regressors, step = total nr of
     % Regressors, which may require a justification for particular project
     regrStep = P.nrBasFct + nrRegrToCorrect;
 
 
 
-    %% LUCAS IMPLEMENTATION
-    
-    if flags.isPSC || flags.isSVM 
+    % Two different routines, if first run, normal routine. If run 2
+    % onwards, loading half of the previous GLM and attach it to the actual
+    % run 
+
+    if flags.isPSC || flags.isSVM || flags.isCorr || P.isAutoRTQA
         if P.NFRunNr == 1
             if (tmp_ind_end < regrStep)
                 tmpRegr = ones(tmp_ind_end,1);
@@ -252,55 +254,25 @@ for indRoi = 1:P.NrROIs
                     cX0 = tmpRegr;
                     betaReg = pinv(cX0) * tmp_rawTimeSeries;
                     tmp_glmProcTimeSeries = (tmp_rawTimeSeries - cX0 * betaReg)';
-                    mainLoopData.betRegr{indRoi}(tmp_ind_end,:) = betaReg;
                     if P.isRTQA
                         tmp_noRegGlmProcTimeSeries = tmp_glmProcTimeSeries;
                     end
                 end
-    
+                mainLoopData.betRegr{indRoi}(tmp_ind_end,:) = betaReg;
             end
-        else
-            
-            % previous NFB run estimates, skip first ca 100 unstable
-            vols2skip = 251;
-            prevRunL  = size(mainLoopData.prevTS.rawTimeSeries,2);
-            currRunL  = size(mainLoopData.prev_cX0,1); % length defined on current run length in setupProcParams
-            diffRunL  = prevRunL-currRunL;
-            
-            comb_tmp_rawTimeSeries = [mainLoopData.prevTS.rawTimeSeries(indRoi,vols2skip+diffRunL:end)'; tmp_rawTimeSeries];
-
-            % zscore() is cumulative, which limits truly recursive
-            % AR(1) filtering on regressors
-            tmpRegr = [ones(tmp_ind_end,1) P.linRegr(1:tmp_ind_end) ...
-                zscore(P.motCorrParam(1:tmp_ind_end,:))];
-            if P.cglmAR1
-                tmpRegr = arRegr(P.aAR1,tmpRegr);
-            end
-%             if ~P.isRestingState
-                comb_cX0 = [mainLoopData.prev_cX0(vols2skip:end,:);[tmpRegr mainLoopData.signalPreprocGlmDesign(1:tmp_ind_end,:)]];
-                betaReg = pinv(comb_cX0) * comb_tmp_rawTimeSeries;
-                tmp_glmProcTimeSeries = (comb_tmp_rawTimeSeries - ...
-                    comb_cX0 * [betaReg(1:end-1); zeros(1,1)])';
-%             else
-%                 comb_cX0 = tmpRegr;
-%                 betaReg = pinv(comb_cX0) * comb_tmp_rawTimeSeries;
-%                 tmp_glmProcTimeSeries = (comb_tmp_rawTimeSeries - comb_cX0 * betaReg)';
-%             end
-%             mainLoopData.betRegr{indRoi}(tmp_ind_end,:) = betaReg; %
-%             giving an issue at the moment...
 
             if P.isRTQA
                 tContr = mainLoopData.tContr;
                 erGlmProcTimeSeries = tmp_rawTimeSeries - cX0*betaReg;
                 rtQA_matlab.varErGlmProcTimeSeries(indRoi,tmp_ind_end) = erGlmProcTimeSeries'*erGlmProcTimeSeries/(tmp_ind_end - length(tContr.pos));
-                
+    
                 tmpBetRegr = [ betaReg; zeros(P.nrBasFct + nrRegrToCorrect - length(betaReg),1) ];
                 rtQA_matlab.ROI(indRoi).betRegr(tmp_ind_end,:) = tmpBetRegr;
                 rtQA_matlab.linRegr(indRoi,tmp_ind_end) = tmpBetRegr(2);
-                
+    
                 tContr.pos = [ zeros(length(betaReg)-length(tContr.pos),1); tContr.pos ];
                 tContr.neg = [ zeros(length(betaReg)-length(tContr.neg),1); tContr.neg ];
-                
+    
                 if (tmp_ind_end >= 3*regrStep)
     
                     invCX0 = inv(cX0'*cX0);
@@ -320,108 +292,184 @@ for indRoi = 1:P.NrROIs
                         tmp_noRegGlmProcTimeSeries(end);
                 end
     
-            end        
+            end
 
-        end            
+            mainLoopData.glmProcTimeSeries(indRoi,indVolNorm) = ...
+        tmp_glmProcTimeSeries(end);
+
+        else % second or subsequent run
+
+            % previous NFB run estimates, skip first half of the run
+            vols2skip = P.NrOfVolumes/2;
+            prevRunL  = size(mainLoopData.prevTS.rawTimeSeries,2);
+            currRunL  = size(mainLoopData.prev_cX0,1); % length defined on current run length in setupProcParams
+            diffRunL  = prevRunL-currRunL; % baselines are different between 1st and following runs, i.e. different number of volumes per run
+
+            comb_tmp_rawTimeSeries = [mainLoopData.prevTS.rawTimeSeries(indRoi,vols2skip+diffRunL:end)'; tmp_rawTimeSeries];
+
+            % zscore() is cumulative, which limits truly recursive
+            % AR(1) filtering on regressors
+            tmpRegr = [ones(tmp_ind_end,1) P.linRegr(1:tmp_ind_end) ...
+                zscore(P.motCorrParam(1:tmp_ind_end,:))];
+            if P.cglmAR1
+                tmpRegr = arRegr(P.aAR1,tmpRegr);
+            end
+            if ~P.isAutoRTQA
+                % cX0 = [tmpRegr mainLoopData.signalPreprocGlmDesign(1:tmp_ind_end,:)];
+                % comb_cX0 = [mainLoopData.prev_cX0(vols2skip:end,:);[tmpRegr P.spmDesign(1:tmp_ind_end,:)]];
+                comb_cX0 = [mainLoopData.prev_cX0(vols2skip:end,:);[tmpRegr mainLoopData.signalPreprocGlmDesign(1:tmp_ind_end,:)]];
+                betaReg = pinv(comb_cX0) * comb_tmp_rawTimeSeries;
+                tmp_glmProcTimeSeries = (comb_tmp_rawTimeSeries - ...
+                    comb_cX0 * [betaReg(1:end-mainLoopData.nrSignalPreprocGlmDesign); zeros(mainLoopData.nrSignalPreprocGlmDesign,1)])';
+                if P.isRTQA
+                    tmp_noRegGlmProcTimeSeries = (comb_tmp_rawTimeSeries - ...
+                        comb_cX0 * [zeros(length(betaReg)-mainLoopData.nrSignalPreprocGlmDesign,1); betaReg(end-mainLoopData.nrSignalPreprocGlmDesign+1:end)])';
+                end
+            else
+                comb_cX0 = [mainLoopData.prev_cX0(vols2skip:end,:);[tmpRegr mainLoopData.signalPreprocGlmDesign(1:tmp_ind_end,:)]];
+                betaReg = pinv(comb_cX0) * comb_tmp_rawTimeSeries;
+                tmp_glmProcTimeSeries = (comb_tmp_rawTimeSeries - comb_cX0 * betaReg)';
+                if P.isRTQA
+                    tmp_noRegGlmProcTimeSeries = tmp_glmProcTimeSeries;
+                end
+            end
+            mainLoopData.betRegr{indRoi}(tmp_ind_end,:) = betaReg;
+
+            if P.isRTQA
+                tContr = mainLoopData.tContr;
+                erGlmProcTimeSeries = comb_tmp_rawTimeSeries - comb_cX0*betaReg;
+                rtQA_matlab.varErGlmProcTimeSeries(indRoi,tmp_ind_end) = erGlmProcTimeSeries'*erGlmProcTimeSeries/(tmp_ind_end - length(tContr.pos));
+    
+                tmpBetRegr = [ betaReg; zeros(P.nrBasFct + nrRegrToCorrect - length(betaReg),1) ];
+                rtQA_matlab.ROI(indRoi).betRegr(tmp_ind_end,:) = tmpBetRegr;
+                rtQA_matlab.linRegr(indRoi,tmp_ind_end) = tmpBetRegr(2);
+    
+                tContr.pos = [ zeros(length(betaReg)-length(tContr.pos),1); tContr.pos ];
+                tContr.neg = [ zeros(length(betaReg)-length(tContr.neg),1); tContr.neg ];
+    
+                if (tmp_ind_end >= 3*regrStep)
+    
+                    comb_invCX0 = inv(comb_cX0'*comb_cX0);
+                    pos_comb_invCX0 = tContr.pos'*comb_invCX0*tContr.pos;
+                    neg_comb_invCX0 = tContr.neg'*comb_invCX0*tContr.neg;
+    
+                    rtQA_matlab.tGlmProcTimeSeries.pos(indRoi,tmp_ind_end) = tContr.pos'*betaReg /sqrt(rtQA_matlab.varErGlmProcTimeSeries(indRoi,tmp_ind_end)*pos_comb_invCX0);
+                    rtQA_matlab.tGlmProcTimeSeries.neg(indRoi,tmp_ind_end) = tContr.neg'*betaReg /sqrt(rtQA_matlab.varErGlmProcTimeSeries(indRoi,tmp_ind_end)*neg_comb_invCX0);
+    
+                end
+    
+                if tmp_ind_end < 3*regrStep
+                    mainLoopData.noRegGlmProcTimeSeries(indRoi,indVolNorm) = ...
+                        tmp_rawTimeSeries(end);
+                else
+                    mainLoopData.noRegGlmProcTimeSeries(indRoi,indVolNorm) = ...
+                        tmp_noRegGlmProcTimeSeries(end);
+                end
+    
+            end
+
+        end
+
         mainLoopData.glmProcTimeSeries(indRoi,indVolNorm) = ...
-                tmp_glmProcTimeSeries(end);      
+            tmp_glmProcTimeSeries(end);
 
     end
-
-%     if flags.isPSC || flags.isSVM || flags.isCorr || P.isAutoRTQA
-%         if (tmp_ind_end < regrStep)
-%             tmpRegr = ones(tmp_ind_end,1);
-%             if P.cglmAR1
-%                 tmpRegr = arRegr(P.aAR1,tmpRegr);
-%             end
-%             cX0 = tmpRegr;
-%             betaReg = pinv(cX0)*tmp_rawTimeSeries;
-%             tmp_glmProcTimeSeries = (tmp_rawTimeSeries - cX0*betaReg)';
-% 
-%         elseif (tmp_ind_end >= regrStep) && (tmp_ind_end < 2*regrStep)
-%             tmpRegr = [ones(tmp_ind_end,1) P.linRegr(1:tmp_ind_end)];
-%             if P.cglmAR1
-%                 tmpRegr = arRegr(P.aAR1, tmpRegr);
-%             end
-%             cX0 = tmpRegr;
-%             betaReg = pinv(cX0) * tmp_rawTimeSeries;
-%             tmp_glmProcTimeSeries = (tmp_rawTimeSeries - cX0 * betaReg)';
-% 
-%         elseif (tmp_ind_end >= 2*regrStep) && (tmp_ind_end < 3*regrStep)
-%             tmpRegr = [ones(tmp_ind_end,1) P.linRegr(1:tmp_ind_end) ...
-%                 zscore(P.motCorrParam(1:tmp_ind_end,:))];
-%             if P.cglmAR1
-%                 tmpRegr = arRegr(P.aAR1,tmpRegr);
-%             end
-%             cX0 = tmpRegr;
-%             betaReg = pinv(cX0) * tmp_rawTimeSeries;
-%             tmp_glmProcTimeSeries = (tmp_rawTimeSeries - cX0 * betaReg)';
-% 
-%         else
-%             % zscore() is cumulative, which limits truly recursive
-%             % AR(1) filtering on regressors
-%             tmpRegr = [ones(tmp_ind_end,1) P.linRegr(1:tmp_ind_end) ...
-%                 zscore(P.motCorrParam(1:tmp_ind_end,:))];
-%             if P.cglmAR1
-%                 tmpRegr = arRegr(P.aAR1,tmpRegr);
-%             end
-%             if ~P.isAutoRTQA
-%                 cX0 = [tmpRegr mainLoopData.signalPreprocGlmDesign(1:tmp_ind_end,:)];
-%                 betaReg = pinv(cX0) * tmp_rawTimeSeries;
-%                 tmp_glmProcTimeSeries = (tmp_rawTimeSeries - ...
-%                     cX0 * [betaReg(1:end-mainLoopData.nrSignalPreprocGlmDesign); zeros(mainLoopData.nrSignalPreprocGlmDesign,1)])';
-%                 if P.isRTQA
-%                     tmp_noRegGlmProcTimeSeries = (tmp_rawTimeSeries - ...
-%                         cX0 * [zeros(length(betaReg)-mainLoopData.nrSignalPreprocGlmDesign,1); betaReg(end-mainLoopData.nrSignalPreprocGlmDesign+1:end)])';
-%                 end
-%             else
-%                 cX0 = tmpRegr;
-%                 betaReg = pinv(cX0) * tmp_rawTimeSeries;
-%                 tmp_glmProcTimeSeries = (tmp_rawTimeSeries - cX0 * betaReg)';
-%                 if P.isRTQA
-%                     tmp_noRegGlmProcTimeSeries = tmp_glmProcTimeSeries;
-%                 end
-%             end
-% 
-%         end
-%         
-%         if P.isRTQA
-%             tContr = mainLoopData.tContr;
-%             erGlmProcTimeSeries = tmp_rawTimeSeries - cX0*betaReg;
-%             rtQA_matlab.varErGlmProcTimeSeries(indRoi,tmp_ind_end) = erGlmProcTimeSeries'*erGlmProcTimeSeries/(tmp_ind_end - length(tContr.pos));
-%             
-%             tmpBetRegr = [ betaReg; zeros(P.nrBasFct + nrRegrToCorrect - length(betaReg),1) ];
-%             rtQA_matlab.ROI(indRoi).betRegr(tmp_ind_end,:) = tmpBetRegr;
-%             rtQA_matlab.linRegr(indRoi,tmp_ind_end) = tmpBetRegr(2);
-%             
-%             tContr.pos = [ zeros(length(betaReg)-length(tContr.pos),1); tContr.pos ];
-%             tContr.neg = [ zeros(length(betaReg)-length(tContr.neg),1); tContr.neg ];
-%             
-%             if (tmp_ind_end >= 3*regrStep)
-% 
-%                 invCX0 = inv(cX0'*cX0);
-%                 pos_invCX0 = tContr.pos'*invCX0*tContr.pos;
-%                 neg_invCX0 = tContr.neg'*invCX0*tContr.neg;
-% 
-%                 rtQA_matlab.tGlmProcTimeSeries.pos(indRoi,tmp_ind_end) = tContr.pos'*betaReg /sqrt(rtQA_matlab.varErGlmProcTimeSeries(indRoi,tmp_ind_end)*pos_invCX0);
-%                 rtQA_matlab.tGlmProcTimeSeries.neg(indRoi,tmp_ind_end) = tContr.neg'*betaReg /sqrt(rtQA_matlab.varErGlmProcTimeSeries(indRoi,tmp_ind_end)*neg_invCX0);
-% 
-%             end
-% 
-%             if tmp_ind_end < 3*regrStep
-%                 mainLoopData.noRegGlmProcTimeSeries(indRoi,indVolNorm) = ...
-%                     tmp_rawTimeSeries(end);
-%             else
-%                 mainLoopData.noRegGlmProcTimeSeries(indRoi,indVolNorm) = ...
-%                     tmp_noRegGlmProcTimeSeries(end);
-%             end
-% 
-%         end
-% 
-%         mainLoopData.glmProcTimeSeries(indRoi,indVolNorm) = ...
-%                 tmp_glmProcTimeSeries(end);
-% 
-%     end
+    
+    % routine without combined matrix
+    %     if flags.isPSC || flags.isSVM || flags.isCorr || P.isAutoRTQA
+    %         if (tmp_ind_end < regrStep)
+    %             tmpRegr = ones(tmp_ind_end,1);
+    %             if P.cglmAR1
+    %                 tmpRegr = arRegr(P.aAR1,tmpRegr);
+    %             end
+    %             cX0 = tmpRegr;
+    %             betaReg = pinv(cX0)*tmp_rawTimeSeries;
+    %             tmp_glmProcTimeSeries = (tmp_rawTimeSeries - cX0*betaReg)';
+    %
+    %         elseif (tmp_ind_end >= regrStep) && (tmp_ind_end < 2*regrStep)
+    %             tmpRegr = [ones(tmp_ind_end,1) P.linRegr(1:tmp_ind_end)];
+    %             if P.cglmAR1
+    %                 tmpRegr = arRegr(P.aAR1, tmpRegr);
+    %             end
+    %             cX0 = tmpRegr;
+    %             betaReg = pinv(cX0) * tmp_rawTimeSeries;
+    %             tmp_glmProcTimeSeries = (tmp_rawTimeSeries - cX0 * betaReg)';
+    %
+    %         elseif (tmp_ind_end >= 2*regrStep) && (tmp_ind_end < 3*regrStep)
+    %             tmpRegr = [ones(tmp_ind_end,1) P.linRegr(1:tmp_ind_end) ...
+    %                 zscore(P.motCorrParam(1:tmp_ind_end,:))];
+    %             if P.cglmAR1
+    %                 tmpRegr = arRegr(P.aAR1,tmpRegr);
+    %             end
+    %             cX0 = tmpRegr;
+    %             betaReg = pinv(cX0) * tmp_rawTimeSeries;
+    %             tmp_glmProcTimeSeries = (tmp_rawTimeSeries - cX0 * betaReg)';
+    %
+    %         else
+    %             % zscore() is cumulative, which limits truly recursive
+    %             % AR(1) filtering on regressors
+    %             tmpRegr = [ones(tmp_ind_end,1) P.linRegr(1:tmp_ind_end) ...
+    %                 zscore(P.motCorrParam(1:tmp_ind_end,:))];
+    %             if P.cglmAR1
+    %                 tmpRegr = arRegr(P.aAR1,tmpRegr);
+    %             end
+    %             if ~P.isAutoRTQA
+    %                 cX0 = [tmpRegr mainLoopData.signalPreprocGlmDesign(1:tmp_ind_end,:)];
+    %                 betaReg = pinv(cX0) * tmp_rawTimeSeries;
+    %                 tmp_glmProcTimeSeries = (tmp_rawTimeSeries - ...
+    %                     cX0 * [betaReg(1:end-mainLoopData.nrSignalPreprocGlmDesign); zeros(mainLoopData.nrSignalPreprocGlmDesign,1)])';
+    %                 if P.isRTQA
+    %                     tmp_noRegGlmProcTimeSeries = (tmp_rawTimeSeries - ...
+    %                         cX0 * [zeros(length(betaReg)-mainLoopData.nrSignalPreprocGlmDesign,1); betaReg(end-mainLoopData.nrSignalPreprocGlmDesign+1:end)])';
+    %                 end
+    %             else
+    %                 cX0 = tmpRegr;
+    %                 betaReg = pinv(cX0) * tmp_rawTimeSeries;
+    %                 tmp_glmProcTimeSeries = (tmp_rawTimeSeries - cX0 * betaReg)';
+    %                 if P.isRTQA
+    %                     tmp_noRegGlmProcTimeSeries = tmp_glmProcTimeSeries;
+    %                 end
+    %             end
+    %
+    %         end
+    %
+    %         if P.isRTQA
+    %             tContr = mainLoopData.tContr;
+    %             erGlmProcTimeSeries = tmp_rawTimeSeries - cX0*betaReg;
+    %             rtQA_matlab.varErGlmProcTimeSeries(indRoi,tmp_ind_end) = erGlmProcTimeSeries'*erGlmProcTimeSeries/(tmp_ind_end - length(tContr.pos));
+    %
+    %             tmpBetRegr = [ betaReg; zeros(P.nrBasFct + nrRegrToCorrect - length(betaReg),1) ];
+    %             rtQA_matlab.ROI(indRoi).betRegr(tmp_ind_end,:) = tmpBetRegr;
+    %             rtQA_matlab.linRegr(indRoi,tmp_ind_end) = tmpBetRegr(2);
+    %
+    %             tContr.pos = [ zeros(length(betaReg)-length(tContr.pos),1); tContr.pos ];
+    %             tContr.neg = [ zeros(length(betaReg)-length(tContr.neg),1); tContr.neg ];
+    %
+    %             if (tmp_ind_end >= 3*regrStep)
+    %
+    %                 invCX0 = inv(cX0'*cX0);
+    %                 pos_invCX0 = tContr.pos'*invCX0*tContr.pos;
+    %                 neg_invCX0 = tContr.neg'*invCX0*tContr.neg;
+    %
+    %                 rtQA_matlab.tGlmProcTimeSeries.pos(indRoi,tmp_ind_end) = tContr.pos'*betaReg /sqrt(rtQA_matlab.varErGlmProcTimeSeries(indRoi,tmp_ind_end)*pos_invCX0);
+    %                 rtQA_matlab.tGlmProcTimeSeries.neg(indRoi,tmp_ind_end) = tContr.neg'*betaReg /sqrt(rtQA_matlab.varErGlmProcTimeSeries(indRoi,tmp_ind_end)*neg_invCX0);
+    %
+    %             end
+    %
+    %             if tmp_ind_end < 3*regrStep
+    %                 mainLoopData.noRegGlmProcTimeSeries(indRoi,indVolNorm) = ...
+    %                     tmp_rawTimeSeries(end);
+    %             else
+    %                 mainLoopData.noRegGlmProcTimeSeries(indRoi,indVolNorm) = ...
+    %                     tmp_noRegGlmProcTimeSeries(end);
+    %             end
+    %
+    %         end
+    %
+    %         mainLoopData.glmProcTimeSeries(indRoi,indVolNorm) = ...
+    %                 tmp_glmProcTimeSeries(end);
+    %
+    %     end
 
     % 2.3.1 alternative processign for DCM, e.g. no motion and linear trend
     % regressors. Note, DCM could be very sensitive to cumulative signal
@@ -456,9 +504,9 @@ for indRoi = 1:P.NrROIs
                 mainLoopData.inpFilt(indRoi));
         end
     end
-    
+
 end
-    
+
 % 2. time-series iGLM
 
 for indRoi = 1:P.NrROIs
@@ -486,10 +534,11 @@ for indRoi = 1:P.NrROIs
         mainLoopData.fNegatDerivSpike(indRoi));
     rtQA_matlab.kalmanSpikesPos(indRoi,indVolNorm) = mainLoopData.fPositDerivSpike(indRoi);
     rtQA_matlab.kalmanSpikesNeg(indRoi,indVolNorm) = mainLoopData.fNegatDerivSpike(indRoi);
-
+    
+    % adding the constant betas to the Kalman filter output
     mainLoopData.constProcTimeSeries(indRoi,indVolNorm) = ...
-    mainLoopData.kalmanProcTimeSeries(indRoi,indVolNorm) + ...
-    mainLoopData.betRegr{indRoi}(indVolNorm,1);   
+        mainLoopData.kalmanProcTimeSeries(indRoi,indVolNorm) + ...
+        mainLoopData.betRegr{indRoi}(indVolNorm,1);
 
     %4. Scaling
     if ~P.isAutoRTQA
@@ -513,7 +562,7 @@ for indRoi = 1:P.NrROIs
         mainLoopData.scalProcTimeSeries(indRoi, indVolNorm) = ...
             1 ./ (1 + exp(-zcoredVal(end))); % or 1-logsig()
     end
-    
+
 end
 
 % update main loop variable
@@ -527,13 +576,13 @@ mainLoopData.mposMin(indVolNorm)= mean(mainLoopData.posMin(:, indVolNorm));
 output.posMin = [mainLoopData.posMin; mainLoopData.mposMin];
 output.posMax = [mainLoopData.posMax; mainLoopData.mposMax];
 output.scalProcTimeSeries = mainLoopData.scalProcTimeSeries;
-
+output.constProcTimeSeries = mainLoopData.constProcTimeSeries;
 output.glmProcTimeSeries = mainLoopData.glmProcTimeSeries;
 output.kalmanProcTimeSeries = mainLoopData.kalmanProcTimeSeries;
 output.displRawTimeSeries = mainLoopData.displRawTimeSeries;
 output.rawTimeSeries = mainLoopData.rawTimeSeries;
 output.motCorrParam = P.motCorrParam;
-    
+
 if P.isRTQA
     assignin('base', 'rtQA_matlab', rtQA_matlab);
 end

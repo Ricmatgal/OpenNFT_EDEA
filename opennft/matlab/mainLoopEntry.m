@@ -96,6 +96,7 @@ if (strcmp(P.Prot, 'Inter') ||  strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTa
         %displayData.displayStage = 'instruction'; % this could be adjusted?
         displayData.rawDispValues = mainLoopData.rawDispValues;
         displayData.currNFblock = mainLoopData.currNFblock;
+        displayData.blockNF = mainLoopData.blockNF;
 
     %%===============================================================%%
 

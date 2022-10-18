@@ -24,7 +24,7 @@ if P.NFRunNr > 1
         assignin('base', 'prev_actValue', prev_actValue);
     end
 else
-    fprintf('\nPut previous Reward file into the Work Folder!\n');
+    %fprintf('\nPut previous Reward file into the Work Folder!\n');
     P.prev_actValue = [];
 end
 

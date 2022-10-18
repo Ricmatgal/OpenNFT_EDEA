@@ -618,7 +618,12 @@ class OpenNFT(QWidget):
 
         self.eng.workspace['rtQA_matlab'] = self.rtQA_matlab
 
-        self.eng.setupProcParams(nargout=0)
+        check_overwrite = self.eng.setupProcParams(nargout=1)
+
+        # check the current NFbRUN with the old one
+
+        if bool(check_overwrite):
+            logger.warning('Did you update the NF run number? Check to not overwrite results!')
 
         if self.P['isRTQA']:
             self.eng.epiWholeBrainROI(nargout=0)
@@ -1397,6 +1402,27 @@ class OpenNFT(QWidget):
             if not self.P['isAutoRTQA']:
                 self.createMusterInfo()
 
+            if config.TSPROCESSINGFLAG:
+                self.P['tsProcessingFlag'] = config.TSPROCESSINGFLAG
+                logger.info("Time series processing flag set to: {}, check config.py".format(config.TSPROCESSINGFLAG))
+                if config.TSPROCESSINGFLAG == 1:
+                    self.P['RoiAnatOperation'] = "norm_PSC_baseline"
+                elif config.TSPROCESSINGFLAG == 2:
+                    self.P['RoiAnatOperation'] = "norm_PSC_mean"
+                elif config.TSPROCESSINGFLAG == 3:
+                    self.P['RoiAnatOperation'] = "const_PSC_baseline"
+                elif config.TSPROCESSINGFLAG == 4:
+                    self.P['RoiAnatOperation'] = "const_PSC_mean"
+            else:
+                logger.warning("Specify time series processing routine")
+
+            if config.HEMISPHERENORMFLAG:
+                self.P['hemisphereNorm'] = config.HEMISPHERENORMFLAG
+                logger.info("Hemisphere activity difference normalization ON")
+            else:
+                logger.info("No Hemisphere activity difference normalization")
+
+
             self.setupRoiPlots()
             self.setupMcPlots()
 
@@ -1430,6 +1456,24 @@ class OpenNFT(QWidget):
             action.setCheckable(False)
 
             self.roiSelectorBtn.setEnabled(True)
+
+            if config.SELFSCALINGFLAG:
+                self.P['selfScalingFlag'] = config.SELFSCALINGFLAG
+                if config.SELFSCALINGVOLUMES:
+                    self.P['selfScalingNVolumes'] = config.SELFSCALINGVOLUMES
+                    logger.info(
+                    "Self-scaling flag set to: {} with N volumes: {}, check config.py".format(config.SELFSCALINGFLAG,config.SELFSCALINGVOLUMES))
+                else:
+                    logger.warning("Specify self-scaling limits")
+            else:
+                logger.warning("No self-scaling applied")
+
+            if config.WHEELSCALINGFLAG:
+                self.P['wheelScalingFlag'] = config.WHEELSCALINGFLAG
+                logger.info(
+                    "Wheel speed scaling flag set to: {}, check config.py".format(config.WHEELSCALINGFLAG))
+            else:
+                logger.warning("Specify wheel speed scaling routine")
 
             if config.USE_SHAM:
                 logger.warning("Sham feedback has been selected")
@@ -1471,6 +1515,10 @@ class OpenNFT(QWidget):
                     # ptbP['FeedbackValDec'] = self.P['FeedbackValDec']
                     # if self.P['Prot'] == 'ContTask':
                     #     ptbP['TaskFolder'] = self.P['TaskFolder']
+
+                    # had to force again to get the value for some reason...
+                    self.P['tsProcessingFlag'] = config.TSPROCESSINGFLAG
+                    self.P['hemisphereNorm'] = config.HEMISPHERENORMFLAG
 
                     self.ptbScreen.initialize(
                         sid, self.P['WorkFolder'], self.P['Prot'], self.P)
@@ -2561,6 +2609,7 @@ class OpenNFT(QWidget):
             self.P['TCPDataIP'] = self.leTCPDataIP.text()
             self.P['TCPDataPort'] = int(self.leTCPDataPort.text())
         self.P['DisplayFeedbackFullscreen'] = self.cbDisplayFeedbackFullscreen.isChecked()
+        self.P['DisplayFeedbackScreenID'] = self.cbScreenId.currentIndex() + 1
 
         # --- bottom right ---
         self.P['DataType'] = str(self.cbDataType.currentText())
@@ -2652,6 +2701,7 @@ class OpenNFT(QWidget):
 
         if self.P['Prot'] == 'ContTask':
             self.settings.setValue('TaskFolder', self.P['TaskFolder'])
+            self.settings.setValue('StimFolder', self.P['StimFolder'])
 
         # --- middle ---
         self.settings.setValue('ProjectName', self.P['ProjectName'])
@@ -2683,6 +2733,7 @@ class OpenNFT(QWidget):
         self.settings.setValue('PlotFeedback', self.P['PlotFeedback'])
 
         self.settings.setValue('ShamFile', self.P['ShamFile'])
+        self.settings.setValue('DoubleBlindDir', self.P['DoubleBlindDir'])
 
         self.settings.setValue('UsePTB', self.cbUsePTB.isChecked())
         self.settings.setValue('DisplayFeedbackScreenID', self.cbScreenId.currentIndex())
@@ -2850,9 +2901,13 @@ class OpenNFT(QWidget):
         dataNorm = np.array(self.outputSamples['scalProcTimeSeries'], ndmin=2)[self.selectedRoi, :]
         
         if self.P['PlotFeedback']:
-            dataNorm = np.concatenate(
-                (dataNorm, np.array([self.displaySamples]) / self.P['MaxFeedbackVal'])
+#            dataNorm = np.concatenate(
+#                (dataNorm, np.array([self.displaySamples]) / self.P['MaxFeedbackVal'])
+#            )
+                dataNorm = np.concatenate(
+                (dataNorm, np.array([self.displaySamples]))
             )
+
 
         if config.USE_BBLIND: # get the black line data
             dataBlackLine = np.array(np.zeros(self.iteration - self.P['nrSkipVol'] + 1), ndmin=2)

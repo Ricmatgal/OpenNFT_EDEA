@@ -21,8 +21,12 @@ function ptbPreparation(screenId, workFolder, protName)
 
 P = evalin('base', 'P');
 
+PsychDefaultSetup(2)
 Screen('CloseAll');
-Screen('Preference', 'SkipSyncTests', 2);
+Screen('Preference', 'Verbosity', 0);
+Screen('Preference', 'SkipSyncTests',1);
+Screen('Preference', 'VisualDebugLevel',0);
+Screen('Preference', 'ScreenToHead', 0, 1, 1);
 
 if ~ismac
     % Because this command messes the coordinate system on the Mac OS
@@ -31,31 +35,28 @@ end
 
 AssertOpenGL();
 
-myscreens = Screen('Screens');
-if length(myscreens) == 3
-    % two monitors: [0 1 2]
-    % screenid = myscreens(screenId + 1);
-    screenid = 1;
-elseif length(myscreens) == 2
-    % one monitor: [0 1]
-    screenid = myscreens(screenId);
-else
-    % if different, configure your mode
-    screenid = 0;
-end
+% myscreens = Screen('Screens');
+% if length(myscreens) == 3
+%     % two monitors: [0 1 2]
+%     % screenid = myscreens(screenId + 1);
+%     screenid = 1;
+% elseif length(myscreens) == 2
+%     % one monitor: [0 1]
+%     screenid = myscreens(screenId);
+% else
+%     % if different, configure your mode
+%     screenid = 0;
+% end
 
-screenid = 2;
+screenid = double(P.DisplayFeedbackScreenID); 
 fFullScreen = P.DisplayFeedbackFullscreen;
+
+% screenid = 2;
 
 if ~fFullScreen
     % part of the screen, e.g. for test mode
-    if strcmp(protName, 'Cont')
-        P.Screen.wPtr = Screen('OpenWindow', screenid, [0 0 0], ...
-            [40 40 640 520]);
-    else
-        P.Screen.wPtr = Screen('OpenWindow', screenid, [0 0 0], ...
-            [40 40 720 720]);
-    end
+    P.Screen.wPtr = Screen('OpenWindow', screenid, [0 0 0], ...
+        [40 40 720 720]);
 else
     % full screen
     P.Screen.wPtr = Screen('OpenWindow', screenid, [0 0 0]);
@@ -77,11 +78,12 @@ P.textSizeBAS = 60;
 P.textSizeNF = 10; % width of the fixation cross while regulating
 P.textSizeSUM = 100;
 
-% Text "HELLO" - also to check that PTB-3 function 'DrawText' is working
+% Text "HELLO WORLD" - also to check that PTB-3 function 'DrawText' is working
 Screen('TextSize', P.Screen.wPtr , P.Screen.h/10);
-Screen('DrawText', P.Screen.wPtr, 'HELLO', ...
-    floor(P.Screen.w/2-P.Screen.h/6), ...
-    floor(P.Screen.h/2-P.Screen.h/10), [200 200 200]);
+%Screen('DrawText', P.Screen.wPtr, 'HELLO WORLD', ...
+%    floor(P.Screen.w/2-P.Screen.w/2), ...
+%    floor(P.Screen.h/2-P.Screen.h/10), [200 200 200]);
+DrawFormattedText(P.Screen.wPtr, 'HELLO WORLD','center','center',[200 200 200]);
 P.Screen.vbl=Screen('Flip', P.Screen.wPtr,P.Screen.vbl+P.Screen.ifi/2);
 
 pause(1);
@@ -104,27 +106,34 @@ if strcmp(protName, 'ContTask')
     % -----------------------------------------------------------
     % ----------------------- PHYSIOLOGY ------------------------
     % -----------------------------------------------------------
-    % Initialize the inpout32.dll I/O driver:
-%     config_io;
-%     % Set condition code to zero:
-%     outp(57392, 0);
-%     % Set automatic BIOPAC and eye tracker recording to "stop":
-%     outp(57394, bitset(inp(57394), 3, 0));
-%     % Close pneumatic valve:
-%     outp(57394, bitset(inp(57394), 4, 1));
-%
-%     usingMRI = 1;
-%     if usingMRI
-%         P.parportAddr = hex2dec('2FD8');
-%     else
-%         P.parportAddr = hex2dec('378');
-%     end
+    P.triggerON = 0;
+
+    if P.triggerON
+        % Initialize the inpout32.dll I/O driver:
+        config_io;
+        % Set condition code to zero:
+        outp(12248, 0);
+        % Set automatic BIOPAC and eye tracker recording to "stop":
+        outp(12250, bitset(inp(12250), 3, 0));
+        % Close pneumatic valve:
+        outp(12250, bitset(inp(12250), 4, 1));
+    
+        usingMRI = 1;
+
+        if usingMRI
+            P.parportAddr = hex2dec('2FD8'); % Shadow-BBL hexadecimal
+    
+            % Start automatic BIOPAC recording: 
+            outp(12250, bitset(inp(12250), 3, 1));
+        end
+        
+    end
 
     % Define Triggers
-    % 3 = VAS onset, 64 = motivation probe, 1 = Baseline, 2 = Regulation
-    % 4 = Task, 8 = Detection, 16 = Recognition, 32 = SumFB, 5 = run
-    % offset;
-    P.triggers = [1, 2, 4, 8, 16, 32, 64, 3, 5];
+    % 2 = Baseline, 4 = Regulation, 8 = SumFB, 
+    % 1 = VAS onset, 16 = NF run offset
+    % 32 = Positive Regulation, 64 = Negative Regulation
+    P.triggers = [1, 2, 4, 8, 16, 32, 64];
 
     % -----------------------------------------------------------
     % -----------------------------------------------------------
@@ -140,7 +149,7 @@ if strcmp(protName, 'ContTask')
     P.Screen.fixCrossDimPix = 40;
     
     % Set the line width for fixation cross
-    P.Screen.lineWidthPix = 8;
+    P.Screen.lineWidthPix = 4;
 
     % Setting the coordinates
     P.Screen.wRect = [0, 0, P.Screen.w, P.Screen.h];
@@ -168,6 +177,8 @@ if strcmp(protName, 'ContTask')
     % accepted response keys
     P.Screen.leftKey = KbName('1!');
     P.Screen.rightKey = KbName('2@');
+    P.Screen.thirdKey = KbName('3#');
+    P.Screen.otherKey = KbName('4$');
 
     % show initial fixation dot
     P.Screen.fix = [w/2-w/150, h/2-w/150, w/2+w/150, h/2+w/150];
@@ -176,22 +187,64 @@ if strcmp(protName, 'ContTask')
 
     
     %% Cecilia Task Parameters
-    P.nrEqBlock = 3;
-    P.nrAnglesBlock = 2;
-    P.nrEq      = length(P.ProtCond{2})*P.nrEqBlock; % number of blocks which requires the equations to be generated for
+
+    nLongBasVolumes = length([P.ProtCond{2}{1}]); % N volumes in long (1st) bas
+    nShortBasBlocks = length([P.ProtCond{2}])-1; % N block with short (2nd onwards) bas
+    nShortBasVolumes = length([P.ProtCond{2}{2}]); % N volumes in short (2nd onwards) bas
+
+    eqSkipVolumes = 4; % every n volumes we change the equation
+    angleSkipVolumes = 4; % every n volumes we change the presented wheel orientation
+    
+    nTotalBasVolumes = nLongBasVolumes + nShortBasVolumes * nShortBasBlocks;
+    % P.nrEq = nTotalBasVolumes * eqSkipVolumes;
+    
     P.nrDigits = 2; % how many digits per equation?
+    P.strings_operation = repelem(ptbCreateOperations(ceil(nTotalBasVolumes/eqSkipVolumes), P.nrDigits),2*eqSkipVolumes); % times 2 because function visited twice
+    
+    angleLongBas = 0:360/nLongBasVolumes*angleSkipVolumes:360; % angles list for long bas
+    angleShortBas = 0:360/nShortBasVolumes*angleSkipVolumes:360; % angles list for short bas
+    angleLongBas = angleLongBas(2:end);
+    angleShortBas = angleShortBas(2:end);
+
+    % shuffle
+    nAngleLongBas = length(angleLongBas);
+    nAngleShortBas = length(angleShortBas);
+    angleLongBas = angleLongBas(randperm(nAngleLongBas));
+    angleShortBasAll = [];
+
+    for i = 1:nShortBasBlocks
+        angleShortBas = angleShortBas(randperm(nAngleShortBas));
+        angleShortBasAll = [angleShortBasAll,angleShortBas];
+    end
+    
+    P.rotation_angle_BAS = repelem([angleLongBas,angleShortBasAll],2*angleSkipVolumes);
+
+    if length(P.rotation_angle_BAS) < nTotalBasVolumes*2
+        diff = abs(length(P.rotation_angle_BAS) - nTotalBasVolumes*2);
+        pick = randsample(P.rotation_angle_BAS,ceil(diff/(angleSkipVolumes*2)));
+        P.rotation_angle_BAS = [P.rotation_angle_BAS,repelem(pick,2*angleSkipVolumes)];
+    end
+    
+    %P.nrEqBlock = 3;
+    %P.nrAnglesBlock = 2;
+    %P.nrEq      = length(P.ProtCond{2})*P.nrEqBlock; % number of blocks which requires the equations to be generated for
+    %P.nrDigits = 2; % how many digits per equation?
     % (all baseline blocks - 2 per baseline block)
+
     P.nrFigs    = 2; % number of textures on screen
     P.dim       = 100; % Texture dimensions
     P.yPos      = P.Screen.yCenter;
     P.xPos      = linspace(w * 0.15, w * 0.85, P.nrFigs);
-    P.strings_operation = repelem(ptbCreateOperations(P.nrEq, P.nrDigits),ceil(length(P.ProtCond{2}{1})*2/P.nrEqBlock)); % times 2 because function visited twice
-    list_angles = 360/length(P.ProtCond{2}):360/length(P.ProtCond{2}):360;
-    P.rotation_angle_BAS = repelem(list_angles(randperm(length(list_angles))),floor(length(P.ProtCond{2}{1})*2/P.nrAnglesBlock)); % times 2 because function visited twice
+
+    %P.strings_operation = repelem(ptbCreateOperations(P.nrEq, P.nrDigits),ceil(length(P.ProtCond{2}{1})*2/P.nrEqBlock)); % times 2 because function visited twice
+    %list_angles = 360/length(P.ProtCond{2}):360/length(P.ProtCond{2}):360;
+    %P.rotation_angle_BAS = repelem(list_angles(randperm(length(list_angles))),floor(length(P.ProtCond{2}{1})*2/P.nrAnglesBlock)); % times 2 because function visited twice
+    
     P.K_rot = 0;
     P.k_eq = 0;
     P.rotAng = 0;
     P.rotSpe = 0;
+    
     % we have to double the amount of strings operation and rotation angles BAS that we should need because the diplay function is called twice durin each iteration
 
     %  hemifield and wheel parameters
@@ -290,8 +343,9 @@ if strcmp(protName, 'ContTask')
         P.stimFolderPath    = P.StimFolder;
 
         % wheelImage = 'wheel_illustrator_prf_2.png';
-        wheelImage = 'wheel_illustrator.png';
+        % wheelImage = 'wheel_illustrator.png';
         % wheelImage = 'wheel_illustrator_grayscale.png';
+        wheelImage = 'wheel_illustrator_newshape.png'; % wheel adjusted from Soraya
         P.imWheel           = imread([P.stimFolderPath, filesep, wheelImage]);
     
         P.wheelTex          = Screen('MakeTexture', P.Screen.wPtr, P.imWheel);
@@ -338,7 +392,9 @@ if strcmp(protName, 'ContTask')
         % set the flag to 1 so each run the first task iteration will be VAS
         P.VAS_flag = 1;
     
-        P.VAS_duration = 3; % in seconds
+        P.VAS_duration = 3.5; % in seconds
+        P.CHOOSE_duration = 8; % in seconds (3 secs more than vas duration)
+        P.firstTASKcall = 0; % to be updated only once
         % =====================================================================
     
         % set flag to 0. We flip it to 1 after the last task block so the final
@@ -373,6 +429,8 @@ if strcmp(protName, 'ContTask')
     %     P.stepMaxUp = 1;
     %     P.stepMinDown = -1;
     %     P.stepMaxDown =  0;
+
+        P.wheelSpeedCorrection = 0.15; % in case normalization bring the wheel speed to 0
     
         P.finalDispVal = 0;
     
@@ -380,8 +438,8 @@ if strcmp(protName, 'ContTask')
         % its only the initial range and will be updated as soon as new display
         % values come in.. it helps to make the first FB block less eratic
         if P.NFRunNr == 1
-            P.limLow  = -0.1;
-            P.limUp   = 0.1;
+            P.limLow  = [];
+            P.limUp   = [];
         else
             prevNfbPtbP   = fullfile(P.WorkFolder,['taskFolder', filesep, 'taskResults', filesep,...
                                            'NFB_taskResults_r' sprintf('%d',P.NFRunNr-1)]);
