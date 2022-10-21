@@ -205,6 +205,9 @@ elseif P.END_run_msg == 1
         elseif keyCode(P.Screen.rightKey)
             P.sideAnswer = "right";
             not_response = 0;
+        elseif keyCode(P.Screen.thirdKey)
+            P.sideAnswer = "center";
+            not_response = 0;
         else
             P.sideAnswer = "none";
         end
@@ -213,7 +216,8 @@ elseif P.END_run_msg == 1
         DrawFormattedText(P.Screen.wPtr, [ ...
             'WHICH SIDE HAVE YOU FOCUSED ON MORE?\n\n\n' ...
             '1 - LEFT\n\n' ...
-            '2 - RIGHT\n\n'], 'center',P.Screen.h * 0.3, [255 255 255]);
+            '2 - RIGHT\n\n' ...
+            '3 - CENTER\n\n'], 'center',P.Screen.h * 0.3, [255 255 255]);
 
         % Flip to the screen
         P.Screen.vbl=Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.5) * P.Screen.ifi);
@@ -229,8 +233,11 @@ elseif P.END_run_msg == 1
     elseif P.sideAnswer == "right"
         DrawFormattedText(P.Screen.wPtr, ['CHOSEN:\n\n\n\n\n' ...
             '2 - RIGHT'], 'center',P.Screen.h * 0.3, [255 255 255]);
-    else
+    elseif P.sideAnswer == "center"
         DrawFormattedText(P.Screen.wPtr, ['CHOSEN:\n\n\n\n\n\n\n' ...
+            '3 - CENTER'], 'center',P.Screen.h * 0.3, [255 255 255]);
+    else
+        DrawFormattedText(P.Screen.wPtr, ['CHOSEN:\n\n\n\n\n\n\n\n\n' ...
             'NONE'], 'center',P.Screen.h * 0.3, [255 255 255]);
     end
 
