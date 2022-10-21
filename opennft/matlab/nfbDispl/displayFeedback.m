@@ -52,7 +52,7 @@ if isfield(P,'selfScalingFlag')
     if isfield(P,'selfScalingNVolumes')
         NLimitsVolumes = P.selfScalingNVolumes;
     else
-        NLimitsVolumes = 0;
+        NLimitsVolumes = 1;
     end
 
     limitScalStart = min(P.ProtCond{3}{2}); % start from the second block
@@ -61,7 +61,7 @@ if isfield(P,'selfScalingFlag')
         
         % as limits we take the mean of N volums of best and worst
         % performance
-        P.limLow  = mean(rawDispVSorted(end-NLimitsVolumes:end));
+        P.limLow  = mean(rawDispVSorted(end-(NLimitsVolumes-1):end));
         P.limUp   = mean(rawDispVSorted(1:NLimitsVolumes));
 
     end
@@ -259,7 +259,7 @@ switch feedbackType
                             case 3
 
                                 if dispValue ~= 0
-                                    dispValue = tanh(dispValue)*10; % fit inside a tahn function for smoothing and upscaling
+                                    dispValue = tanh(dispValue) * P.wheelSpeedUpscale; % fit inside a tahn function for smoothing and upscaling
                                 else
                                     dispValue = 0;
                                 end
@@ -642,7 +642,9 @@ end
 %recs = P.eventRecords;
 %save(P.eventRecordsPath, 'recs', '-ascii', '-double');
 
+% Trial by Trial saving
 save([P.WorkFolder, filesep, 'TaskFolder', filesep, 'taskResults', filesep, 'displayFeedback_r' num2str(P.NFRunNr)], 'P')
+
 
 if P.triggerON
     % close trigger port
