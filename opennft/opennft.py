@@ -1309,6 +1309,7 @@ class OpenNFT(QWidget):
         self.autoRTQASetup = False
         logger.info("Initialization finished ({:.2f} s)", time.time() - ts)
 
+
     # --------------------------------------------------------------------------
     def reset(self):
         self.P = {}
@@ -1391,7 +1392,8 @@ class OpenNFT(QWidget):
             self.displaySamples = []
 
             with utils.timeit("  Load protocol data:"):
-                self.loadJsonProtocol()
+                NrOfVolumes = self.loadJsonProtocol()
+                logger.info(f"Total number of volumes from protocol: {NrOfVolumes}")
 
             with utils.timeit("  Selecting ROI:"):
                 self.selectRoi()
@@ -1521,7 +1523,7 @@ class OpenNFT(QWidget):
                     self.P['hemisphereNorm'] = config.HEMISPHERENORMFLAG
 
                     self.ptbScreen.initialize(
-                        sid, self.P['WorkFolder'], self.P['Prot'], self.P)
+                        int(sid), self.P['WorkFolder'], self.P['Prot'], self.P)
 
                     # return updated params to the GUI, this is necessary when in double blind routine (implemented in the ptb engine)
                     self.P = self.ptbScreen.return_params()
@@ -1569,6 +1571,8 @@ class OpenNFT(QWidget):
 
             if config.USE_MRPULSE:
                 (self.pulseProc, self.mrPulses) = mrpulse.start(self.P['NrOfVolumes'], self.displayEvent)
+
+            #logger.debug(f"{self.P['NrOfVolumes']}")
 
             self.recorder.initialize(self.P['NrOfVolumes'])
             self.eng.nfbInitReward(nargout=0)
@@ -2460,7 +2464,11 @@ class OpenNFT(QWidget):
 
     # --------------------------------------------------------------------------
     def loadJsonProtocol(self):
-        self.eng.loadJsonProtocol(nargout=0)
+
+        NrOfVolumes = self.eng.loadJsonProtocol(nargout=1)
+        self.sbVolumesNr3.setEnabled(False)
+
+        return int(NrOfVolumes)
 
     # --------------------------------------------------------------------------
     def selectRoi(self):
