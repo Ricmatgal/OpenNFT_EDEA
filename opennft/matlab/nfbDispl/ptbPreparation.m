@@ -38,28 +38,30 @@ AssertOpenGL();
 % myscreens = Screen('Screens');
 % if length(myscreens) == 3
 %     % two monitors: [0 1 2]
-%     % screenid = myscreens(screenId + 1);
-%     screenid = 1;
+%     % screenId = myscreens(screenId + 1);
+%     screenId = 1;
 % elseif length(myscreens) == 2
 %     % one monitor: [0 1]
-%     screenid = myscreens(screenId);
+%     screenId = myscreens(screenId);
 % else
 %     % if different, configure your mode
-%     screenid = 0;
+%     screenId = 0;
 % end
 
-screenid = double(P.DisplayFeedbackScreenID); 
+% get screen ID and fullscreen option from python GUI
+screenId = double(P.DisplayFeedbackScreenID); 
 fFullScreen = P.DisplayFeedbackFullscreen;
 
-% screenid = 2;
+% for debugging
+% screenId = 0;
 
 if ~fFullScreen
     % part of the screen, e.g. for test mode
-    P.Screen.wPtr = Screen('OpenWindow', screenid, [0 0 0], ...
+    P.Screen.wPtr = Screen('OpenWindow', screenId, [0 0 0], ...
         [40 40 720 720]);
 else
     % full screen
-    P.Screen.wPtr = Screen('OpenWindow', screenid, [0 0 0]);
+    P.Screen.wPtr = Screen('OpenWindow', screenId, [0 0 0]);
 end
 
 [w, h] = Screen('WindowSize', P.Screen.wPtr);
@@ -80,12 +82,8 @@ P.textSizeSUM = 100;
 
 % Text "HELLO WORLD" - also to check that PTB-3 function 'DrawText' is working
 Screen('TextSize', P.Screen.wPtr , P.Screen.h/10);
-%Screen('DrawText', P.Screen.wPtr, 'HELLO WORLD', ...
-%    floor(P.Screen.w/2-P.Screen.w/2), ...
-%    floor(P.Screen.h/2-P.Screen.h/10), [200 200 200]);
-DrawFormattedText(P.Screen.wPtr, 'HELLO WORLD','center','center',[200 200 200]);
+DrawFormattedText(P.Screen.wPtr, 'Experiment loading...','center','center',[200 200 200]);
 P.Screen.vbl=Screen('Flip', P.Screen.wPtr,P.Screen.vbl+P.Screen.ifi/2);
-
 pause(1);
 
 % Each event row for PTB is formatted as
@@ -164,8 +162,8 @@ if strcmp(protName, 'ContTask')
     P.Screen.numFrames = round(P.Screen.numSecs / P.Screen.ifi);    % in frames
     
     % get some color information
-    P.Screen.white = WhiteIndex(screenid);
-    P.Screen.black = BlackIndex(screenid);
+    P.Screen.white = WhiteIndex(screenId);
+    P.Screen.black = BlackIndex(screenId);
     P.Screen.grey  = P.Screen.white / 2;
 
     % response option coords on the x and y axis relative to center
@@ -225,21 +223,11 @@ if strcmp(protName, 'ContTask')
         P.rotation_angle_BAS = [P.rotation_angle_BAS,repelem(pick,2*angleSkipVolumes)];
     end
     
-    %P.nrEqBlock = 3;
-    %P.nrAnglesBlock = 2;
-    %P.nrEq      = length(P.ProtCond{2})*P.nrEqBlock; % number of blocks which requires the equations to be generated for
-    %P.nrDigits = 2; % how many digits per equation?
-    % (all baseline blocks - 2 per baseline block)
-
     P.nrFigs    = 2; % number of textures on screen
     P.dim       = 100; % Texture dimensions
     P.yPos      = P.Screen.yCenter;
     P.xPos      = linspace(w * 0.15, w * 0.85, P.nrFigs);
 
-    %P.strings_operation = repelem(ptbCreateOperations(P.nrEq, P.nrDigits),ceil(length(P.ProtCond{2}{1})*2/P.nrEqBlock)); % times 2 because function visited twice
-    %list_angles = 360/length(P.ProtCond{2}):360/length(P.ProtCond{2}):360;
-    %P.rotation_angle_BAS = repelem(list_angles(randperm(length(list_angles))),floor(length(P.ProtCond{2}{1})*2/P.nrAnglesBlock)); % times 2 because function visited twice
-    
     P.K_rot = 0;
     P.k_eq = 0;
     P.rotAng = 0;
@@ -418,36 +406,29 @@ if strcmp(protName, 'ContTask')
         P.Onsets.SumFB_fix  = [];
         P.Onsets.SumNF      = [];
     
-    %     P.limLow  = 0;
-    %     P.limUp   = 0.02;
-    %     P.stepMin = -3;
-    %     P.stepMax = 3;
         P.stepMin = -3.5;
         P.stepMax = 3.5;
-    
-    %     P.stepMinUp = 0;
-    %     P.stepMaxUp = 1;
-    %     P.stepMinDown = -1;
-    %     P.stepMaxDown =  0;
 
         P.wheelSpeedCorrection = 0.15; % in case normalization bring the wheel speed to 0
+        P.wheelSpeedUpscale = 20; % upscaling of wheel speed after normalization and for sumNF
     
         P.finalDispVal = 0;
     
         % to start the initial guess of the limits based on the previous run.
         % its only the initial range and will be updated as soon as new display
         % values come in.. it helps to make the first FB block less eratic
-        if P.NFRunNr == 1
-            P.limLow  = [];
-            P.limUp   = [];
-        else
-            prevNfbPtbP   = fullfile(P.WorkFolder,['taskFolder', filesep, 'taskResults', filesep,...
-                                           'NFB_taskResults_r' sprintf('%d',P.NFRunNr-1)]);
-            prevLims            = load(prevNfbPtbP);
-    
-            P.limLow  = prevLims.P.limLow;
-            P.limUp   = prevLims.P.limUp;
-        end
+
+%         if P.NFRunNr == 1
+%             P.limLow  = [];
+%             P.limUp   = [];
+%         else
+%             prevNfbPtbP   = fullfile(P.WorkFolder,['taskFolder', filesep, 'taskResults', filesep,...
+%                                            'NFB_taskResults_r' sprintf('%d',P.NFRunNr-1)]);
+%             prevLims            = load(prevNfbPtbP);
+%     
+%             P.limLow  = prevLims.P.limLow;
+%             P.limUp   = prevLims.P.limUp;
+%         end
 
     % %% Prepare PTB Sprites
     % stimPath = P.TaskFolder;
