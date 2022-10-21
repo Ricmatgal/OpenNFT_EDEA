@@ -82,6 +82,8 @@ mainLoopData.flagsSpmReslice = struct('quality',.9,'fwhm',5,'sep',4,...
 
 %% Signal Processing Settings
 P.VolumesNumber = P.NrOfVolumes - P.nrSkipVol;
+% debug
+% disp(P.VolumesNumber)
 % sliding window length in blocks, large value is used to ignore it.
 P.nrBlocksInSlidingWindow = 100; % i.e disabled
 
