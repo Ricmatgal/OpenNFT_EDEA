@@ -2,7 +2,7 @@
 
 function [strings_operation] = ptbCreateOperations(neqs,ndigits)
 
-a = 0; b = 10; % range from -100 to 100;
+a = 1; b = 10; % from n to n;
 
 % how many numbers per equation? create the numbers and concatenate in list
 
