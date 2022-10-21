@@ -35,7 +35,6 @@ end
 
 if P.END_run_msg == 0
 
-    % start_timer = GetSecs;
     vas_timer   = 0;
     waitframes  = 1;
 
@@ -92,14 +91,14 @@ if P.END_run_msg == 0
         vas_timer = GetSecs - P.firstTASKcall;
 
     end
-    
+
     % time over or response given
     DrawFormattedText(P.Screen.wPtr, '','center','center');
     P.Screen.vbl=Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.5) * P.Screen.ifi);
 
     % record motivation score
     P.VAS_score = (P.X-(P.Screen.w-P.HSize(3))/2)/10;
-    
+
     % so that people take away the finger from the button box
     WaitSecs(0.5);
 
@@ -148,19 +147,19 @@ if P.END_run_msg == 0
     % Draw what they decided for feedback
 
     if P.strategyAnswer == "imagine1"
-        DrawFormattedText(P.Screen.wPtr, ['CHOOSEN:\n\n\n' ...
+        DrawFormattedText(P.Screen.wPtr, ['CHOSEN:\n\n\n' ...
             '1 - IMAGINE SPACE'], 'center',P.Screen.h * 0.3, [255 255 255]);
     elseif P.strategyAnswer == "imagine2"
-        DrawFormattedText(P.Screen.wPtr, ['CHOOSEN:\n\n\n\n\n' ...
+        DrawFormattedText(P.Screen.wPtr, ['CHOSEN:\n\n\n\n\n' ...
             '2 - IMAGINE OBJECT'], 'center',P.Screen.h * 0.3, [255 255 255]);
     elseif P.strategyAnswer == "covert_attend"
-        DrawFormattedText(P.Screen.wPtr, ['CHOOSEN:\n\n\n\n\n\n\n' ...
+        DrawFormattedText(P.Screen.wPtr, ['CHOSEN:\n\n\n\n\n\n\n' ...
             '3 - FOCUS SPACE'], 'center',P.Screen.h * 0.3, [255 255 255]);
     elseif P.strategyAnswer == "other"
-        DrawFormattedText(P.Screen.wPtr, ['CHOOSEN:\n\n\n\n\n\n\n\n\n' ...
+        DrawFormattedText(P.Screen.wPtr, ['CHOSEN:\n\n\n\n\n\n\n\n\n' ...
             '4 - OTHER'], 'center',P.Screen.h * 0.3, [255 255 255]);
     else
-        DrawFormattedText(P.Screen.wPtr, ['CHOOSEN:\n\n\n\n\n\n\n\n\n\n\n' ...
+        DrawFormattedText(P.Screen.wPtr, ['CHOSEN:\n\n\n\n\n\n\n\n\n\n\n' ...
             'NONE'], 'center',P.Screen.h * 0.3, [255 255 255]);
     end
 
@@ -173,6 +172,13 @@ if P.END_run_msg == 0
 
 elseif P.END_run_msg == 1
 
+    %%======== END OF RUN ===============%%%
+
+    side_question_timer = 0;
+    waitframes  = 1;
+    not_response = 1;
+
+
     if P.triggerON
         % Send Trigger run offset
         outp(P.parportAddr,P.triggers(5));
@@ -182,12 +188,62 @@ elseif P.END_run_msg == 1
         outp(P.parportAddr,0);
     end
 
+    if P.secondTASKcall == 0
+        P.secondTASKcall = GetSecs;
+    end
+
+    while (side_question_timer < P.CHOOSE_duration) && (not_response)
+
+
+        % Check the keyboard to see if a button has been pressed
+        [keyIsDown,secs, keyCode] = KbCheck;
+
+        % Depending on the button press,
+        if keyCode(P.Screen.leftKey)
+            P.sideAnswer = "left";
+            not_response = 0;
+        elseif keyCode(P.Screen.rightKey)
+            P.sideAnswer = "right";
+            not_response = 0;
+        else
+            P.sideAnswer = "none";
+        end
+
+        % Draw CHOOSE....
+        DrawFormattedText(P.Screen.wPtr, [ ...
+            'WHICH SIDE HAVE YOU FOCUSED ON MORE?\n\n\n' ...
+            '1 - LEFT\n\n' ...
+            '2 - RIGHT\n\n'], 'center',P.Screen.h * 0.3, [255 255 255]);
+
+        % Flip to the screen
+        P.Screen.vbl=Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.5) * P.Screen.ifi);
+
+        % update timer
+        side_question_timer = GetSecs - P.secondTASKcall;
+
+    end
+
+    if P.sideAnswer == "left"
+        DrawFormattedText(P.Screen.wPtr, ['CHOSEN:\n\n\n' ...
+            '1 - LEFT'], 'center',P.Screen.h * 0.3, [255 255 255]);
+    elseif P.sideAnswer == "right"
+        DrawFormattedText(P.Screen.wPtr, ['CHOSEN:\n\n\n\n\n' ...
+            '2 - RIGHT'], 'center',P.Screen.h * 0.3, [255 255 255]);
+    else
+        DrawFormattedText(P.Screen.wPtr, ['CHOSEN:\n\n\n\n\n\n\n' ...
+            'NONE'], 'center',P.Screen.h * 0.3, [255 255 255]);
+    end
+
+    P.Screen.vbl=Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.5) * P.Screen.ifi);
+
+    % so that people see the feedback for a bit
+    WaitSecs(0.5);
+
     % Draw end run message to buffer
     DrawFormattedText(P.Screen.wPtr, strcat('THANKS! END OF THE RUN: ',num2str(P.NFRunNr)), 'center','center', [255 255 255]);
 
     % Flip message to the screen
     Screen('Flip', P.Screen.wPtr);
-
 
 end
 

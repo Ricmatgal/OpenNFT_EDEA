@@ -383,6 +383,7 @@ if strcmp(protName, 'ContTask')
         P.VAS_duration = 3.5; % in seconds
         P.CHOOSE_duration = 8; % in seconds (3 secs more than vas duration)
         P.firstTASKcall = 0; % to be updated only once
+        P.secondTASKcall = 0; % to be updated only once
         % =====================================================================
     
         % set flag to 0. We flip it to 1 after the last task block so the final
