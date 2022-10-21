@@ -1,4 +1,4 @@
-function loadJsonProtocol()
+function [NrOfVolumes] = loadJsonProtocol()
 % Function to load experimental protocol stored in json format.
 % Note, to work with json files, use jsonlab toolbox.
 %
@@ -18,10 +18,12 @@ flags = getFlagsType(P);
 
 if ~P.isAutoRTQA
     jsonFile = P.ProtocolFile;
-    NrOfVolumes = P.NrOfVolumes;
+    % NrOfVolumes = P.NrOfVolumes; % ignore the GUI value
     nrSkipVol = P.nrSkipVol;
 
     prt = loadjson(jsonFile);
+    % return the max number of volumes looking at the protocol
+    NrOfVolumes = prt.ConditionIndex{1}.OnOffsets(2,2) + P.nrSkipVol;
 
     % -- remove dcmdef field -- %
     if flags.isDCM
@@ -33,6 +35,7 @@ if ~P.isAutoRTQA
     for x=1:lCond
         protNames{x} = prt.ConditionIndex{x}.ConditionName;
     end
+
 
     P.vectEncCond = ones(1,NrOfVolumes-nrSkipVol);
     P.TaskFirstVol = zeros(1,NrOfVolumes+nrSkipVol);
@@ -102,5 +105,9 @@ else
 
 end
 
+P.NrOfVolumes = NrOfVolumes;
+
 assignin('base', 'P', P);
+
+
 end
