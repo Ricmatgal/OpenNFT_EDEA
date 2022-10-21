@@ -73,8 +73,10 @@ MAX_ROI_NAME_LENGTH = 6
 
 ROI_PLOT_COLORS = [
     pg.mkColor(0, 0, 255, 255),
-    pg.mkColor(0, 255, 255, 255),
-    pg.mkColor(0, 255, 0, 255),
+    # pg.mkColor(0, 255, 255, 255),
+    pg.mkColor(0, 100, 0, 255), # green
+    # pg.mkColor(0, 255, 0, 255),
+    pg.mkColor(0, 0, 0, 255), # black
     pg.mkColor(255, 0, 255, 255),
     pg.mkColor(255, 0, 0, 255),
     pg.mkColor(255, 255, 0, 255),
@@ -116,7 +118,7 @@ MC_PLOT_COLORS = [
     (255, 123, 0),   # translations - x, y, z
     (255, 56, 109),
     (127, 0, 255),
-    (0, 46, 255),    # rotations - alpha, betta, gamma
+    (0, 46, 255),    # rotations - alpha, beta, gamma
     (0, 147, 54),
     (145, 130, 43),
 ]
