@@ -1309,6 +1309,24 @@ class OpenNFT(QWidget):
         self.autoRTQASetup = False
         logger.info("Initialization finished ({:.2f} s)", time.time() - ts)
 
+        # EDEA protocol adjustements
+        self.sbVolumesNr.setEnabled(False)
+
+        # set params to original as they are set false when/when not in double blind routine
+        self.cbDoubleBlind.setEnabled(True)
+        self.leShamFile.setEnabled(True)
+        self.leSessionNr.setEnabled(True)
+        # ROI and ROTATION
+        self.cbRIGHT.setChecked(False)
+        self.cbLEFT.setChecked(False)
+        self.cbleftRot.setChecked(False)
+        self.cbrightRot.setChecked(False)
+        self.cbRIGHT.setEnabled(True)
+        self.cbLEFT.setEnabled(True)
+        self.cbleftRot.setEnabled(True)
+        self.cbrightRot.setEnabled(True)
+
+
 
     # --------------------------------------------------------------------------
     def reset(self):
@@ -1464,7 +1482,8 @@ class OpenNFT(QWidget):
                 if config.SELFSCALINGVOLUMES:
                     self.P['selfScalingNVolumes'] = config.SELFSCALINGVOLUMES
                     logger.info(
-                    "Self-scaling flag set to: {} with N volumes: {}, check config.py".format(config.SELFSCALINGFLAG,config.SELFSCALINGVOLUMES))
+                    "Self-scaling flag set to: {} with N volumes: {}, check config.py".format(config.SELFSCALINGFLAG,
+                                                                                              config.SELFSCALINGVOLUMES))
                 else:
                     logger.warning("Specify self-scaling limits")
             else:
@@ -1476,6 +1495,11 @@ class OpenNFT(QWidget):
                     "Wheel speed scaling flag set to: {}, check config.py".format(config.WHEELSCALINGFLAG))
             else:
                 logger.warning("Specify wheel speed scaling routine")
+
+            if config.USE_TRIGGERS:
+                logger.warning("Triggers routine set ot ON")
+            else:
+                logger.warning("Triggers routine set to OFF")
 
             if config.USE_SHAM:
                 logger.warning("Sham feedback has been selected")
@@ -1521,6 +1545,7 @@ class OpenNFT(QWidget):
                     # had to force again to get the value for some reason...
                     self.P['tsProcessingFlag'] = config.TSPROCESSINGFLAG
                     self.P['hemisphereNorm'] = config.HEMISPHERENORMFLAG
+                    self.P['triggerON'] = config.USE_TRIGGERS
 
                     self.ptbScreen.initialize(
                         int(sid), self.P['WorkFolder'], self.P['Prot'], self.P)
@@ -1532,12 +1557,11 @@ class OpenNFT(QWidget):
                     self.eng.assignin('base', 'P', self.ptbScreen.eng.evalin('base', 'P'), nargout=0)
 
                     # inform the experimenter about the V1 chosen from the double blind routine
-                    logger.info('V1 Right: {}, V1 Left: {}'.format(bool(self.P['V1_right']), bool(self.P['V1_left'])))
-
+                    if not config.USE_BBLIND:
+                        logger.info('V1 Right: {}, V1 Left: {}'.format(bool(self.P['V1_right']), bool(self.P['V1_left'])))
 
             if config.USE_BBLIND and self.P['yokID'] != 'Null':
                 logger.info('Sham subject taken') # for debug purposes
-
 
                 sessNr = self.P['SessionNr']
                 runNr = self.P['NFRunNr']
@@ -1572,7 +1596,6 @@ class OpenNFT(QWidget):
             if config.USE_MRPULSE:
                 (self.pulseProc, self.mrPulses) = mrpulse.start(self.P['NrOfVolumes'], self.displayEvent)
 
-            #logger.debug(f"{self.P['NrOfVolumes']}")
 
             self.recorder.initialize(self.P['NrOfVolumes'])
             self.eng.nfbInitReward(nargout=0)
@@ -2774,11 +2797,31 @@ class OpenNFT(QWidget):
         config.USE_SHAM = bool(len(self.P['ShamFile']))
 
         config.USE_SHAM = bool(len(self.P['ShamFile']))
+
         config.USE_BBLIND = bool(len(self.P['DoubleBlindDir'])) and self.P['DoubleBlindCheck']
+
         if bool(len(self.P['DoubleBlindDir'])) == 0:
             logger.warning('Please specify a double blind directory to write in')
+
+
         if config.USE_BBLIND:
             logger.warning("Double Blind mode ON")
+            if not bool(len(self.P['SessionNr'])):
+                logger.warning("In double blind mode, you need to specify the session nr for sham routine")
+            self.cbRIGHT.setChecked(False)
+            self.cbLEFT.setChecked(False)
+            self.cbleftRot.setChecked(False)
+            self.cbrightRot.setChecked(False)
+            self.cbRIGHT.setEnabled(False)
+            self.cbLEFT.setEnabled(False)
+            self.cbleftRot.setEnabled(False)
+            self.cbrightRot.setEnabled(False)
+        else:
+            if not self.P['V1_right'] or self.P['V1_left']:
+                logger.error("NO V1 ROI selected")
+            self.cbDoubleBlind.setEnabled(False)
+            self.leShamFile.setEnabled(False)
+            self.leSessionNr.setEnabled(False)
 
 
 
