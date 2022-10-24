@@ -104,7 +104,7 @@ if strcmp(protName, 'ContTask')
     % -----------------------------------------------------------
     % ----------------------- PHYSIOLOGY ------------------------
     % -----------------------------------------------------------
-    P.triggerON = 0;
+    % P.triggerON = 0;
 
     if P.triggerON
         % Initialize the inpout32.dll I/O driver:
