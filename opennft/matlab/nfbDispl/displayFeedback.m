@@ -337,7 +337,7 @@ switch feedbackType
 
                     % Here we carefully control for how many frames we
                     % display each flip. numFrames is defines in
-                    % ptbPreperation.m
+                    % ptbPreparation.m
 
                     waitframes = 1;
                     for frame = 1:P.Screen.numFrames
@@ -648,6 +648,7 @@ save([P.WorkFolder, filesep, 'TaskFolder', filesep, 'taskResults', filesep, 'dis
 
 if P.triggerON
     % close trigger port
+    WaitSecs(0.05);
     outp(P.parportAddr,0);
 end
 
