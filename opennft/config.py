@@ -192,4 +192,4 @@ WHEELSCALINGFLAG = 3
 # 2 = log scaling
 # 3 = tanh scaling
 
-USE_TRIGGERS = False # for EEG, Biopac and Eyeblink triggers
+USE_TRIGGERS = True # for EEG, Biopac and Eyelink triggers

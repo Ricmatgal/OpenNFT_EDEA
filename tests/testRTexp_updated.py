@@ -22,8 +22,9 @@ delete_files = True
 fns = None
 testCase = 'PSC'
 if testCase == 'PSC':
-    dstpath = 'D:/watch_folder'
-    srcpath = 'D:/TBV-input/20220923.EDEA_S02_SESS3.112417/NF_RUN6'
+    dstpath = 'D:\LABNIC\EDEA\offline_testing\watch_folder'
+    # srcpath = 'D:/TBV-input/20220923.EDEA_S02_SESS3.112417/NF_RUN6'
+    srcpath = 'E:/TBV-input/20221026.EDEA_S03.112755/test'
     pause_in_sec = 0.8
 elif testCase == 'SVM':
     srcpath = 'C:/_RT/rtData/NF_SVM/NF_Run_1_src'
