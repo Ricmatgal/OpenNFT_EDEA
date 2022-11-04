@@ -161,13 +161,8 @@ switch feedbackType
                 if P.triggerON
                     % Send Trigger Baseline
                     outp(P.parportAddr,P.triggers(2));
-<<<<<<< HEAD
-                    % WaitSecs(0.05);
+                    %WaitSecs(0,05);
                     %outp(P.parportAddr,0);
-=======
-                    WaitSecs(0,05);
-                    outp(P.parportAddr,0);
->>>>>>> a76eff80adc8bfaae0aad56dd0da929ccbe4fe9a
                 end
 
 
@@ -201,13 +196,8 @@ switch feedbackType
                     if P.triggerON
                         % send Trigger Regulation
                         outp(P.parportAddr,P.triggers(3));
-<<<<<<< HEAD
                         %WaitSecs(0.05);
                         %outp(P.parportAddr,0);
-=======
-                        WaitSecs(0,05);
-                        outp(P.parportAddr,0);
->>>>>>> a76eff80adc8bfaae0aad56dd0da929ccbe4fe9a
                     end
 
                     %                     if (length(rawDispV) - nFirstBasVolumes > 0 && length(rawDispV) - nFirstBasVolumes <= NfirstVolumes)
@@ -325,13 +315,8 @@ switch feedbackType
                     if P.triggerON
                         % Send Trigger Good Regulation
                         outp(P.parportAddr,P.triggers(6));
-<<<<<<< HEAD
                         %WaitSecs(0.05);
                         %outp(P.parportAddr,0);
-=======
-                        WaitSecs(0,05);
-                        outp(P.parportAddr,0);
->>>>>>> a76eff80adc8bfaae0aad56dd0da929ccbe4fe9a
                     end
 
 
@@ -342,13 +327,8 @@ switch feedbackType
                     if P.triggerON
                         % Send Trigger Bad Regulation
                         outp(P.parportAddr,P.triggers(7));
-<<<<<<< HEAD
                         %WaitSecs(0.05);
                         %outp(P.parportAddr,0);
-=======
-                        WaitSecs(0,05);
-                        outp(P.parportAddr,0);
->>>>>>> a76eff80adc8bfaae0aad56dd0da929ccbe4fe9a
                     end
 
 
@@ -467,13 +447,9 @@ switch feedbackType
                     if P.triggerON
                         % trigger for sum FB
                         outp(P.parportAddr,P.triggers(4));
-<<<<<<< HEAD
                         %WaitSecs(0.05);
                         %outp(P.parportAddr,0);
-=======
-                        WaitSecs(0,05);
-                        outp(P.parportAddr,0);
->>>>>>> a76eff80adc8bfaae0aad56dd0da929ccbe4fe9a
+
                     end
 
                     % Total Score center message
@@ -680,11 +656,8 @@ end
 % Trial by Trial saving
 save([P.WorkFolder, filesep, 'TaskFolder', filesep, 'taskResults', filesep, 'displayFeedback_r' num2str(P.NFRunNr)], 'P')
 
-<<<<<<< HEAD
 if P.triggerON
     outp(P.parportAddr,0);
 end
 
-=======
->>>>>>> a76eff80adc8bfaae0aad56dd0da929ccbe4fe9a
 assignin('base', 'P', P);
