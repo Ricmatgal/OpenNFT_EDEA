@@ -42,7 +42,7 @@ if P.END_run_msg == 0
         % Send Trigger Task onset
         outp(P.parportAddr,P.triggers(1));
         % Wait a bit
-        WaitSecs(0.05);
+        WaitSecs(0.002);
         % Close trigger port
         outp(P.parportAddr,0);
     end
@@ -183,7 +183,7 @@ elseif P.END_run_msg == 1
         % Send Trigger run offset
         outp(P.parportAddr,P.triggers(5));
         % Wait a bit
-        WaitSecs(0.05);
+        WaitSecs(0.002);
         % Close trigger port
         outp(P.parportAddr,0);
     end

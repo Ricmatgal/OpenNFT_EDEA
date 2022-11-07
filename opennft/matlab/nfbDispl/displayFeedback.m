@@ -161,8 +161,8 @@ switch feedbackType
                 if P.triggerON
                     % Send Trigger Baseline
                     outp(P.parportAddr,P.triggers(2));
-                    %WaitSecs(0,05);
-                    %outp(P.parportAddr,0);
+                    WaitSecs(0.002);
+                    outp(P.parportAddr,0);
                 end
 
 
@@ -196,8 +196,8 @@ switch feedbackType
                     if P.triggerON
                         % send Trigger Regulation
                         outp(P.parportAddr,P.triggers(3));
-                        %WaitSecs(0.05);
-                        %outp(P.parportAddr,0);
+                        WaitSecs(0.002);
+                        outp(P.parportAddr,0);
                     end
 
                     %                     if (length(rawDispV) - nFirstBasVolumes > 0 && length(rawDispV) - nFirstBasVolumes <= NfirstVolumes)
@@ -315,8 +315,8 @@ switch feedbackType
                     if P.triggerON
                         % Send Trigger Good Regulation
                         outp(P.parportAddr,P.triggers(6));
-                        %WaitSecs(0.05);
-                        %outp(P.parportAddr,0);
+                        WaitSecs(0.002);
+                        outp(P.parportAddr,0);
                     end
 
 
@@ -327,8 +327,8 @@ switch feedbackType
                     if P.triggerON
                         % Send Trigger Bad Regulation
                         outp(P.parportAddr,P.triggers(7));
-                        %WaitSecs(0.05);
-                        %outp(P.parportAddr,0);
+                        WaitSecs(0.002);
+                        outp(P.parportAddr,0);
                     end
 
 
@@ -386,7 +386,7 @@ switch feedbackType
                                 P.Screen.lineWidthPix, P.Screen.white, [P.Screen.xCenter P.Screen.yCenter], 2);
                         end
 
-                        P.Screen.vbl = Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.4) * P.Screen.ifi);
+                        P.Screen.vbl = Screen('Flip', P.Screen.wPtr, P.Screen.vbl + (waitframes - 0.5) * P.Screen.ifi);
                     end
 
                     % Increment the angle if rotation is clockwise
@@ -447,8 +447,8 @@ switch feedbackType
                     if P.triggerON
                         % trigger for sum FB
                         outp(P.parportAddr,P.triggers(4));
-                        %WaitSecs(0.05);
-                        %outp(P.parportAddr,0);
+                        WaitSecs(0.002);
+                        outp(P.parportAddr,0);
 
                     end
 
