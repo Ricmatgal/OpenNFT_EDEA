@@ -2817,7 +2817,7 @@ class OpenNFT(QWidget):
             self.cbleftRot.setEnabled(False)
             self.cbrightRot.setEnabled(False)
         else:
-            if not self.P['V1_right'] or self.P['V1_left']:
+            if not (self.P['V1_right'] or self.P['V1_left']):
                 logger.error("NO V1 ROI selected")
             self.cbDoubleBlind.setEnabled(False)
             self.leShamFile.setEnabled(False)
