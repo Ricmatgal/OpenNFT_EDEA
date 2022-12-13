@@ -2461,7 +2461,7 @@ class OpenNFT(QWidget):
             self.sbTargDIAM.setValue(float(self.settings.value('TargDIAM', 0.0)))
             self.leWeightsFile.setText(str(self.settings.value('WeightsFileName', '')))
 
-            self.actualize
+            self.actualize()
         else:
             self.leWatchFolder3.setText(self.settings.value('WatchFolder', ''))
             if config.SELECT_ROIS:
