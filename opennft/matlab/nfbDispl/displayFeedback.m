@@ -73,6 +73,13 @@ else
 end
 
 
+% check for TRANSFER phase, since it is always at run 7
+
+if P.NFRunNr == 7
+    P.TRANSF = 1;
+end
+
+
 
 
 switch feedbackType
