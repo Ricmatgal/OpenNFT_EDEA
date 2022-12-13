@@ -216,7 +216,10 @@ if strcmp(protName, 'ContTask')
     end
     
     P.rotation_angle_BAS = repelem([angleLongBas,angleShortBasAll],2*angleSkipVolumes);
-
+    
+    % compensate if for any reason whe do not have enough wheels for the
+    % baseline
+    
     if length(P.rotation_angle_BAS) < nTotalBasVolumes*2
         diff = abs(length(P.rotation_angle_BAS) - nTotalBasVolumes*2);
         pick = randsample(P.rotation_angle_BAS,ceil(diff/(angleSkipVolumes*2)));
