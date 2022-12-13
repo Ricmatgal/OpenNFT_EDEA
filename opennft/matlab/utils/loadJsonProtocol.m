@@ -17,7 +17,16 @@ P = evalin('base', 'P');
 flags = getFlagsType(P);
 
 if ~P.isAutoRTQA
+
+
+    if P.NFRunNr == 1 % automatically deduce, from the protocol folder, which protocol file to use
+        P.ProtocolFile = [P.ProtocolFile '\run1_brief.json'];
+    else
+        P.ProtocolFile = [P.ProtocolFile '\run2_brief.json'];
+    end
+
     jsonFile = P.ProtocolFile;
+    disp(jsonFile)
     % NrOfVolumes = P.NrOfVolumes; % ignore the GUI value
     nrSkipVol = P.nrSkipVol;
 
