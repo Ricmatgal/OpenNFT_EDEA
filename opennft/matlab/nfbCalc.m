@@ -60,9 +60,10 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
             % also, we accumulate baseline across blocks
 
             i_blockBAS = [];
-            i_nVolBas = 9; % last 10 blocks
+            i_nVolBas = 9; % last 10 volumes
 
-            % if NFB run is 1
+            % if NFB run is 1 %% TO DO: there is no difference between run
+            % 1 and onwards, this could be taken away
             if P.NFRunNr == 1
                 % if NFB block is 1
                 if blockNF < 2
