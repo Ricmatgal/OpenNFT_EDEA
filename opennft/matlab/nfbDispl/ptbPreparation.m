@@ -414,7 +414,7 @@ if strcmp(protName, 'ContTask')
         P.stepMax = 3.5;
 
         P.wheelSpeedCorrection = 0.15; % in case normalization bring the wheel speed to 0
-        P.wheelSpeedUpscale = 20; % upscaling of wheel speed after normalization and for sumNF
+        P.wheelSpeedUpscale = 10; % upscaling of wheel speed after normalization and for sumNF
     
         P.finalDispVal = 0;
     

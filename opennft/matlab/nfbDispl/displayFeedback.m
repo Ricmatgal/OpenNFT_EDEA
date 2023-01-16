@@ -55,7 +55,7 @@ if isfield(P,'selfScalingFlag')
         NLimitsVolumes = 1;
     end
 
-    limitScalStart = min(P.ProtCond{3}{2}); % start from the second block
+    limitScalStart = min(P.ProtCond{3}{2}); % start from the second block, regulation
 
     if iteration-P.nrSkipVol > limitScalStart
         
@@ -223,9 +223,26 @@ switch feedbackType
 
                         if iteration-P.nrSkipVol > limitScalStart
 
-                            % Adaptive Feedback display for differential PSC, scaled according to limits (limlow, limup) of brain activity
+                            % Adaptive Feedback display for differential
+                            % PSC, scaled according to limits (limlow,
+                            % limup) of brain activity, we keep the sign to
+                            % avoid confusion for pp between good and bad
+                            % regulation
 
-                            dispValue = (dispValue - P.limLow) / (P.limUp - P.limLow);
+                            signDispValue = sign(dispValue);
+
+                            % scaling everything and giving sign back
+%                             dispValue = (dispValue - P.limLow) / (P.limUp - P.limLow);
+%                             if signDispValue < 0
+%                                 dispValue = - dispValue;
+%                             end
+                            
+                            % scaling only positive
+
+                            if signDispValue > 0
+                                dispValue = (dispValue - P.limLow) / (P.limUp - P.limLow);
+                            end
+
                             fprintf('Feedback Value from nfbCalc after self-normalization: %f with lims: %f, %f  \n',dispValue,P.limLow,P.limUp);
                             P.scaledDispVal(iteration-P.nrSkipVol) = dispValue;
 
