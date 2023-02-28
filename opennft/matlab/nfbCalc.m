@@ -82,7 +82,7 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
             elseif P.NFRunNr > 1
                 % if NFB block is 1
                 if blockNF < 2
-                    % we take the last 10 voumes of the first baseline
+                    % we take the last 10 volumes of the first baseline
                     i_blockBAS = P.ProtCond{2}{blockNF}(end-i_nVolBas:end);
                     % if NFB block is > 1
                 else
@@ -161,11 +161,11 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
                     if P.V1_right > P.V1_left
                         switch P.tsProcessingFlag
                             case 1
-                                tmp_fbVal = norm_percValues2(1)-norm_percValues2(2);
-                            case 2
-                                tmp_fbVal = psc(1)-psc(2);
-                            case 3
                                 tmp_fbVal = norm_percValues(1)-norm_percValues(2);
+                            case 2
+                                tmp_fbVal = norm_percValues2(1)-norm_percValues2(2);
+                            case 3
+                                tmp_fbVal = psc(1)-psc(2);
                             case 4
                                 tmp_fbVal = psc2(1)-psc2(2);
                         end
@@ -174,11 +174,11 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
 
                         switch P.tsProcessingFlag
                             case 1
-                                tmp_fbVal = norm_percValues2(2)-norm_percValues2(1);
-                            case 2
-                                tmp_fbVal = psc(2)-psc(1);
-                            case 3
                                 tmp_fbVal = norm_percValues(2)-norm_percValues(1);
+                            case 2
+                                tmp_fbVal = norm_percValues2(2)-norm_percValues2(1);
+                            case 3
+                                tmp_fbVal = psc(2)-psc(1);
                             case 4
                                 tmp_fbVal = psc2(2)-psc2(1);
                         end
@@ -198,11 +198,11 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
                     if P.V1_right > P.V1_left
                         switch P.tsProcessingFlag
                             case 1
-                                tmp_fbVal = (norm_percValues2(1)-norm_percValues2(2))/(norm_percValues2(1)+norm_percValues2(2));
-                            case 2
-                                tmp_fbVal = (psc(1)-psc(2))/(psc(1)+psc(2));
-                            case 3
                                 tmp_fbVal = (norm_percValues(1)-norm_percValues(2))/(norm_percValues(1)+norm_percValues(2));
+                            case 2
+                                tmp_fbVal = (norm_percValues2(1)-norm_percValues2(2))/(norm_percValues2(1)+norm_percValues2(2));
+                            case 3
+                                tmp_fbVal = (psc(1)-psc(2))/(psc(1)+psc(2));
                             case 4
                                 tmp_fbVal = (psc2(1)-psc2(2))/(psc2(1)+psc2(2));
                         end
@@ -211,11 +211,11 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
 
                         switch P.tsProcessingFlag
                             case 1
-                                tmp_fbVal = (norm_percValues2(2)-norm_percValues2(1))/(norm_percValues2(2)+norm_percValues2(1));
-                            case 2
-                                tmp_fbVal = (psc(2)-psc(1))/(psc(2)+psc(1));
-                            case 3
                                 tmp_fbVal = (norm_percValues(2)-norm_percValues(1))/(norm_percValues(2)+norm_percValues(1));
+                            case 2
+                                tmp_fbVal = (norm_percValues2(2)-norm_percValues2(1))/(norm_percValues2(2)+norm_percValues2(1));
+                            case 3
+                                tmp_fbVal = (psc(2)-psc(1))/(psc(2)+psc(1));
                             case 4
                                 tmp_fbVal = (psc2(2)-psc2(1))/(psc2(2)+psc2(1));
                         end
