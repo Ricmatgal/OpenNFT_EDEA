@@ -55,7 +55,7 @@ if isfield(P,'selfScalingFlag')
         NLimitsVolumes = 1;
     end
 
-    limitScalStart = min(P.ProtCond{3}{2}); % start from the second block, regulation
+    limitScalStart = min(P.ProtCond{2}{2}); % start from the second block, regulation
 
     if iteration-P.nrSkipVol > limitScalStart
         
@@ -163,7 +163,7 @@ switch feedbackType
 
         switch condition
 
-            case 2 % Baseline
+            case 1 % Baseline
                 
                 if P.triggerON
                     % Send Trigger Baseline
@@ -187,7 +187,7 @@ switch feedbackType
                 Screen('Flip',P.Screen.wPtr);
 
 
-            case 3 % Regulation
+            case 2 % Regulation
 
                 fprintf('Feedback Value from nfbCalc: %f \n',dispValue);
 
@@ -382,7 +382,7 @@ switch feedbackType
                         if P.TRANSF == 0
 
                             % intialize the wheels according to the specific angle
-                            fvol = cellfun(@(x) x(1) == (iteration-P.nrSkipVol), P.ProtCond{3});
+                            fvol = cellfun(@(x) x(1) == (iteration-P.nrSkipVol), P.ProtCond{2});
                             if any(fvol)
                                 P.rotAng = P.rotation_angle_BAS(P.K_rot);
                                 P.rotSpe = 0;
@@ -439,11 +439,11 @@ switch feedbackType
                 end
 
 
-            case 1
+            case 4
                 % ptbTask.m sequence called separately in python (VAS)
 
 
-            case 4 % intermittent score (final value after regulation block)
+            case 3 % intermittent score (final value after regulation block)
 
                 % this is calculated in nfbCalc already
                 % dispValue = ceil((sum(P.finalDispVal(P.ProtCond{3}{displayData.currNFblock})) / P.stepMax) * 10);
@@ -457,12 +457,12 @@ switch feedbackType
                 % 100 for the precedent NF block, then taking the mean
                 % (i.e. giving a score 0-100 of how good they performed)
 
-                NFvalues = P.finalDispVal(P.ProtCond{3}{displayData.currNFblock});
+                NFvalues = P.finalDispVal(P.ProtCond{2}{displayData.currNFblock});
 
                 dispValue = round(mean(NFvalues));
                 P.sumFBscore(iteration-P.nrSkipVol) = dispValue;
 
-                k = cellfun(@(x) x(2) == (iteration-P.nrSkipVol), P.ProtCond{4});
+                k = cellfun(@(x) x(2) == (iteration-P.nrSkipVol), P.ProtCond{3});
                 % if onset volume: show fixation cross (currently dispValue still
                 % contains the last contNF value, this will be updated after
                 % the acquisition of the first Sum volume).
@@ -500,7 +500,7 @@ switch feedbackType
                 end
 
                 % Add trial number to keep count.
-                k = cellfun(@(x) x(end) == (iteration-P.nrSkipVol), P.ProtCond{4});
+                k = cellfun(@(x) x(end) == (iteration-P.nrSkipVol), P.ProtCond{3});
                 if any(k)
                     P.Task.trialCounter = find(k==1)+1;
                 end

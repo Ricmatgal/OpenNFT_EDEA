@@ -72,21 +72,21 @@ if (strcmp(P.Prot, 'Inter') ||  strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTa
 
     if strcmp(P.Prot,'ContTask')
         switch condition
-            case 1 % Task (VAS and END)
+            case 4 % Task (VAS and END)
                 mainLoopData.flagEndPSC = 0;
                 mainLoopData.dispValue = 0; 
                 mainLoopData.Reward = '';
                 displayData.displayStage = 'VAS';
-            case 2 % Baseline
+            case 1 % Baseline
                 mainLoopData.flagEndPSC = 0;
                 mainLoopData.dispValue = 0;
                 mainLoopData.Reward = '';
                 displayData.displayStage = 'Baseline';
-            case 3 % NF
+            case 2 % NF
                 % set flanEndPSC to one so we record dispValue in nfbCalc
                 displayData.displayStage = 'Modulation';
                 mainLoopData.flagEndPSC = 1; 
-            case 4 % sumFB
+            case 3 % sumFB
                 mainLoopData.flagEndPSC = 0;
                 mainLoopData.dispValue = 0; 
                 mainLoopData.Reward = '';

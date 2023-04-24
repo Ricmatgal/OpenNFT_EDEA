@@ -166,7 +166,7 @@ PLOT_PEN_COLORS = [
 
 # type of time series processing (see nfbCalc)
 
-TSPROCESSINGFLAG = 3
+TSPROCESSINGFLAG = 1
 
 # 1 = normalized PSC against last N blocks of baseline
 # 2 = normalized PSC with point to point mean signal
@@ -179,7 +179,7 @@ HEMISPHERENORMFLAG = False
 
 # ROI difference normalized by sum of activity
 
-SELFSCALINGFLAG = 1
+SELFSCALINGFLAG = False
 
 # 1 = self-normalization
 # False = No scaling
@@ -192,4 +192,4 @@ WHEELSCALINGFLAG = 3
 # 2 = log scaling
 # 3 = tanh scaling
 
-USE_TRIGGERS = True # for EEG, Biopac and Eyelink triggers
+USE_TRIGGERS = False # for EEG, Biopac and Eyelink triggers

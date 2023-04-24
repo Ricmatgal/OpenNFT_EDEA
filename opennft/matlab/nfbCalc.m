@@ -44,13 +44,13 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
     % NF estimation condition
 
     switch condition
-        case 3
+        case 2
 
             % count NF regulation blocks
             % index for Regulation block == 3
             % find which NF block we are in and
 
-            k = cellfun(@(x) x(1) == indVolNorm, P.ProtCond{ 3 });
+            k = cellfun(@(x) x(1) == indVolNorm, P.ProtCond{ 2 });
             if any(k)
                 blockNF = find(k);
                 firstNF = indVolNorm;
@@ -69,12 +69,12 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
                 if blockNF < 2
                     % take the last 10 blocks of the first baseline
                     % baseline
-                    i_blockBAS = P.ProtCond{2}{blockNF}(end-i_nVolBas:end);
+                    i_blockBAS = P.ProtCond{1}{blockNF}(end-i_nVolBas:end);
                     % otherwise NFBrun > 1
                 else
                     % we skip the first baseline in the accumulation process
                     for iBas = 2 : blockNF
-                        i_blockBAS = [i_blockBAS P.ProtCond{2}{iBas}(end-i_nVolBas:end)];
+                        i_blockBAS = [i_blockBAS P.ProtCond{1}{iBas}(end-i_nVolBas:end)];
                     end
                 end
 
@@ -83,12 +83,12 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
                 % if NFB block is 1
                 if blockNF < 2
                     % we take the last 10 volumes of the first baseline
-                    i_blockBAS = P.ProtCond{2}{blockNF}(end-i_nVolBas:end);
+                    i_blockBAS = P.ProtCond{1}{blockNF}(end-i_nVolBas:end);
                     % if NFB block is > 1
                 else
                     % we also skip the first baseline from accumulation
                     for iBas = 2:blockNF
-                        i_blockBAS = [i_blockBAS P.ProtCond{2}{iBas}(end-i_nVolBas:end)];
+                        i_blockBAS = [i_blockBAS P.ProtCond{1}{iBas}(end-i_nVolBas:end)];
                     end
                 end
             end
@@ -252,8 +252,8 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
             mainLoopData.dispValues(indVolNorm) = dispValue;
             mainLoopData.dispValue = dispValue;
 
-        case 4 % sum NF end of NF block
-            NFVols = P.ProtCond{2}{blockNF};
+        case 3 % sum NF end of NF block
+            NFVols = P.ProtCond{1}{blockNF};
 
             % this block does not actually makes much sense as the dispValue
             % produced here is ignored in displayFeedbakc (we take the
