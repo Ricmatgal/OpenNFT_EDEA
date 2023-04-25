@@ -118,7 +118,6 @@ if flags.isPSC && (strcmp(P.Prot, 'Cont') || strcmp(P.Prot, 'ContTask'))
                 % normalized PSC against last N blocks of baseline
                 mBas = median(mainLoopData.scalProcTimeSeries(indRoi,i_blockBAS));
                 mCond = mainLoopData.scalProcTimeSeries(indRoi,i_reg);
-
                 norm_percValues(indRoi) = mean(mCond) - mBas;
 
                 % point to point mean signal
