@@ -25,7 +25,7 @@ if ~P.isAutoRTQA
     %    P.ProtocolFile = [P.ProtocolFile '\run2_brief.json'];
     %end
 
-    P.ProtocolFile = [P.ProtocolFile '\finger_tapping_sum.json'];
+    P.ProtocolFile = [P.ProtocolFile '\finger_tapping_sum_2.json'];
 
     jsonFile = P.ProtocolFile;
     disp(jsonFile)
@@ -34,7 +34,7 @@ if ~P.isAutoRTQA
 
     prt = loadjson(jsonFile);
     % return the max number of volumes looking at the protocol
-    NrOfVolumes = prt.ConditionIndex{3}.OnOffsets(2,2) + P.nrSkipVol;
+    NrOfVolumes = prt.ConditionIndex{3}.OnOffsets(end,end) + P.nrSkipVol;
 
     % -- remove dcmdef field -- %
     if flags.isDCM

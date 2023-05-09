@@ -184,7 +184,7 @@ SELFSCALINGFLAG = False
 # 1 = self-normalization
 # False = No scaling
 
-SELFSCALINGVOLUMES = 10 # N of volumes to use for computing mean limits in self-scaling
+SELFSCALINGVOLUMES = 5 # N of volumes to use for computing mean limits in self-scaling
 
 WHEELSCALINGFLAG = 3
 
