@@ -166,7 +166,7 @@ PLOT_PEN_COLORS = [
 
 # type of time series processing (see nfbCalc)
 
-TSPROCESSINGFLAG = 3
+TSPROCESSINGFLAG = 1
 
 # 1 = normalized PSC against last N blocks of baseline
 # 2 = normalized PSC with point to point mean signal
