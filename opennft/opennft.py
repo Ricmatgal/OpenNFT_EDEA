@@ -1568,12 +1568,14 @@ class OpenNFT(QWidget):
                 shamSub = self.P['yokID']
 
                 # for debug purposes
-                sessNr = '01'
-                runNr = '1'
-                shamSub = '01'
+                # sessNr = '01'
+                # runNr = '1'
+                # shamSub = '01'
 
                 pathRoot = self.P['ProjectFolder'] + os.path.sep
                 pathMainLoop =  str(shamSub) + os.path.sep + 'Session_' + str(sessNr) + os.path.sep + 'NF_DATA_' + str(runNr) + os.path.sep + str(shamSub) + '_' + str(runNr) + '_mainLoopData.mat'
+
+                print(pathMainLoop)
 
                 NFBdata = loadmat(os.path.join(pathRoot,pathMainLoop))['dispValues']
                 NFBdataRaw = loadmat(os.path.join(pathRoot, pathMainLoop))['rawDispValues']
@@ -2382,6 +2384,7 @@ class OpenNFT(QWidget):
             self.leProtocolFile.setText(self.settings.value('StimulationProtocol', ''))
             self.leWorkFolder.setText(self.settings.value('WorkFolder', ''))
             self.leProjectFolder.setText(self.settings.value('ProjectFolder', ''))
+            self.leSessionNr.setText(self.settings.value('SessionNumber', ''))
             self.leWatchFolder.setText(self.settings.value('WatchFolder', ''))
             if (self.settings.value('Type', '')) == 'DCM':
                 self.leRoiAnatFolder.setText(self.settings.value('RoiAnatFolder', ''))
@@ -2819,9 +2822,9 @@ class OpenNFT(QWidget):
         else:
             if not (self.P['V1_right'] or self.P['V1_left']):
                 logger.error("NO V1 ROI selected")
-            self.cbDoubleBlind.setEnabled(False)
+            # self.cbDoubleBlind.setEnabled(False)
             self.leShamFile.setEnabled(False)
-            self.leSessionNr.setEnabled(False)
+            # self.leSessionNr.setEnabled(False)
 
 
 

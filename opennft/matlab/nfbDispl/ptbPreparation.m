@@ -306,7 +306,7 @@ if strcmp(protName, 'ContTask')
         % can find the activation file for the participant
         
         if strcmp(sub_row.groupID,'Sham')
-            P.yokID = ['0' char(sub_row.yokedOn)];
+            P.yokID = char(sub_row.yokedOn);
         else
             P.yokID = 'Null'; % flag for the Python interface
         end

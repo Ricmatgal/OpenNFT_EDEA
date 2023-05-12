@@ -67,15 +67,19 @@ function [subSettings] = getSubSettings(subID, gender, dbListDir, simulate)
     subRow = subID; 
     
     % Get the sex and groupID of current sub
-    tmpSex      = gender;
+    
+    tmpSex      = {gender};
     tmpGroupID  = LiveList.groupID(subRow);
     
     if isequal(tmpGroupID{1}, 'Exp')
 
         % Chek if we still have matching experimental subjects in the
         % waiting list
-        poolIDs = intersect(find(strcmp(tmpSex, ExpWaitingList.Sex)),...
-            find(strcmp('V', ExpWaitingList.Availability)));
+
+%         poolIDs = intersect(find(strcmp(tmpSex, ExpWaitingList.Sex)),...
+%             find(strcmp('V', ExpWaitingList.Availability)));
+
+        poolIDs = find(strcmp('V', ExpWaitingList.Availability));
         
 
         % check if poolIDs is not empty. if the case it means there are no
@@ -91,8 +95,10 @@ function [subSettings] = getSubSettings(subID, gender, dbListDir, simulate)
             % entry with the current one.
             ShamSubsLeft = find(strcmp(LiveList.groupID(subRow+1:end), 'Sham')) + subRow;
             
-            checkShamCount = numel(intersect(find(strcmp(LiveList.groupID, 'Sham')),...
-                           find(strcmp(LiveList.Sex, tmpSex))));
+%             checkShamCount = numel(intersect(find(strcmp(LiveList.groupID, 'Sham')),...
+%                            find(strcmp(LiveList.Sex, tmpSex))));
+
+            checkShamCount = numel(find(strcmp(LiveList.groupID, 'Sham')));
 
             if isempty(ShamSubsLeft) || (checkShamCount >= (totNrSubs/2))
                 rot     = {'left', 'right'};
@@ -129,14 +135,18 @@ function [subSettings] = getSubSettings(subID, gender, dbListDir, simulate)
                 LiveList(ShamSubsLeft(1),:)  = exChangeExp;
 
                 % Now rewrite the subject --> sham subject
-                tmpGroupID = LiveList.groupID(subRow);
+                % tmpGroupID = LiveList.groupID(subRow);
 
                 % from here we need to go back to the SHAM routine. For
                 % now a quick copy paste but can be optimized.
                 % find the experimental subjects in LiveList that match the sex and are available
-                poolIDs = intersect(intersect(find(strcmp(tmpSex, LiveList.Sex)),...
-                                find(strcmp('V', LiveList.Availability)), 'stable'),...
-                                find(strcmp('Exp', LiveList.groupID)), 'stable');
+%                 poolIDs = intersect(intersect(find(strcmp(tmpSex, LiveList.Sex)),...
+%                                 find(strcmp('V', LiveList.Availability)), 'stable'),...
+%                                 find(strcmp('Exp', LiveList.groupID)), 'stable');
+                
+                poolIDs = intersect(find(strcmp('V', LiveList.Availability)),...
+                            find(strcmp('Exp', LiveList.groupID)), 'stable');
+
 
                 % randomly pick one of the matching experimental subjects
                 pickedSub = poolIDs(randperm(numel(poolIDs),1));
@@ -181,16 +191,25 @@ function [subSettings] = getSubSettings(subID, gender, dbListDir, simulate)
         % last iterations of the sample. Here we check if we have enough
         % sham subs of that gender and if so we add an entry to the waiting
         % list
-        checkShamCount = numel(intersect(find(strcmp(LiveList.groupID, 'Sham')),...
-                                   find(strcmp(LiveList.Sex, tmpSex))));
+
+%         checkShamCount = numel(intersect(find(strcmp(LiveList.groupID, 'Sham')),...
+%                                    find(strcmp(LiveList.Sex, tmpSex))));
+
+
+        checkShamCount = numel(find(strcmp(LiveList.groupID, 'Sham')));
 
         
-        if (checkShamCount < (totNrSubs/2))
+%         if (checkShamCount < (totNrSubs/2))
+        if (checkShamCount < totNrSubs)
             
             % check if we have matching experimental subjects available to
             % yoke on
-            poolIDs = intersect(intersect(find(strcmp(tmpSex, LiveList.Sex)),...
-                                find(strcmp('V', LiveList.Availability)), 'stable'),...
+
+%             poolIDs = intersect(intersect(find(strcmp(tmpSex, LiveList.Sex)),...
+%                                 find(strcmp('V', LiveList.Availability)), 'stable'),...
+%                                 find(strcmp('Exp', LiveList.groupID)), 'stable');
+
+            poolIDs = intersect(find(strcmp('V', LiveList.Availability)),...
                                 find(strcmp('Exp', LiveList.groupID)), 'stable');
 
             % check if poolIDs is not empty. if the case it means there are no
@@ -215,14 +234,17 @@ function [subSettings] = getSubSettings(subID, gender, dbListDir, simulate)
                 LiveList(ExpSubsLeft(1),:)  = exChangeSham;
 
                 % Now rewrite the subject 
-                tmpGroupID = LiveList.groupID(subRow);
+                % tmpGroupID = LiveList.groupID(subRow);
 
                 % from here we need to go back to the experimental routine. For
                 % now a quick copy paste but can be optimized.
                 % find the subjects in waiting that match the sex and are still
                 % marked available
-                poolIDs = intersect(find(strcmp(tmpSex, ExpWaitingList.Sex)),...
-                    find(strcmp('V', ExpWaitingList.Availability)));
+
+%                 poolIDs = intersect(find(strcmp(tmpSex, ExpWaitingList.Sex)),...
+%                     find(strcmp('V', ExpWaitingList.Availability)));
+
+                poolIDs = find(strcmp('V', ExpWaitingList.Availability));
 
                 % pick first sub (list was already randomzied)
                 pickedSub = poolIDs(1);
@@ -253,7 +275,8 @@ function [subSettings] = getSubSettings(subID, gender, dbListDir, simulate)
             
         % if we have satisfied the nr of sham*gender we create a new
         % experimental subject
-        elseif (checkShamCount >= (totNrSubs/2))
+        % elseif (checkShamCount >= (totNrSubs/2))
+        elseif (checkShamCount >= totNrSubs)
             rot     = {'left', 'right'};
             side    = {'left', 'right'};
 
