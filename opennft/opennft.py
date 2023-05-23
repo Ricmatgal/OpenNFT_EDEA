@@ -1561,7 +1561,7 @@ class OpenNFT(QWidget):
                         logger.info('V1 Right: {}, V1 Left: {}'.format(bool(self.P['V1_right']), bool(self.P['V1_left'])))
 
             if config.USE_BBLIND and self.P['yokID'] != 'Null':
-                logger.info('Sham subject taken') # for debug purposes
+                # logger.info('Sham subject taken') # for debug purposes
 
                 sessNr = self.P['SessionNr']
                 runNr = self.P['NFRunNr']
@@ -1589,7 +1589,7 @@ class OpenNFT(QWidget):
                 # loading the sham data
                 self.P['shamData'] = self.shamData
                 self.P['shamDataRaw'] = self.shamDataRaw
-                logger.info("Sham data has been loaded") # for debugging purposes only
+                #logger.info("Sham data has been loaded") # for debugging purposes only
 
                 # give back sham data params to PTBscreen (is this necessary?)
                 self.ptbScreen.insert_params(self.P)

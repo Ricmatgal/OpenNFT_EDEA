@@ -200,7 +200,7 @@ function [subSettings] = getSubSettings(subID, gender, dbListDir, simulate)
 
         
 %         if (checkShamCount < (totNrSubs/2))
-        if (checkShamCount < totNrSubs)
+        if (checkShamCount < totNrSubs/2)
             
             % check if we have matching experimental subjects available to
             % yoke on
@@ -276,7 +276,7 @@ function [subSettings] = getSubSettings(subID, gender, dbListDir, simulate)
         % if we have satisfied the nr of sham*gender we create a new
         % experimental subject
         % elseif (checkShamCount >= (totNrSubs/2))
-        elseif (checkShamCount >= totNrSubs)
+        elseif (checkShamCount >= totNrSubs/2)
             rot     = {'left', 'right'};
             side    = {'left', 'right'};
 
