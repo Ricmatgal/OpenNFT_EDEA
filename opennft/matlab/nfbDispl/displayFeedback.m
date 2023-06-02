@@ -31,7 +31,7 @@ end
 % If we are in sham mode, and a yok subject is selected, we use the shame
 % data for the whole routine, i.e. we update the dispvalue
 if isfield(P, 'shamData')
-    dispValue = cell2mat(P.shamData(iteration-P.nrSkipVol));
+    dispValue = cell2mat(P.shamDataRaw(iteration-P.nrSkipVol));
     rawDispV = cell2mat(P.shamDataRaw(1:iteration-P.nrSkipVol));
     rawDispV = rawDispV(rawDispV~=0);
     rawDispVSorted = sort(rawDispV, 'descend');
@@ -304,6 +304,8 @@ switch feedbackType
                         end
 
                         P.rotSpe  = dispValue;
+
+
                         fprintf('Feedback value given to the wheel: %s \n',dispValue)
                         P.finalDispVal(iteration-P.nrSkipVol) = dispValue;
 
