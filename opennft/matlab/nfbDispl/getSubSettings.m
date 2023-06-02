@@ -60,7 +60,7 @@ function [subSettings] = getSubSettings(subID, gender, dbListDir, simulate)
         ExpWaitingList  = dbListDir.ExpWaitingList; 
     end
     
-    totNrSubs   = size(ExpWaitingList, 1);
+    % totNrSubs   = size(ExpWaitingList, 1);
 
     % define sub row to take into account the first experimental subs
     % before going into double blind mode
@@ -87,83 +87,83 @@ function [subSettings] = getSubSettings(subID, gender, dbListDir, simulate)
         % completed enough experimental participants of this gender..So in
         % this case we change the current experimental subject to a sham
         % subject..  
-        if isempty(poolIDs) 
-
-            % find the remaining Sham participants in the LiveList
-            % We start looking after current subject, find the index and
-            % scale up to match entire LiveList. We will excahnge this
-            % entry with the current one.
-            ShamSubsLeft = find(strcmp(LiveList.groupID(subRow+1:end), 'Sham')) + subRow;
-            
-%             checkShamCount = numel(intersect(find(strcmp(LiveList.groupID, 'Sham')),...
-%                            find(strcmp(LiveList.Sex, tmpSex))));
-
-            checkShamCount = numel(find(strcmp(LiveList.groupID, 'Sham')));
-
-            if isempty(ShamSubsLeft) || (checkShamCount >= (totNrSubs/2))
-                rot     = {'left', 'right'};
-                side    = {'left', 'right'};
-
-                editSubEntry                = LiveList(subRow,:);
-                editSubEntry.subID          = {num2str(subRow)};
-                editSubEntry.Sex            = tmpSex;
-                editSubEntry.groupID        = {'Exp'};
-                editSubEntry.Availability   = {'V'};  
-                editSubEntry.yokedOn        = {'None'};
-                editSubEntry.BufferSub      = {'V'};
-
-                editSubEntry.TargetSide = rot(randi(numel(side)));
-                editSubEntry.WheelRot = rot(randi(numel(rot)));
-                
-                exChangeSham        = LiveList(subRow, :);
-                LiveList(subRow,:)  = editSubEntry;
-                LiveList(end+1,:)   = exChangeSham;
-                
-                % Alternatviley we can change still pick from the waiting
-                % list but take one of the opposite gender. We will create
-                % a disbalance but this will only be very light. 
-            else
-            
-                % save current subject entry for which we don't have a match
-                exChangeExp                = LiveList(subRow, :);
-
-                % take the first experimental subject in line
-                exChangeSham                 = LiveList(ShamSubsLeft(1),:);
-
-                % swap them 
-                LiveList(subRow, :)          = exChangeSham;
-                LiveList(ShamSubsLeft(1),:)  = exChangeExp;
-
-                % Now rewrite the subject --> sham subject
-                % tmpGroupID = LiveList.groupID(subRow);
-
-                % from here we need to go back to the SHAM routine. For
-                % now a quick copy paste but can be optimized.
-                % find the experimental subjects in LiveList that match the sex and are available
-%                 poolIDs = intersect(intersect(find(strcmp(tmpSex, LiveList.Sex)),...
-%                                 find(strcmp('V', LiveList.Availability)), 'stable'),...
-%                                 find(strcmp('Exp', LiveList.groupID)), 'stable');
-                
-                poolIDs = intersect(find(strcmp('V', LiveList.Availability)),...
-                            find(strcmp('Exp', LiveList.groupID)), 'stable');
-
-
-                % randomly pick one of the matching experimental subjects
-                pickedSub = poolIDs(randperm(numel(poolIDs),1));
-
-                % change the entry before pasting it back into the LiveList. We
-                % need to flag this sub as a sham and set the yoked to unavailable
-                editSubEntry                = LiveList(pickedSub,:);
-                editSubEntry.groupID        = {'Sham'};
-                editSubEntry.Availability   = {'-'};  
-                editSubEntry.subID          = {num2str(subRow)};
-                editSubEntry.yokedOn        = LiveList.subID(pickedSub);
-
-                LiveList(subRow, :) = editSubEntry;
-                LiveList.Availability(pickedSub) = {'X'}; % flag yoked sub to unav 
-            end
-            
-        else
+%         if isempty(poolIDs) 
+% 
+%             % find the remaining Sham participants in the LiveList
+%             % We start looking after current subject, find the index and
+%             % scale up to match entire LiveList. We will excahnge this
+%             % entry with the current one.
+%             ShamSubsLeft = find(strcmp(LiveList.groupID(subRow+1:end), 'Sham')) + subRow;
+%             
+% %             checkShamCount = numel(intersect(find(strcmp(LiveList.groupID, 'Sham')),...
+% %                            find(strcmp(LiveList.Sex, tmpSex))));
+% 
+%             checkShamCount = numel(find(strcmp(LiveList.groupID, 'Sham')));
+% 
+%             if isempty(ShamSubsLeft) || (checkShamCount >= (totNrSubs/2))
+%                 rot     = {'left', 'right'};
+%                 side    = {'left', 'right'};
+% 
+%                 editSubEntry                = LiveList(subRow,:);
+%                 editSubEntry.subID          = {num2str(subRow)};
+%                 editSubEntry.Sex            = tmpSex;
+%                 editSubEntry.groupID        = {'Exp'};
+%                 editSubEntry.Availability   = {'V'};  
+%                 editSubEntry.yokedOn        = {'None'};
+%                 editSubEntry.BufferSub      = {'V'};
+% 
+%                 editSubEntry.TargetSide = rot(randi(numel(side)));
+%                 editSubEntry.WheelRot = rot(randi(numel(rot)));
+%                 
+%                 exChangeSham        = LiveList(subRow, :);
+%                 LiveList(subRow,:)  = editSubEntry;
+%                 LiveList(end+1,:)   = exChangeSham;
+%                 
+%                 % Alternatviley we can change still pick from the waiting
+%                 % list but take one of the opposite gender. We will create
+%                 % a disbalance but this will only be very light. 
+%             else
+%             
+%                 % save current subject entry for which we don't have a match
+%                 exChangeExp                = LiveList(subRow, :);
+% 
+%                 % take the first experimental subject in line
+%                 exChangeSham                 = LiveList(ShamSubsLeft(1),:);
+% 
+%                 % swap them 
+%                 LiveList(subRow, :)          = exChangeSham;
+%                 LiveList(ShamSubsLeft(1),:)  = exChangeExp;
+% 
+%                 % Now rewrite the subject --> sham subject
+%                 % tmpGroupID = LiveList.groupID(subRow);
+% 
+%                 % from here we need to go back to the SHAM routine. For
+%                 % now a quick copy paste but can be optimized.
+%                 % find the experimental subjects in LiveList that match the sex and are available
+% %                 poolIDs = intersect(intersect(find(strcmp(tmpSex, LiveList.Sex)),...
+% %                                 find(strcmp('V', LiveList.Availability)), 'stable'),...
+% %                                 find(strcmp('Exp', LiveList.groupID)), 'stable');
+%                 
+%                 poolIDs = intersect(find(strcmp('V', LiveList.Availability)),...
+%                             find(strcmp('Exp', LiveList.groupID)), 'stable');
+% 
+% 
+%                 % randomly pick one of the matching experimental subjects
+%                 pickedSub = poolIDs(randperm(numel(poolIDs),1));
+% 
+%                 % change the entry before pasting it back into the LiveList. We
+%                 % need to flag this sub as a sham and set the yoked to unavailable
+%                 editSubEntry                = LiveList(pickedSub,:);
+%                 editSubEntry.groupID        = {'Sham'};
+%                 editSubEntry.Availability   = {'-'};  
+%                 editSubEntry.subID          = {num2str(subRow)};
+%                 editSubEntry.yokedOn        = LiveList.subID(pickedSub);
+% 
+%                 LiveList(subRow, :) = editSubEntry;
+%                 LiveList.Availability(pickedSub) = {'X'}; % flag yoked sub to unav 
+%             end
+%             
+%         else
             % if we do find a match in the waiting list extract and copy to
             % live list, mark unavailable on waiting list
             % pick first sub (list was already randomzied)
@@ -174,7 +174,7 @@ function [subSettings] = getSubSettings(subID, gender, dbListDir, simulate)
             LiveList.yokedOn(subRow) = {'None'};
 
             ExpWaitingList.Availability(pickedSub) = {'X'};
-        end
+%         end
        
     elseif isequal(tmpGroupID{1}, 'Sham')
         % if it's a sham subject we will go over the subjects we have had
@@ -196,11 +196,11 @@ function [subSettings] = getSubSettings(subID, gender, dbListDir, simulate)
 %                                    find(strcmp(LiveList.Sex, tmpSex))));
 
 
-        checkShamCount = numel(find(strcmp(LiveList.groupID, 'Sham')));
+%         checkShamCount = numel(find(strcmp(LiveList.groupID, 'Sham')));
 
         
 %         if (checkShamCount < (totNrSubs/2))
-        if (checkShamCount < totNrSubs/2)
+%         if (checkShamCount < totNrSubs/2)
             
             % check if we have matching experimental subjects available to
             % yoke on
@@ -276,28 +276,28 @@ function [subSettings] = getSubSettings(subID, gender, dbListDir, simulate)
         % if we have satisfied the nr of sham*gender we create a new
         % experimental subject
         % elseif (checkShamCount >= (totNrSubs/2))
-        elseif (checkShamCount >= totNrSubs/2)
-            rot     = {'left', 'right'};
-            side    = {'left', 'right'};
-
-            editSubEntry                = LiveList(subRow,:);
-            editSubEntry.subID          = {num2str(subRow)};
-            editSubEntry.Sex            = tmpSex;
-            editSubEntry.groupID        = {'Exp'};
-            editSubEntry.Availability   = {'V'};  
-            editSubEntry.yokedOn        = {'None'};
-            editSubEntry.BufferSub      = {'V'};
-
-            editSubEntry.TargetSide = rot(randi(numel(side)));
-            editSubEntry.WheelRot   = rot(randi(numel(rot)));
-
-            exChangeSham        = LiveList(subRow, :);
-            LiveList(subRow,:)  = editSubEntry;
-            LiveList(end+1,:)   = exChangeSham;            
+%         elseif (checkShamCount >= totNrSubs/2)
+%             rot     = {'left', 'right'};
+%             side    = {'left', 'right'};
+% 
+%             editSubEntry                = LiveList(subRow,:);
+%             editSubEntry.subID          = {num2str(subRow)};
+%             editSubEntry.Sex            = tmpSex;
+%             editSubEntry.groupID        = {'Exp'};
+%             editSubEntry.Availability   = {'V'};  
+%             editSubEntry.yokedOn        = {'None'};
+%             editSubEntry.BufferSub      = {'V'};
+% 
+%             editSubEntry.TargetSide = rot(randi(numel(side)));
+%             editSubEntry.WheelRot   = rot(randi(numel(rot)));
+% 
+%             exChangeSham        = LiveList(subRow, :);
+%             LiveList(subRow,:)  = editSubEntry;
+%             LiveList(end+1,:)   = exChangeSham;            
 
 %             fprintf('switch!\n')
 
-        end
+%         end
                         
     
     end
