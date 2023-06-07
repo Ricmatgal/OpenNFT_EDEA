@@ -992,11 +992,13 @@ class OpenNFT(QWidget):
 
         if self.displayData:
             if config.USE_SHAM:
-                self.displayData['dispValue'] = self.shamData[self.iteration - self.P['nrSkipVol'] - 1]
+                # self.displayData['dispValue'] = self.shamData[self.iteration - self.P['nrSkipVol'] - 1]
+                self.displayData['dispValue'] = 1
 
             # if we are in double blind mode and the sham data are available (Yok subj)
             if config.USE_BBLIND and self.shamData:
-                self.displayData['dispValue'] = self.shamData[self.iteration - self.P['nrSkipVol'] - 1]
+                # self.displayData['dispValue'] = self.shamData[self.iteration - self.P['nrSkipVol'] - 1]
+                self.displayData['dispValue'] = 1
 
             if config.USE_UDP_FEEDBACK:
                 logger.info('Sending by UDP - dispValue = {}', self.displayData['dispValue'])
@@ -1575,7 +1577,8 @@ class OpenNFT(QWidget):
                 pathRoot = self.P['ProjectFolder'] + os.path.sep
                 pathMainLoop =  str(shamSub) + os.path.sep + 'Session_' + str(sessNr) + os.path.sep + 'NF_DATA_' + str(runNr) + os.path.sep + str(shamSub) + '_' + str(runNr) + '_mainLoopData.mat'
 
-                print(pathMainLoop)
+                # for debug purposes
+                # print(pathMainLoop)
 
                 NFBdata = loadmat(os.path.join(pathRoot,pathMainLoop))['dispValues']
                 NFBdataRaw = loadmat(os.path.join(pathRoot, pathMainLoop))['rawDispValues']
