@@ -55,7 +55,7 @@ USE_FAST_OFFLINE_LOOP = True
 USE_MATLAB_MODEL_HELPER = False
 
 # use PTB helper and include PTB option in parameters
-USE_PTB_HELPER = True
+USE_PTB_HELPER = False
 
 # use only when FFileDialog.by crashes when opening the dialog windows
 DONOT_USE_QFILE_NATIVE_DIALOG = False
@@ -131,13 +131,13 @@ USE_SLEEP_IN_STOP = False
 HIDE_TEST_BTN = True
 
 # Flag for new Siemens XA30 DICOM format
-DICOM_SIEMENS_XA30 = False
+DICOM_SIEMENS_XA30 = True
 
 # rtQA may cause linear performance loss on the big data
 # due to saving process of iGLM quality parameters
 USE_RTQA = True
-USE_IGLM = True
-USE_ROI = True
+USE_IGLM = False
+USE_ROI = False
 FIRST_SNR_VOLUME = 1
 
 # zero padding settings
