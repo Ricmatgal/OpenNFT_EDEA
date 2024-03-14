@@ -1359,6 +1359,15 @@ class OpenNFT(QWidget):
             # -self.chooseSetFile(self.leSetFile.text())
 
             self.actualize()
+
+            if self.P['NFRunNr'] == 2:
+                self.P['NrOfVolumes'] = 574
+
+            elif self.P['NFRunNr'] == 3:
+                self.P['NrOfVolumes'] = 580
+
+            logger.info(f"Nr of volumes set to {self.P['NrOfVolumes']}")
+
             self.isOffline = self.cbOfflineMode.isChecked()
 
             memMapFile = self.getFreeMemmapFilename()
@@ -2323,7 +2332,7 @@ class OpenNFT(QWidget):
             self.sbTargDIAM.setValue(float(self.settings.value('TargDIAM', 0.0)))
             self.leWeightsFile.setText(str(self.settings.value('WeightsFileName', '')))
 
-            self.actualize
+            self.actualize()
         else:
             self.leWatchFolder3.setText(self.settings.value('WatchFolder', ''))
             if config.SELECT_ROIS:
@@ -2484,6 +2493,7 @@ class OpenNFT(QWidget):
         self.P['NFRunNr'] = self.sbNFRunNr.value()
 
         self.P['NrOfVolumes'] = self.sbVolumesNr.value()
+
         self.P['NrOfSlices'] = self.sbSlicesNr.value()
         self.P['TR'] = self.sbTR.value()
         self.P['nrSkipVol'] = self.sbSkipVol.value()
