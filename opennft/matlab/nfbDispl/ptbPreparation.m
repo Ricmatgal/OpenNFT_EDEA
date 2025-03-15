@@ -230,7 +230,7 @@ if strcmp(protName, 'ContTask')
     P.dim       = 100; % Texture dimensions
     P.yPos      = P.Screen.yCenter;
     % Right FOV only
-    P.xPos      = linspace(w * 0.6, w * 0.9, P.nrFigs);
+    P.xPos      = linspace(w * 0.5, w * 0.9, P.nrFigs);
 
     P.K_rot = 0;
     P.k_eq = 0;
@@ -349,12 +349,16 @@ if strcmp(protName, 'ContTask')
     
         P.nrDim = P.dim * 2 + 1;
         P.baseRectDst = [0, 0, P.nrDim, P.nrDim];
-        P.dstRects = nan(4, 2);
+        P.dstRects = nan(4, 3);
+
+        % display(P.xPos)
     
         for ii = [1,3] % left and right side of the cross
             P.theRect           = [0 0 P.imageWidths P.imageHeights]; % dimension of rectangle where to display image
             P.dstRects(:, ii)   = CenterRectOnPointd(P.theRect, P.xPos(ii), P.yPos);
         end
+
+        % display(P.dstRects)
     
         % here will per probably needed to adjust the P.dstRects formula so
         % that it fits Soraya script for stimuli delivery

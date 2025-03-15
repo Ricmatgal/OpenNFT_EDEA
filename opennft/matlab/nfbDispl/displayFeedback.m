@@ -181,9 +181,9 @@ switch feedbackType
                 Screen('TextSize',P.Screen.wPtr,P.textSizeBAS);
 
                 Screen('DrawTextures', P.Screen.wPtr, P.wheelTex, [],...
-                    P.dstRects(:, 1:2), P.rotation_angle_BAS(P.K_rot),[],[]); % need to adjust the rotation angle update
+                    P.dstRects(:, [1,3]), P.rotation_angle_BAS(P.K_rot),[],[]); % need to adjust the rotation angle update
 
-                DrawFormattedText(P.Screen.wPtr, P.strings_operation{P.k_eq}, P.Screen.xCenter,'center', P.Screen.white);
+                DrawFormattedText(P.Screen.wPtr, P.strings_operation{P.k_eq}, P.Screen.xCenter - 100,'center', P.Screen.white);
 
                 Screen('Flip',P.Screen.wPtr);
 
@@ -393,7 +393,7 @@ switch feedbackType
                             end
 
                             Screen('DrawTextures', P.Screen.wPtr, P.wheelTex, [],...
-                                P.dstRects(:, 1:2), P.rotAng, [], []);
+                                P.dstRects(:, [1,3]), P.rotAng, [], []);
                             % fixation cross while regulation
                             Screen('DrawLines', P.Screen.wPtr, P.Screen.allCoords,...
                                 P.Screen.lineWidthPix, fixCol, [P.Screen.xCenter P.Screen.yCenter], 2); % last arguments is the smoothing
@@ -408,7 +408,7 @@ switch feedbackType
 
                         elseif P.TRANSF == 1
                             Screen('DrawTextures', P.Screen.wPtr, P.wheelTex, [],...
-                                P.dstRects(:, 1:2), 0, [], []);
+                                P.dstRects(:, [1,3]), 0, [], []);
                             Screen('DrawLines', P.Screen.wPtr, P.Screen.allCoords,...
                                 P.Screen.lineWidthPix, P.Screen.white, [P.Screen.xCenter P.Screen.yCenter], 2);
                         end
@@ -481,17 +481,17 @@ switch feedbackType
 
                     % Total Score center message
                     Screen('TextSize',P.Screen.wPtr,50);
-                    DrawFormattedText(P.Screen.wPtr, 'Total Score: ',P.Screen.xCenter, 'center', P.Screen.white);
+                    DrawFormattedText(P.Screen.wPtr, 'Total Score: ',P.Screen.xCenter - 100, 'center', P.Screen.white);
                     % if regular run:
                     if P.TRANSF == 0
                         % feedback value
                         Screen('TextSize',P.Screen.wPtr,P.textSizeSUM);
                         DrawFormattedText(P.Screen.wPtr, mat2str(dispValue), ...
-                            P.Screen.xCenter,  P.Screen.h * 0.65, P.Screen.white);
+                            P.Screen.xCenter - 100,  P.Screen.h * 0.65, P.Screen.white);
                         % if transfer run:
                     elseif P.TRANSF == 1
                         DrawFormattedText(P.Screen.wPtr, 'XXX',...
-                            P.Screen.xCenter, P.Screen.h * 0.65, P.Screen.white);
+                            P.Screen.xCenter - 100, P.Screen.h * 0.65, P.Screen.white);
                     end
                     % record onset event
                     if size(P.Onsets.SumFB_fix,2) < P.Task.trialCounter
