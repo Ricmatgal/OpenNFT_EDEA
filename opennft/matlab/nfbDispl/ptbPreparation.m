@@ -58,7 +58,7 @@ fFullScreen = P.DisplayFeedbackFullscreen;
 if ~fFullScreen
     % part of the screen, e.g. for test mode
     P.Screen.wPtr = Screen('OpenWindow', screenId, [0 0 0], ...
-        [40 40 720 720]);
+        [0 0 1480 720]);
 else
     % full screen
     P.Screen.wPtr = Screen('OpenWindow', screenId, [0 0 0]);
@@ -94,7 +94,7 @@ P.eventRecords = [0, 0, 0, 0];
 if strcmp(protName, 'Cont')
     % fixation
     P.Screen.fix = [w/2-w/150, h/2-w/150, w/2+w/150, h/2+w/150];
-    Screen('FillOval', P.Screen.wPtr, [255 255 255], P.Screen.fix);
+    Screen('FillOval', P.Screen.wPtr, [0 0 0], P.Screen.fix);
     P.Screen.vbl=Screen('Flip', P.Screen.wPtr,P.Screen.vbl+P.Screen.ifi/2);
     Tex = struct;
 end
@@ -180,7 +180,7 @@ if strcmp(protName, 'ContTask')
 
     % show initial fixation dot
     P.Screen.fix = [w/2-w/150, h/2-w/150, w/2+w/150, h/2+w/150];
-    Screen('FillOval', P.Screen.wPtr, [255 255 255], P.Screen.fix);
+    % Screen('FillOval', P.Screen.wPtr, [255 255 255], P.Screen.fix);
     P.Screen.vbl=Screen('Flip', P.Screen.wPtr,P.Screen.vbl+P.Screen.ifi/2);
 
     
@@ -226,10 +226,11 @@ if strcmp(protName, 'ContTask')
         P.rotation_angle_BAS = [P.rotation_angle_BAS,repelem(pick,2*angleSkipVolumes)];
     end
     
-    P.nrFigs    = 2; % number of textures on screen
+    P.nrFigs    = 3; % number of textures + cross on screen
     P.dim       = 100; % Texture dimensions
     P.yPos      = P.Screen.yCenter;
-    P.xPos      = linspace(w * 0.15, w * 0.85, P.nrFigs);
+    % Right FOV only
+    P.xPos      = linspace(w * 0.6, w * 0.9, P.nrFigs);
 
     P.K_rot = 0;
     P.k_eq = 0;
@@ -350,7 +351,7 @@ if strcmp(protName, 'ContTask')
         P.baseRectDst = [0, 0, P.nrDim, P.nrDim];
         P.dstRects = nan(4, 2);
     
-        for ii = 1:2
+        for ii = [1,3] % left and right side of the cross
             P.theRect           = [0 0 P.imageWidths P.imageHeights]; % dimension of rectangle where to display image
             P.dstRects(:, ii)   = CenterRectOnPointd(P.theRect, P.xPos(ii), P.yPos);
         end
@@ -361,8 +362,8 @@ if strcmp(protName, 'ContTask')
         [solution_in_cm_mirror,solution_in_cm_stimuliscreen,solution_in_pixel_stimuliscreen] = compute_distance_readable_from_screen_center_overt_fmri(50,60, 6.45, 3);
         P.distanceStimuli = solution_in_pixel_stimuliscreen;
     
-        P.dstRects(:,1) = CenterRectOnPointd(P.theRect, P.Screen.xCenter -  P.distanceStimuli , P.yPos);
-        P.dstRects(:,2) = CenterRectOnPointd(P.theRect, P.Screen.xCenter +  P.distanceStimuli , P.yPos);
+        %P.dstRects(:,1) = CenterRectOnPointd(P.theRect, P.Screen.xCenter -  P.distanceStimuli , P.yPos);
+        %P.dstRects(:,2) = CenterRectOnPointd(P.theRect, P.Screen.xCenter +  P.distanceStimuli , P.yPos);
         P.dstEqs =  P.distanceStimuli/2;
     
         P.NFBC.it_curr = [0];

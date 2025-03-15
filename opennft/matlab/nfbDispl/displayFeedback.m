@@ -79,7 +79,8 @@ if P.NFRunNr == 7
     P.TRANSF = 1;
 end
 
-
+% in neglect the fixation cross is shifted to the right FOV
+P.Screen.xCenter = P.xPos(2);
 
 
 switch feedbackType
@@ -182,7 +183,7 @@ switch feedbackType
                 Screen('DrawTextures', P.Screen.wPtr, P.wheelTex, [],...
                     P.dstRects(:, 1:2), P.rotation_angle_BAS(P.K_rot),[],[]); % need to adjust the rotation angle update
 
-                DrawFormattedText(P.Screen.wPtr, P.strings_operation{P.k_eq}, 'center','center', P.Screen.white);
+                DrawFormattedText(P.Screen.wPtr, P.strings_operation{P.k_eq}, P.Screen.xCenter,'center', P.Screen.white);
 
                 Screen('Flip',P.Screen.wPtr);
 
@@ -480,17 +481,17 @@ switch feedbackType
 
                     % Total Score center message
                     Screen('TextSize',P.Screen.wPtr,50);
-                    DrawFormattedText(P.Screen.wPtr, 'Total Score: ','center', 'center', P.Screen.white);
+                    DrawFormattedText(P.Screen.wPtr, 'Total Score: ',P.Screen.xCenter, 'center', P.Screen.white);
                     % if regular run:
                     if P.TRANSF == 0
                         % feedback value
                         Screen('TextSize',P.Screen.wPtr,P.textSizeSUM);
                         DrawFormattedText(P.Screen.wPtr, mat2str(dispValue), ...
-                            'center',  P.Screen.h * 0.65, P.Screen.white);
+                            P.Screen.xCenter,  P.Screen.h * 0.65, P.Screen.white);
                         % if transfer run:
                     elseif P.TRANSF == 1
                         DrawFormattedText(P.Screen.wPtr, 'XXX',...
-                            'center', P.Screen.h * 0.65, P.Screen.white);
+                            P.Screen.xCenter, P.Screen.h * 0.65, P.Screen.white);
                     end
                     % record onset event
                     if size(P.Onsets.SumFB_fix,2) < P.Task.trialCounter
